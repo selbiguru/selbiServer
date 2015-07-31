@@ -19,7 +19,6 @@
     "bluebird": "^2.9.13",
     "cloudinary": "^1.2.1",
     "cloudinary-url": "0.0.2",
-    "ejs": "^2.3.3",
     "include-all": "0.1.6",
     "jsonwebtoken": "3.2.2",
     "lodash": "3.2.0",
