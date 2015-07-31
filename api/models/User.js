@@ -35,7 +35,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       type: 'boolean',
       defaultsTo: false
     },
-
+    facebookEmail: {
+      type: 'email',
+      unique: true
+    },
     // Below is all specification for relations to another models
 
     // Passport configurations
@@ -55,6 +58,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     listings: {
       collection: 'Listing',
       via: 'user'
+    },
+    userAddress: {
+      model: 'address'
     }
   }
 });
