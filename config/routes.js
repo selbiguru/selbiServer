@@ -27,6 +27,9 @@ module.exports.routes = {
     res.send(200);
   },
 
+  // Health Route
+  'GET /': 'HelpController.showStatus',
+
   // Authentication routes
   '/logout': 'AuthController.logout',
   'POST /login': 'AuthController.callback',

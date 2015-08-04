@@ -21,6 +21,11 @@ module.exports.policies = {
   // Default policy for all controllers and actions
   '*': ['authenticated'],
 
+  // Help Controller
+  HelpController: {
+    '*': []
+  },
+
   // Author controller
   AuthController: {
     '*':              ['passport'],
