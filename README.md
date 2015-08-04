@@ -1,5 +1,5 @@
 # Heroku Builds
-[![Heroku](http://heroku-badge.herokuapp.com/?app=selbi-server&style=flat)]
+![Heroku](http://heroku-badge.herokuapp.com/?app=selbi-server&style=flat)
 
 # Backend side for 'xx' boilerplate
 
