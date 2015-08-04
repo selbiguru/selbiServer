@@ -11,8 +11,8 @@ var _ = require('lodash');
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	
 	getListingSignature: function getSignature(request, response){
-	 	var listingId = request.param('listingId');
-	  return response.json(200, sails.services['image'].getListingSignature(listingId, request.token));
+		var referenceId = request.param('referenceId');
+		return response.json(200, sails.services['image'].getListingSignature(referenceId, request.token));
 	}
 });
 

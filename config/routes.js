@@ -36,7 +36,7 @@ module.exports.routes = {
   'POST /auth/local/:action': 'AuthController.callback',
 
   // Image routes
-  'GET /image/sign/:listingId': 'ImageController.getListingSignature',
+  'GET /image/sign/:referenceId': 'ImageController.getListingSignature',
 
   //Listing routes
   'GET /userlistings/:userId': 'ListingController.getUserListings'

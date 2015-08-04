@@ -31,6 +31,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       type: 'string',
       required: true
     },
+    profileImage: {
+      type: 'string',
+      required: false
+    }, 
     admin: {
       type: 'boolean',
       defaultsTo: false
