@@ -25,7 +25,6 @@ var AuthController = {
    */
   logout: function logout(request, response) {
     request.logout();
-    sails.services['image'].getSignature();
     response.json(200, true);
   },
 
