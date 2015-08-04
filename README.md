@@ -1,3 +1,6 @@
+# Heroku Builds
+[![Heroku](http://heroku-badge.herokuapp.com/?app=selbi-server&style=flat)]
+
 # Backend side for 'xx' boilerplate
 
 Backend is a [Sails](http://sailsjs.org) application without frontend. Basically this only serves an API and
