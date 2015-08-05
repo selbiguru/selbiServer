@@ -19,6 +19,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       type: 'string',
       required: true
     },
+    /* bldg/apt/block*/
+    streetAddress2: {
+      type: 'string',
+      required: false
+    },
     city: {
       type: 'string',
       required: true
