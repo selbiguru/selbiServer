@@ -42,5 +42,8 @@ module.exports.routes = {
   'GET /image/sign/:referenceId': 'ImageController.getListingSignature',
 
   //Listing routes
-  'GET /userlistings/:userId': 'ListingController.getUserListings'
+  'GET /userlistings/:userId': 'ListingController.getUserListings',
+
+  //Get User
+  'GET /getUserData/:userId': 'UserController.getUserData'
 };
