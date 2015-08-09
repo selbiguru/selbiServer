@@ -20,7 +20,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       required: true
     },
     /* bldg/apt/block*/
-    streetAddress2: {
+    bldg: {
       type: 'string',
       required: false
     },

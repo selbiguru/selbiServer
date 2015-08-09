@@ -30,13 +30,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 			});
 		});
 	}, 
-	getUserData: function getUserData(request, response){
-    	sails.models['user'].find({id: request.params['userid']}).populate('userAddress').exec(function(err, results){		
-    		if(err) {
-    			console.log('error: ' + err);
-    			return response.json(500, err);
-    		}
-    		return response.json(results);
+	getUserData: function(req, res){
+    	sails.models['user'].find({ where: { id: req.params['userId'] } }).populate('userAddress').exec(function(err, results){
+    		if(err) 
+    			return res.json(500, err);
+    		return res.json(results);
     	});
-	}
+    }
 });
