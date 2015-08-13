@@ -45,5 +45,6 @@ module.exports.routes = {
   'GET /userlistings/:userId': 'ListingController.getUserListings',
 
   //Get User
-  'GET /getUserData/:userId': 'UserController.getUserData'
+  'GET /UserData/:userId': 'UserController.getUserData',
+  'PUT /UserData/:userId': 'UserController.updateUserData'
 };
