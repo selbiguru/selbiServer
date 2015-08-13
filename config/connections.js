@@ -78,7 +78,7 @@ module.exports.connections = {
 
   someCouchDBServer: {
     adapter: 'sails-couchdb',
-    host: 'ec2-52-7-210-171.compute-1.amazonaws.com',
+    host: 'localhost',
     port: 5984,
     username: '',
     password: '' 
