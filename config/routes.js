@@ -49,5 +49,5 @@ module.exports.routes = {
   'PUT /userData/:userId': 'UserController.updateUserData',
 
   //braintree payments routes
-  'GET /payments/getClientToken': 'BraintreeController.getClientToken'
+  'GET /payments/getClientToken': 'PaymentsController.getClientToken'
 };

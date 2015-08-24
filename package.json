@@ -38,7 +38,8 @@
     "sails-hook-apianalytics": "git://github.com/mikermcneil/sails-hook-apianalytics",
     "sails-mysql": "0.10.11",
     "ua-parser": "0.3.5",
-    "validator": "3.19.0"
+    "validator": "3.19.0",
+    "braintree": "1.28.0"
   },
   "devDependencies": {
     "supertest": "0.13.0",
