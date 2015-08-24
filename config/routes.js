@@ -45,6 +45,9 @@ module.exports.routes = {
   'GET /userlistings/:userId': 'ListingController.getUserListings',
 
   //Get User
-  'GET /UserData/:userId': 'UserController.getUserData',
-  'PUT /UserData/:userId': 'UserController.updateUserData'
+  'GET /userData/:userId': 'UserController.getUserData',
+  'PUT /userData/:userId': 'UserController.updateUserData',
+
+  //braintree payments routes
+  'GET /payments/getClientToken': 'BraintreeController.getClientToken'
 };
