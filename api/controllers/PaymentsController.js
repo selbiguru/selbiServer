@@ -12,7 +12,6 @@ var braintree = require('braintree');
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     getClientToken: function(req, res){
-
     getgateway().clientToken.generate({}, function (err, response) {
             if(err)
                 return res.json(500, err);
