@@ -49,14 +49,6 @@ module.exports.routes = {
   'PUT /userData/:userId': 'UserController.updateUserData',
 
   //braintree payments routes
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-  'GET /payments/getClientToken': 'BraintreeController.getClientToken'
-=======
   'GET /payments/getClientToken': 'PaymentsController.getClientToken',
   'POST /payments/createCustomerAndPaymentMethod': 'PaymentsController.createCustomerAndPaymentMethod'
->>>>>>> Stashed changes
-=======
-  'GET /payments/getClientToken': 'PaymentsController.getClientToken'
->>>>>>> c14d884c0eb1a986c37d708e71d9cd52c472e8ba
 };
