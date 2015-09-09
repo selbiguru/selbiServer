@@ -50,5 +50,6 @@ module.exports.routes = {
 
   //braintree payments routes
   'GET /payments/getClientToken': 'PaymentsController.getClientToken',
-  'POST /payments/createCustomerAndPaymentMethod': 'PaymentsController.createCustomerAndPaymentMethod'
+  'POST /payments/createCustomerAndPaymentMethod': 'PaymentsController.createCustomerAndPaymentMethod', 
+  'GET /payments/findCustomer/:userId': 'PaymentsController.findCustomer',
 };
