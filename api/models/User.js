@@ -65,6 +65,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     },
     userAddress: {
       model: 'address'
+    },
+    userPaymentMethod: {
+      model: 'payments'
     }
   }
 });
