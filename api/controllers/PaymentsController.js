@@ -54,7 +54,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                                 if(err)
                                     return res.json(500, err);
 
-                                return res.json(updateResult);
+                                return res.json(customerCreateResult.customer.paymentMethods[0]);
                             });
 
                     });//create brackets
@@ -80,12 +80,13 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                             }
                             console.log('1 userid :' + pm.id);
                             console.log('token :' + PaymentResult.paymentMethod.token);
-                            //save the paymenttoken user can have multiple payment methods 
+                            
+                            //save the paymenttoken user can have multiple payment methods
                             sails.models['user'].update({id: req.body['userId']}, pm).exec(function(err, updateResult){
                                 if(err)
                                     return res.json(500, err);
 
-                                return res.json(updateResult);
+                                return res.json(PaymentResult.paymentMethod);
                             });
                     }); //create payment method
                 } //else
@@ -99,11 +100,29 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 return res.json(500, err);
             return res.json(customer);
         });
-    }
+    },
+    deletePaymentMethod: function (req, res){
+        sails.models['user'].find({ where: { id: req.params['userId'] } }).populate('userPaymentMethod').exec(function(err, results){
+            if(err) 
+                return res.json(500, err);
+
+            getgateway().paymentMethod.delete(results[0].userPaymentMethod.paymentMethodToken, function (err) {
+                if(err) 
+                return res.json(500, err);
+                //destroy object from db
+                sails.models['payments'].destroy({id: results[0].userPaymentMethod.id}).exec(function deleteCB(err, delResult){
+                    if(err)
+                        console.log('Error deleting record from our db');
+
+                    return res.json(delResult);
+                });
+            });
+        });
+    }    
 });
 
 function getgateway(){
-    //All calls to braintree will need this gateway to connect
+        //All calls to braintree will need this gateway to connect
         return braintree.connect({
             environment: braintree.Environment.Sandbox,
             merchantId: sails.config.braintree.merchantId,
@@ -112,4 +131,6 @@ function getgateway(){
 
     });
 }
-  
+
+
+
