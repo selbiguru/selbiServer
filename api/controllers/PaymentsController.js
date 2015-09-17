@@ -102,15 +102,15 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         });
     },
     deletePaymentMethod: function (req, res){
-        sails.models['user'].find({ where: { id: req.params['userId'] } }).populate('userPaymentMethod').exec(function(err, results){
+        sails.models['user'].findOne({ where: { id: req.params['userId'] } }).populate('userPaymentMethod').exec(function(err, results){
             if(err) 
                 return res.json(500, err);
 
-            getgateway().paymentMethod.delete(results[0].userPaymentMethod.paymentMethodToken, function (err) {
+            getgateway().paymentMethod.delete(results.userPaymentMethod.paymentMethodToken, function (err) {
                 if(err) 
                 return res.json(500, err);
                 //destroy object from db
-                sails.models['payments'].destroy({id: results[0].userPaymentMethod.id}).exec(function deleteCB(err, delResult){
+                sails.models['payments'].destroy({id: results.userPaymentMethod.id}).exec(function deleteCB(err, delResult){
                     if(err)
                         console.log('Error deleting record from our db');
 
