@@ -49,7 +49,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     		if(err)
     			return res.json(500, err);
     			//do a find and populate again to populate address. 
-	    		sails.models['user'].findOne({ where: { id: req.params['userId'] } }).populate('userAddress').exec(function(err, results){
+	    	sails.models['user'].findOne({ where: { id: req.params['userId'] } }).populate('userAddress').exec(function(err, results){
 	    		if(err) 
 	    			return res.json(500, err);
 	    		return res.json(results);
