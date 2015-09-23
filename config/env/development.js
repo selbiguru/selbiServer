@@ -29,6 +29,7 @@ module.exports = {
     braintree: {
         "publicKey" : "nktzr995vy2sxwrx",
         "privateKey" : "a73c6cb5a55678883fe611403d9c4e40",
-        "merchantId" : "zw67j4nst8r33wms"
+        "merchantId" : "zw67j4nst8r33wms",
+        "masterMerchantAccountId": "selbi"
     }
 };

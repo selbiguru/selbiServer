@@ -12,87 +12,72 @@ var braintree = require('braintree');
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     getClientToken: function(req, res){
-    getgateway().clientToken.generate({}, function (err, response) {
+        getgateway().clientToken.generate({}, function (err, response) {
             if(err)
                 return res.json(500, err);
             return res.json(response.clientToken);
         });
     },
     createCustomerAndPaymentMethod: function(req, res){
-
-        console.log(req.body['userId'] + ', ' + req.body['firstName'] + ', ' + req.body['lastName'] + ', pn' + req.body['paymentMethodNonce']);
-        console.log('fahd is here .......... ');
-        
         getgateway().customer.find(req.body['userId'], function(err, customerResult) {
             if(err){
-                //TODO check out for customer not found exception
-                console.log('customer was NOT found');
-                //create new cutomer and payment method
-                    getgateway().customer.create({
+                    //customer not found so create new customer and payment method
+                getgateway().customer.create({
                         id: req.body['userId'],
                         firstName: req.body['firstName'],
                         lastName: req.body['lastName'],
                         paymentMethodNonce: req.body['paymentMethodNonce']
-                    }, function (err, customerCreateResult) {
-                        if(err)
-                            return res.json(500, err);
-                            
-                        var pm = {
-                                id: req.body['userId'],
-                                userPaymentMethod:{
-                                    merchantAccountId: customerCreateResult.customer.merchantId,
-                                    paymentMethodToken: customerCreateResult.customer.paymentMethods[0].token,
-                                    lastFour: customerCreateResult.customer.paymentMethods[0].last4,
-                                    cardType: customerCreateResult.customer.paymentMethods[0].cardType,
-                                    expirationDate: customerCreateResult.customer.paymentMethods[0].expirationDate
-                                }   
+                }, function (err, customerCreateResult) {
+                    if(err)
+                        return res.json(500, err);
+
+                    var pm = {
+                            id: req.body['userId'],
+                            userPaymentMethod:{
+                                paymentMethodToken: customerCreateResult.customer.paymentMethods[0].token,
+                                lastFour: customerCreateResult.customer.paymentMethods[0].last4,
+                                cardType: customerCreateResult.customer.paymentMethods[0].cardType,
+                                expirationDate: customerCreateResult.customer.paymentMethods[0].expirationDate
                             }
-                            console.log('1 userid :' + pm.id);
-                            console.log('token :' + customerCreateResult.customer.paymentMethods[0].token);
-                            //save the paymenttoken user can have multiple payment methods 
-                            sails.models['user'].update({id: req.body['userId']}, pm).exec(function(err, updateResult){
-                                if(err)
-                                    return res.json(500, err);
+                        }
+                        //save the payment token user can have multiple payment methods
+                        sails.models['user'].update({id: req.body['userId']}, pm).exec(function(err, updateResult){
+                            if(err)
+                                return res.json(500, err);
 
-                                return res.json(customerCreateResult.customer.paymentMethods[0]);
-                            });
-
+                            return res.json(200, { success: true })
+                        });
                     });//create brackets
                 }
             else{
                     console.log('customer was found');
-                    getgateway().paymentMethod.create({
-                        customerId: req.body['userId'],
-                        paymentMethodNonce: req.body['paymentMethodNonce']
-                    }, function (err, PaymentResult) { 
-                        if(err)
-                            res.json(500, err);
+                getgateway().paymentMethod.create({
+                    customerId: req.body['userId'],
+                    paymentMethodNonce: req.body['paymentMethodNonce']
+                }, function (err, PaymentResult) {
+                    if(err)
+                        res.json(500, err);
 
-                            var pm = {
-                                id: req.body['userId'],
-                                userPaymentMethod:{
-                                    merchantAccountId: customerResult.merchantId,
-                                    paymentMethodToken: PaymentResult.paymentMethod.token,
-                                    lastFour: PaymentResult.paymentMethod.last4,
-                                    cardType: PaymentResult.paymentMethod.cardType,
-                                    expirationDate: PaymentResult.paymentMethod.expirationDate
-                                }   
+                        var pm = {
+                            id: req.body['userId'],
+                            userPaymentMethod:{
+                                paymentMethodToken: PaymentResult.paymentMethod.token,
+                                lastFour: PaymentResult.paymentMethod.last4,
+                                cardType: PaymentResult.paymentMethod.cardType,
+                                expirationDate: PaymentResult.paymentMethod.expirationDate
                             }
-                            console.log('1 userid :' + pm.id);
-                            console.log('token :' + PaymentResult.paymentMethod.token);
-                            
-                            //save the paymenttoken user can have multiple payment methods
-                            sails.models['user'].update({id: req.body['userId']}, pm).exec(function(err, updateResult){
-                                if(err)
-                                    return res.json(500, err);
+                        }
 
-                                return res.json(PaymentResult.paymentMethod);
-                            });
-                    }); //create payment method
-                } //else
+                        //save the paymenttoken user can have multiple payment methods
+                        sails.models['user'].update({id: req.body['userId']}, pm).exec(function(err, updateResult){
+                            if(err)
+                                return res.json(500, err);
 
+                            return res.json(200, { success: true })
+                        });
+                }); //create payment method
+            } //else
         }); // customer find end brackets
-
     },
     findCustomer: function (req, res){
         getgateway().customer.find(req.params['userId'], function(err, customer) {
@@ -101,14 +86,27 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             return res.json(customer);
         });
     },
+    getPayments: function (req, res){
+        sails.models['user'].findOne({ where: { id: req.params['userId'] } }).exec(function(err, results){
+            if(err)
+                return res.json(500, err);
+
+            sails.models['payments'].findOne({ where: { id: results.userPaymentMethod } }).exec(function(err, result){
+                    if(err)
+                        return res.json(500, err);
+
+                    return res.json(result);
+            });
+        });
+    },
     deletePaymentMethod: function (req, res){
         sails.models['user'].findOne({ where: { id: req.params['userId'] } }).populate('userPaymentMethod').exec(function(err, results){
-            if(err) 
+            if(err)
                 return res.json(500, err);
 
             getgateway().paymentMethod.delete(results.userPaymentMethod.paymentMethodToken, function (err) {
-                if(err) 
-                return res.json(500, err);
+                if(err)
+                    return res.json(500, err);
                 //destroy object from db
                 sails.models['payments'].destroy({id: results.userPaymentMethod.id}).exec(function deleteCB(err, delResult){
                     if(err)
@@ -118,7 +116,52 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 });
             });
         });
-    }    
+    },
+    createSubMerchantAccount: function (req, res){
+        var merchantAccountParams = {
+            individual: {
+                firstName: req.body['firstName'],
+                lastName: req.body['lastName'],
+                email: req.body['email'],
+                phone: req.body['phone'],
+                dateOfBirth: req.body['dateOfBirth'],
+                address: {
+                    streetAddress: req.body['address'].streetAddress,
+                    locality: req.body['address'].locality,
+                    region: req.body['address'].region,
+                    postalCode: req.body['address'].postalCode
+                }
+            },
+            //business object is optional
+            /*business: {
+                legalName: req.body['firstName'],
+                dbaName: req.body['firstName'],
+                taxId: req.body['firstName'],
+                address: {
+                    streetAddress: req.body['firstName'],
+                    locality: req.body['firstName'],
+                    region: req.body['firstName'],
+                    postalCode: req.body['firstName']
+                }
+            },*/
+            funding: {
+                descriptor: "Selbi Sale",
+                destination: braintree.MerchantAccount.FundingDestination.Bank,
+                accountNumber: req.body['funding'].accountNumber,
+                routingNumber: req.body['funding'].routingNumber
+            },
+            tosAccepted: true,
+            masterMerchantAccountId: sails.config.braintree.masterMerchantAccountId,
+            id:  req.body['id']
+        };
+
+        getgateway().merchantAccount.create(merchantAccountParams, function (err, result) {
+            if(err)
+                return res.json(500, err);
+
+            return res.json(result);
+        });
+    }
 });
 
 function getgateway(){
