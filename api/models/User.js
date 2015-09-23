@@ -34,7 +34,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     profileImage: {
       type: 'string',
       required: false
-    }, 
+    },
     admin: {
       type: 'boolean',
       defaultsTo: false
@@ -42,6 +42,13 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     facebookEmail: {
       type: 'email',
       unique: true
+    },
+    dateOfBirth: {
+      type: 'string',
+    },
+    userAgreementAccepted: {
+      type: 'boolean',
+      defaultsTo: false
     },
     // Below is all specification for relations to another models
 
