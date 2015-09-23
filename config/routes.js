@@ -52,5 +52,7 @@ module.exports.routes = {
   'GET /payments/getClientToken': 'PaymentsController.getClientToken',
   'POST /payments/createCustomerAndPaymentMethod': 'PaymentsController.createCustomerAndPaymentMethod', 
   'GET /payments/findCustomer/:userId': 'PaymentsController.findCustomer',
-  'DELETE /payments/paymentMethod/:userId': 'PaymentsController.deletePaymentMethod'
+  'GET /payments/:userId': 'PaymentsController.getPayments',
+  'DELETE /payments/paymentMethod/:userId': 'PaymentsController.deletePaymentMethod',
+  'POST /payments/createSubMerchantAccount/:userId': 'PaymentsController.createSubMerchantAccount'
 };

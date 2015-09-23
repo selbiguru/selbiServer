@@ -15,11 +15,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       unique: true,
       primaryKey: true
     },
-    /* merchant account Id for bank account info saved on braintree */
-    merchantAccountId: {
-      type: 'string',
-      required: false
-    },
     paymentMethodToken: {
         type: 'string',
         required: false
@@ -29,6 +24,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       required: false
     },
     lastFour: {
+      type: 'string',
+      required: false
+    },
+    expirationDate: {
       type: 'string',
       required: false
     },
