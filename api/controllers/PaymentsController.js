@@ -120,16 +120,16 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     createSubMerchantAccount: function (req, res){
         var merchantAccountParams = {
             individual: {
-                firstName: req.body['firstName'],
-                lastName: req.body['lastName'],
-                email: req.body['email'],
-                phone: req.body['phone'],
-                dateOfBirth: req.body['dateOfBirth'],
+                firstName: req.body.['individual'].firstName,
+                lastName: req.body.['individual'].lastName,
+                email: req.body.['individual'].email,
+                phone: req.body.['individual'].phone,
+                dateOfBirth: req.body.['individual'].dateOfBirth,
                 address: {
-                    streetAddress: req.body['address'].streetAddress,
-                    locality: req.body['address'].locality,
-                    region: req.body['address'].region,
-                    postalCode: req.body['address'].postalCode
+                    streetAddress: req.body.['individual'].address.streetAddress,
+                    locality: req.body.['individual'].address.locality,
+                    region: req.body.['individual'].address.region,
+                    postalCode: req.body.['individual'].address.postalCode
                 }
             },
             //business object is optional
@@ -146,14 +146,20 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             },*/
             funding: {
                 descriptor: "Selbi Sale",
-                destination: braintree.MerchantAccount.FundingDestination.Bank,
-                accountNumber: req.body['funding'].accountNumber,
-                routingNumber: req.body['funding'].routingNumber
             },
             tosAccepted: true,
             masterMerchantAccountId: sails.config.braintree.masterMerchantAccountId,
             id:  req.body['id']
         };
+
+        if(req.body.['venmo']) {
+            merchantAccountParams.funding.destination = braintree.MerchantAccount.FundingDestination.Mobile;
+            merchantAccountParams.funding.mobilePhone = req.body['funding'].mobilePhone;
+        } else {
+            merchantAccountParams.funding.destination = braintree.MerchantAccount.FundingDestination.Bank;
+            merchantAccountParams.funding.accountNumber = req.body['funding'].accountNumber;
+            merchantAccountParams.funding.routingNumber = req.body['funding'].routingNumber;
+        }
 
         getgateway().merchantAccount.create(merchantAccountParams, function (err, result) {
             if(err)
