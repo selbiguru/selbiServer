@@ -120,16 +120,16 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     createSubMerchantAccount: function (req, res){
         var merchantAccountParams = {
             individual: {
-                firstName: req.body.['individual'].firstName,
-                lastName: req.body.['individual'].lastName,
-                email: req.body.['individual'].email,
-                phone: req.body.['individual'].phone,
-                dateOfBirth: req.body.['individual'].dateOfBirth,
+                firstName: req.body['individual'].firstName,
+                lastName: req.body['individual'].lastName,
+                email: req.body['individual'].email,
+                phone: req.body['individual'].phone,
+                dateOfBirth: req.body['individual'].dateOfBirth,
                 address: {
-                    streetAddress: req.body.['individual'].address.streetAddress,
-                    locality: req.body.['individual'].address.locality,
-                    region: req.body.['individual'].address.region,
-                    postalCode: req.body.['individual'].address.postalCode
+                    streetAddress: req.body['individual'].address.streetAddress,
+                    locality: req.body['individual'].address.locality,
+                    region: req.body['individual'].address.region,
+                    postalCode: req.body['individual'].address.postalCode
                 }
             },
             //business object is optional
@@ -152,7 +152,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             id:  req.body['id']
         };
 
-        if(req.body.['venmo']) {
+        if(req.body['venmo']) {
             merchantAccountParams.funding.destination = braintree.MerchantAccount.FundingDestination.Mobile;
             merchantAccountParams.funding.mobilePhone = req.body['funding'].mobilePhone;
         } else {
@@ -180,6 +180,3 @@ function getgateway(){
 
     });
 }
-
-
-
