@@ -45,6 +45,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     },
     dateOfBirth: {
       type: 'string',
+      defaultsTo: false
     },
     userAgreementAccepted: {
       type: 'boolean',
