@@ -31,5 +31,10 @@ module.exports = {
         "privateKey" : "a73c6cb5a55678883fe611403d9c4e40",
         "merchantId" : "zw67j4nst8r33wms",
         "masterMerchantAccountId": "selbi"
+    },
+    twilio: {
+        "accountSid" : "APf320d97246d52e42dc9f9a84b94cd228",
+        "authToken" : "5e7ca65f34e2d19100cb01cf9b2fd67d",
+        "twilioPhoneNumber": "+14155992671"
     }
 };
