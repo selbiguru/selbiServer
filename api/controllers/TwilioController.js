@@ -18,9 +18,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             body:'Hello from Selbi!  Please use the following code '+req.body['verifyPhone']+'.',
         }, function(error, message) {
             if (error) {
-                return res.json(error);
+                return res.json(500, error.message);
             } else {
-                return res.json(message);
+                return res.json(null, message);
             }
         });
     },
