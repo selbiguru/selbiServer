@@ -97,5 +97,8 @@ module.exports.policies = {
     'destroy':  ['authenticated', 'isAdmin'],
     'add':      ['authenticated', 'isAdmin'],
     'remove':   ['authenticated', 'isAdmin']
-  }
+  },
+   TwilioController: {
+    '*': ['authenticated']
+  },
 };

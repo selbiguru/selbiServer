@@ -13,17 +13,18 @@
     var twilio = require('twilio'),
         client = new twilio.RestClient(sails.config.twilio.accountSid, sails.config.twilio.authToken);
 
-
-    module.exports.sendSMSMessage = function(phoneNumber, SMSmessage ) {
+    module.exports.sendSMSMessage = function(phoneNumber, SMSmessage, cb) {
+        console.log("HERE I AM");
     	client.messages.create({
             to: phoneNumber,
             from: sails.config.twilio.twilioPhoneNumber,
             body: SMSmessage,
         }, function(error, message) {
+            console.log("!!!!!!!!!",error,"#####",message)
             if (error) {
-                return res.json(500, error.message);
+                cb(error, null);
             } else {
-                return res.json(null, message);
+                cb(null, message);
             }
         });
     }

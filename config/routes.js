@@ -54,7 +54,7 @@ module.exports.routes = {
   'GET /payments/findCustomer/:userId': 'PaymentsController.findCustomer',
   'GET /payments/:userId': 'PaymentsController.getPayments',
   'DELETE /payments/paymentMethod/:userId': 'PaymentsController.deletePaymentMethod',
-  'POST /payments/createSubMerchantAccount/:userId': 'PaymentsController.createSubMerchantAccount'
+  'POST /payments/createSubMerchantAccount/:userId': 'PaymentsController.createSubMerchantAccount',
 
   //Twilio routes
   'POST /twilio/sendSMSMessage': 'TwilioController.sendSMSMessage'

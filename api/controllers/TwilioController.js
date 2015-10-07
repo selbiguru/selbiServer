@@ -1,7 +1,6 @@
 'use strict';
 
 var _ = require('lodash');
-var SMSService = require('../services/SMSService');
 /**
  * TwilioController
  *
@@ -11,12 +10,15 @@ var SMSService = require('../services/SMSService');
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     sendSMSMessage: function(req, res){
-        var message: "Hello from Selbi!  Please use the following code ("+req.body['verifyPhone']+") to verify your phone."
-    	SMSService.sendSMSMessage(req.body['phoneNumber'], message, function(err, response){
+        console.log("@#$@%$#$%#$%#$%",req.body['phoneNumber'] );
+        var message = "Hello from Selbi!  Please use the following code ("+req.body['verifyPhone']+") to verify your phone."
+    	sails.services['smsservice'].sendSMSMessage(req.body['phoneNumber'], message, function(err, response){
+            console.log("FAHHHHHHHHHHD ", err);
+            console.log("JAAAAAAAM ", response);
             if(err){
-                return (500, err);
+                return res.send(err.status, err);
             } else {
-                return (null, response);
+                return res.send(response);
             }
         });
     },
