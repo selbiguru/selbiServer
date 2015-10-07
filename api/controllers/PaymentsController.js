@@ -19,7 +19,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         });
     },
     createCustomerAndPaymentMethod: function(req, res){
-        getgateway().customer.find(req.body['userId'], function(err, customerResult) {
+        getgateway().customer.find(req.body['userId'], function(err) {
             if(err){
                     //customer not found so create new customer and payment method
                 getgateway().customer.create({
@@ -68,8 +68,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                             }
                         }
 
-                        //save the paymenttoken user can have multiple payment methods
-                        sails.models['user'].update({id: req.body['userId']}, pm).exec(function(err, updateResult){
+                        //save the payment token user can have multiple payment methods
+                        sails.models['user'].update({id: req.body['userId']}, pm).exec(function(err){
                             if(err)
                                 return res.json(500, err);
 
@@ -91,11 +91,29 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             if(err)
                 return res.json(500, err);
 
-            sails.models['payments'].findOne({ where: { id: results.userPaymentMethod } }).exec(function(err, result){
-                    if(err)
+            sails.models['payments'].findOne({ where: { id: results.userPaymentMethod } }).exec(function(err, paymentsResult) {
+                if (err)
+                    return res.json(500, err);
+
+                sails.models['merchant'].findOne({where: {id: results.userMerchant}}).exec(function (err, merchantResult) {
+                    if (err)
                         return res.json(500, err);
 
+                    var result = {
+                        userId:  req.params['userId'] ,
+                        userPaymentMethod:{
+                            lastFour: paymentsResult.lastFour,
+                            cardType: paymentsResult.cardType,
+                            expirationDate: paymentsResult.expirationDate
+                        },
+                        userMerchant: {
+                            accountNumberLast4: merchantResult.accountNumberLast4,
+                            routingNumber: merchantResult.routingNumber
+                        }
+                    }
+
                     return res.json(result);
+                });
             });
         });
     },
@@ -118,6 +136,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         });
     },
     createSubMerchantAccount: function (req, res){
+        //create merchant object
         var merchantAccountParams = {
             individual: {
                 firstName: req.body['individual'].firstName,
@@ -134,18 +153,18 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             },
             //business object is optional
             /*business: {
-                legalName: req.body['firstName'],
-                dbaName: req.body['firstName'],
-                taxId: req.body['firstName'],
-                address: {
-                    streetAddress: req.body['firstName'],
-                    locality: req.body['firstName'],
-                    region: req.body['firstName'],
-                    postalCode: req.body['firstName']
-                }
-            },*/
+             legalName: req.body['firstName'],
+             dbaName: req.body['firstName'],
+             taxId: req.body['firstName'],
+             address: {
+             streetAddress: req.body['firstName'],
+             locality: req.body['firstName'],
+             region: req.body['firstName'],
+             postalCode: req.body['firstName']
+             }
+             },*/
             funding: {
-                descriptor: "Selbi Sale",
+                descriptor: sails.config.braintree.fundingDescriptor
             },
             tosAccepted: true,
             masterMerchantAccountId: sails.config.braintree.masterMerchantAccountId,
@@ -161,11 +180,74 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             merchantAccountParams.funding.routingNumber = req.body['funding'].routingNumber;
         }
 
-        getgateway().merchantAccount.create(merchantAccountParams, function (err, result) {
+        //1) check if this user has a merchant
+        sails.models['user'].findOne({ where: { id: req.body['id'] } }).populate('userMerchant').exec(function(err, merchResults){
             if(err)
                 return res.json(500, err);
 
-            return res.json(result);
+            if(merchResults.userMerchant)
+            {
+                //Merchant Account cannot be updated
+                delete merchantAccountParams['id'];
+                //update merchant on braintree
+                getgateway().merchantAccount.update(merchResults.userMerchant.merchantId, merchantAccountParams, function (err, merchantUpdateResult) {
+                    if(!merchantUpdateResult.success)
+                        return res.json(500, merchantUpdateResult.message);
+                    var merchantUpdateObj = {
+                        id: req.body['userId'],
+                        userMerchant:{
+                            accountNumberLast4: merchantUpdateResult.merchantAccount.funding.accountNumberLast4,
+                            routingNumber:  merchantUpdateResult.merchantAccount.funding.routingNumber,
+                            mobilePhone:  merchantUpdateResult.merchantAccount.funding.mobilePhone
+                        }
+                    }
+                    //create the merchant info in selbi db
+                    sails.models['user'].update({id: req.body['id']}, merchantUpdateObj).exec(function(err){
+                        if(err)
+                            return res.json(500, err);
+
+                        return res.json(200, { success: true })
+                    });
+                });
+            }
+            //No merchant was found on selbi so create a new merchant on braintree
+            else
+            {
+                getgateway().merchantAccount.create(merchantAccountParams, function (err, merchCreateResult) {
+                if(!merchCreateResult.success)
+                    return res.json(500, merchCreateResult.message);
+
+                    getgateway().merchantAccount.find(merchCreateResult.merchantAccount.id, function (err, merchFindResult) {
+                        if(err)
+                            return res.json(500, err);
+
+                            var merchantCreateObj = {
+                                id: req.body['userId'],
+                                userMerchant:{
+                                    merchantId: merchFindResult.id,
+                                    accountNumberLast4: merchFindResult.funding.accountNumberLast4,
+                                    routingNumber: merchFindResult.funding.routingNumber,
+                                    mobilePhone: merchFindResult.funding.mobilePhone
+                                }
+                            }
+                            //create the merchant info in selbi db
+                            sails.models['user'].update({id: req.body['id']}, merchantCreateObj).exec(function(err){
+                                if(err)
+                                    return res.json(500, err);
+
+                                return res.json(200, { success: true })
+                            });
+                        });
+                });
+            }
+        });
+    },
+    getMerchantAccount: function (req, res){
+        getgateway().merchantAccount.find(req.params['merchantAccountId'], function (err, merchantAccount) {
+            if(err)
+                return res.json(500, err);
+            console.log(req.params['merchantAccountId']);
+            return res.json(merchantAccount);
         });
     }
 });
