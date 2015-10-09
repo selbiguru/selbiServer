@@ -32,5 +32,10 @@ module.exports = {
         "merchantId" : "zw67j4nst8r33wms",
         "masterMerchantAccountId": "selbi",
         "fundingDescriptor": "Selbi Sale"
+    },
+    twilio: {
+        "accountSid" : "AC21c328a896543f751d70f26702e77a7c",
+        "authToken" : "5e7ca65f34e2d19100cb01cf9b2fd67d",
+        "twilioPhoneNumber": "+13477673524"
     }
 };
