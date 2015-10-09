@@ -44,8 +44,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       unique: true
     },
     dateOfBirth: {
-      type: 'string',
-      defaultsTo: false
+      type: 'string'
     },
     phoneNumber: {
       type: 'string',
@@ -80,6 +79,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     },
     userPaymentMethod: {
       model: 'payments'
+    },
+    userMerchant: {
+      model: 'merchant'
     }
   }
 });
