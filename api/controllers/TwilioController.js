@@ -9,9 +9,10 @@ var _ = require('lodash');
  */
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
-    sendSMSMessage: function(req, res){
-        var message = "Hello from Selbi!  Please use the following code ("+req.body['verifyPhone']+") to verify your phone."
-    	sails.services['smsservice'].sendSMSMessage(req.body['phoneNumber'], message, function(err, response){
+    sendValidationMessage: function(req, res){
+    	sails.services['smsservice'].sendValidationMessage(req.body['phoneNumber'], req.body['verifyPhone'], function(err, response){
+            console.log("#$@#$@#$@#$ ", err);
+            console.log("michigan go blue ", response);
             if(err){
                 return res.send(err.status, err);
             } else {

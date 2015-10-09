@@ -58,5 +58,5 @@ module.exports.routes = {
   'GET /payments/getMerchantAccount/:merchantAccountId': 'PaymentsController.getMerchantAccount',
 
   //Twilio routes
-  'POST /twilio/sendSMSMessage': 'TwilioController.sendSMSMessage'
+  'POST /twilio/sendValidationMessage': 'TwilioController.sendValidationMessage'
 };
