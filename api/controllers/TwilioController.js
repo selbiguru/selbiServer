@@ -14,9 +14,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             console.log("#$@#$@#$@#$ ", err);
             console.log("michigan go blue ", response);
             if(err){
-                return res.send(err.status, err);
+                return res.json(err.status, err);
             } else {
-                return res.send('Success');
+                return res.json({"success":200});
             }
         });
     },
