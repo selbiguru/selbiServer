@@ -16,7 +16,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             if(err){
                 return res.send(err.status, err);
             } else {
-                return res.send('Success');
+                return res.send({"success":200});
             }
         });
     },
