@@ -50,32 +50,50 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                     });//create brackets
                 }
             else{
-                    console.log('customer was found');
-                getgateway().paymentMethod.create({
-                    customerId: req.body['userId'],
-                    paymentMethodNonce: req.body['paymentMethodNonce']
-                }, function (err, PaymentResult) {
-                    if(err)
-                        res.json(500, err);
+
+                sails.models['user'].findOne({ where: { id: req.params['userId'] } }).populate('userPaymentMethod').exec(function(err, results) {
+                    if (err)
+                        return res.json(500, err);
+
+                    //delete payment method if any exist
+                    if(results && results.userPaymentMethod) {
+                        getgateway().paymentMethod.delete(results.userPaymentMethod.paymentMethodToken, function (err) {
+                            if (err)
+                                return res.json(500, err);
+                            //destroy object from db
+                            sails.models['payments'].destroy({id: results.userPaymentMethod.id}).exec(function deleteCB(err) {
+                                if (err)
+                                    console.log('Error deleting record from our db');
+                            });
+                        });
+                    }
+                    //create new payment method
+                    getgateway().paymentMethod.create({
+                        customerId: req.body['userId'],
+                        paymentMethodNonce: req.body['paymentMethodNonce']
+                    }, function (err, PaymentResult) {
+                        if (err)
+                            res.json(500, err);
 
                         var pm = {
                             id: req.body['userId'],
-                            userPaymentMethod:{
+                            userPaymentMethod: {
                                 paymentMethodToken: PaymentResult.paymentMethod.token,
                                 lastFour: PaymentResult.paymentMethod.last4,
                                 cardType: PaymentResult.paymentMethod.cardType,
                                 expirationDate: PaymentResult.paymentMethod.expirationDate
                             }
-                        }
+                        };
 
                         //save the payment token user can have multiple payment methods
-                        sails.models['user'].update({id: req.body['userId']}, pm).exec(function(err){
-                            if(err)
+                        sails.models['user'].update({id: req.body['userId']}, pm).exec(function (err) {
+                            if (err)
                                 return res.json(500, err);
 
-                            return res.json(200, { success: true })
+                            return res.json(200, {success: true});
                         });
-                }); //create payment method
+                    }); //create payment method
+                });
             } //else
         }); // customer find end brackets
     },
@@ -99,17 +117,29 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                     if (err)
                         return res.json(500, err);
 
-                    var result = {
-                        userId:  req.params['userId'] ,
-                        userPaymentMethod:{
+                    var userPaymentMethod = {};
+                    var userMerchant = {};
+                    if(paymentsResult) {
+                        userPaymentMethod = {
                             lastFour: paymentsResult.lastFour,
                             cardType: paymentsResult.cardType,
                             expirationDate: paymentsResult.expirationDate
-                        },
-                        userMerchant: {
-                            accountNumberLast4: merchantResult.accountNumberLast4,
-                            routingNumber: merchantResult.routingNumber
                         }
+                    }
+
+                    if(userMerchant)
+                    {
+                        userMerchant = {
+                            accountNumberLast4: merchantResult.accountNumberLast4,
+                            routingNumber: merchantResult.routingNumber,
+                            fundingDestination: merchantResult.fundingDestination,
+                            mobilePhone: merchantResult.mobilePhone
+                        }
+                    }
+                    var result = {
+                        userId:  req.params['userId'] ,
+                        userPaymentMethod: userPaymentMethod,
+                        userMerchant: userMerchant
                     }
 
                     return res.json(result);
@@ -198,7 +228,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                         userMerchant:{
                             accountNumberLast4: merchantUpdateResult.merchantAccount.funding.accountNumberLast4,
                             routingNumber:  merchantUpdateResult.merchantAccount.funding.routingNumber,
-                            mobilePhone:  merchantUpdateResult.merchantAccount.funding.mobilePhone
+                            mobilePhone:  merchantUpdateResult.merchantAccount.funding.mobilePhone,
+                            fundingDestination:  merchantUpdateResult.merchantAccount.funding.destination
                         }
                     }
                     //create the merchant info in selbi db
@@ -227,17 +258,18 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                                     merchantId: merchFindResult.id,
                                     accountNumberLast4: merchFindResult.funding.accountNumberLast4,
                                     routingNumber: merchFindResult.funding.routingNumber,
-                                    mobilePhone: merchFindResult.funding.mobilePhone
+                                    mobilePhone: merchFindResult.funding.mobilePhone,
+                                    fundingDestination:  merchFindResult.funding.destination
                                 }
                             }
-                            //create the merchant info in selbi db
-                            sails.models['user'].update({id: req.body['id']}, merchantCreateObj).exec(function(err){
-                                if(err)
-                                    return res.json(500, err);
+                        //create the merchant info in selbi db
+                        sails.models['user'].update({id: req.body['id']}, merchantCreateObj).exec(function(err){
+                            if(err)
+                                return res.json(500, err);
 
-                                return res.json(200, { success: true })
-                            });
+                            return res.json(200, { success: true })
                         });
+                    });
                 });
             }
         });
@@ -249,7 +281,42 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             console.log(req.params['merchantAccountId']);
             return res.json(merchantAccount);
         });
+    },
+    createSaleTransaction: function (req, res){
+        if(!req.body['amount'] || !req.body['userId'] || !req.body['merchantUserId'])
+            return res.json(500, "Amoount or userId or MerchantUserId is missing in the request");
+
+        sails.models['user'].findOne({ where: { id: req.body['userId'] } }).exec(function(err, results){
+            if(err)
+                return res.json(500, err);
+
+            sails.models['payments'].findOne({ where: { id: results.userPaymentMethod } }).exec(function(err, paymentsResult) {
+                if (err)
+                    return res.json(500, err);
+
+                sails.models['user'].findOne({where: {id: req.body['merchantUserId']}}).populate('userMerchant').exec(function (err, merchantResult) {
+                    if (err)
+                        return res.json(500, err);
+
+                    getgateway().transaction.sale({
+                        amount: parseFloat(req.body['amount']).toFixed(2),
+                        merchantAccountId: merchantResult.userMerchant.merchantId,
+                        paymentMethodToken: paymentsResult.paymentMethodToken,
+                        serviceFeeAmount: (parseFloat(req.body['amount']) * parseFloat(sails.config.braintree.serviceFeePercent)/100).toFixed(2),
+                        options: {
+                            submitForSettlement: true
+                        }
+                    }, function (err, merchantAccount) {
+                        if(err)
+                            return res.json(500, err);
+
+                        return res.json(merchantAccount);
+                    });
+                });
+            });
+        });
     }
+
 });
 
 function getgateway(){

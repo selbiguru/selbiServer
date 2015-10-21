@@ -31,6 +31,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
             type: 'string',
             required: false
         },
+        fundingDestination: {
+          type: 'string',
+          required: false
+        },
         owner: {
             model:'user'
         }
