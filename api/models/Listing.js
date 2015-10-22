@@ -57,6 +57,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       required: true,
       defaultsTo: false
     },
+    isPrivate: {
+      type: 'boolean',
+      required: true,
+      defaultsTo: false
+    },
     user: {
       model: 'user',
       columnName: 'userId'
