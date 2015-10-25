@@ -59,5 +59,8 @@ module.exports.routes = {
   'POST /payments/createSaleTransaction': 'PaymentsController.createSaleTransaction',
 
   //Twilio routes
-  'POST /twilio/sendValidationMessage': 'TwilioController.sendValidationMessage'
+  'POST /twilio/sendValidationMessage': 'TwilioController.sendValidationMessage',
+
+  //Mandrill Email
+  'POST /email/contactSelbi': 'EmailController.contactSelbi'
 };
