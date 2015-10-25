@@ -46,8 +46,9 @@ module.exports = {
     },
     mandrill: {
         "apikey": "0Bii9cro9C34sjmr4cZzkw",
-        "fromEmail": "no-reply@etruckingsolutions.com",
-        "fromName": "Etrucking Software Solutions"
+        "fromEmail": "no-reply@selbi.io",
+        "fromName": "Selbi",
+        "toEmail": "selbiguru@gmail.com"
     },
     braintree: {
         "publicKey" : "nktzr995vy2sxwrx",
