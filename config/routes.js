@@ -47,10 +47,11 @@ module.exports.routes = {
   //Get User
   'GET /userData/:userId': 'UserController.getUserData',
   'PUT /userData/:userId': 'UserController.updateUserData',
+  'POST /user/byphone': 'UserController.getUsersByPhones',
 
   //braintree payments routes
   'GET /payments/getClientToken': 'PaymentsController.getClientToken',
-  'POST /payments/createCustomerAndPaymentMethod': 'PaymentsController.createCustomerAndPaymentMethod', 
+  'POST /payments/createCustomerAndPaymentMethod': 'PaymentsController.createCustomerAndPaymentMethod',
   'GET /payments/findCustomer/:userId': 'PaymentsController.findCustomer',
   'GET /payments/:userId': 'PaymentsController.getPayments',
   'DELETE /payments/paymentMethod/:userId': 'PaymentsController.deletePaymentMethod',
@@ -62,5 +63,11 @@ module.exports.routes = {
   'POST /twilio/sendValidationMessage': 'TwilioController.sendValidationMessage',
 
   //Mandrill Email
-  'POST /email/contactSelbi': 'EmailController.contactSelbi'
+  'POST /email/contactSelbi': 'EmailController.contactSelbi',
+
+  //Friend
+  'POST /friend/request': 'InvitationController.sendFriendInvitation',
+  'PUT /friend/request/:invitationId/:status': 'InvitationController.updateFriendInvitation',
+  'GET /friends/:userId': 'FriendController.getFriendsByUser'
+
 };
