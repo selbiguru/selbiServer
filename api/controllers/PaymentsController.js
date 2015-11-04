@@ -20,17 +20,34 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     },
     createCustomerAndPaymentMethod: function(req, res){
         getgateway().customer.find(req.body['userId'], function(err) {
+            if(!req.body['paymentMethodNonce']) {
+               return res.json(500, false); 
+            }
             if(err){
                     //customer not found so create new customer and payment method
                 getgateway().customer.create({
                         id: req.body['userId'],
                         firstName: req.body['firstName'],
                         lastName: req.body['lastName'],
-                        paymentMethodNonce: req.body['paymentMethodNonce']
+                        creditCard: {
+                            paymentMethodNonce: req.body['paymentMethodNonce'],
+                            options: {
+                              verifyCard: true
+                            }
+                        }
                 }, function (err, customerCreateResult) {
+                    var cardMethodStatus = {};
                     if(err)
                         return res.json(500, err);
-
+                    if (!customerCreateResult.success) {
+                            cardMethodStatus.verificationStatus = customerCreateResult.verification.status;
+                            cardMethodStatus.message = customerCreateResult.message;
+                            cardMethodStatus.cardStatus = customerCreateResult.success;
+                            return res.json(200, cardMethodStatus);
+                        } else {
+                            cardMethodStatus.verificationStatus = customerCreateResult.customer.creditCards[0].verifications[0].status;
+                            cardMethodStatus.cardStatus = customerCreateResult.success;
+                        }
                     var pm = {
                             id: req.body['userId'],
                             userPaymentMethod:{
@@ -44,8 +61,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                         sails.models['user'].update({id: req.body['userId']}, pm).exec(function(err, updateResult){
                             if(err)
                                 return res.json(500, err);
-
-                            return res.json(200, { success: true })
+                            return res.json(200, cardMethodStatus);
                         });
                     });//create brackets
                 }
@@ -70,11 +86,24 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                     //create new payment method
                     getgateway().paymentMethod.create({
                         customerId: req.body['userId'],
-                        paymentMethodNonce: req.body['paymentMethodNonce']
+                        paymentMethodNonce: req.body['paymentMethodNonce'],
+                        options: {
+                            verifyCard: true,
+                            verificationMerchantAccountId: sails.config.braintree.masterMerchantAccountId
+                        }
                     }, function (err, PaymentResult) {
-                        if (err)
-                            res.json(500, err);
-
+                        var cardMethodStatus = {};
+                        if (err) 
+                            return res.json(500, err);
+                        if (!PaymentResult.success) {
+                            cardMethodStatus.verificationStatus = PaymentResult.verification.status;
+                            cardMethodStatus.message = PaymentResult.message;
+                            cardMethodStatus.cardStatus = PaymentResult.success;
+                            return res.json(200, cardMethodStatus);
+                        } else {
+                            cardMethodStatus.verificationStatus = PaymentResult.creditCard.verification.status;
+                            cardMethodStatus.cardStatus = PaymentResult.success;
+                        }
                         var pm = {
                             id: req.body['userId'],
                             userPaymentMethod: {
@@ -90,7 +119,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                             if (err)
                                 return res.json(500, err);
 
-                            return res.json(200, {success: true});
+                            return res.json(200, cardMethodStatus);
                         });
                     }); //create payment method
                 });
