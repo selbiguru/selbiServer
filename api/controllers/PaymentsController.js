@@ -250,6 +250,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 delete merchantAccountParams['id'];
                 //update merchant on braintree
                 getgateway().merchantAccount.update(merchResults.userMerchant.merchantId, merchantAccountParams, function (err, merchantUpdateResult) {
+                    if(err)
+                        return res.json(500, err);
                     if(!merchantUpdateResult.success)
                         return res.json(500, merchantUpdateResult.message);
                     var merchantUpdateObj = {
