@@ -56,7 +56,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     		});
     	});
     },
-    uniqueUser: function (req, res){
+    uniqueUsername: function (req, res){
     	sails.models['user'].find({where : {username: req.body['username']} }).exec(function(err, results) {
     		if(err)
     			return res.json(500, err);
