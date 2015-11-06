@@ -55,5 +55,23 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	    		return res.json(results);
     		});
     	});
+    },
+    uniqueUser: function (req, res){
+    	sails.models['user'].find({where : {username: req.body['username']} }).exec(function(err, results) {
+    		console.log("emamil me!!!",results);
+    		if(err)
+    			return res.json(500, err);
+    		if(results.length > 0) {
+    			var uniqueName = true;
+    			for(var i in results) {
+    				if(results[i].id !== req.body['userId']) {
+    					return res.json(false)
+    				}
+    			}
+    			return res.json(true);
+    		} else {
+    			return res.json(true);
+    		}
+    	});
     }
 });
