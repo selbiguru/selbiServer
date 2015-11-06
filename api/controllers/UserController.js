@@ -61,7 +61,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     		if(err)
     			return res.json(500, err);
     		if(results.length > 0) {
-    			var uniqueName = true;
     			for(var i in results) {
     				if(results[i].id !== req.body['userId']) {
     					return res.json(false)
