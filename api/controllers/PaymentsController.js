@@ -12,186 +12,58 @@ var braintree = require('braintree');
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     getClientToken: function(req, res){
-        getgateway().clientToken.generate({}, function (err, response) {
+        sails.services['paymentsservice'].getBraintreeClientToken(function(err, clientToken){
             if(err)
                 return res.json(500, err);
-            return res.json(response.clientToken);
+            return res.json(200, clientToken);
         });
     },
     createCustomerAndPaymentMethod: function(req, res){
-        getgateway().customer.find(req.body['userId'], function(err) {
-            if(!req.body['paymentMethodNonce']) {
-               return res.json(500, false); 
-            }
-            if(err){
-                    //customer not found so create new customer and payment method
-                getgateway().customer.create({
-                        id: req.body['userId'],
-                        firstName: req.body['firstName'],
-                        lastName: req.body['lastName'],
-                        creditCard: {
-                            paymentMethodNonce: req.body['paymentMethodNonce'],
-                            options: {
-                              verifyCard: true
-                            }
-                        }
-                }, function (err, customerCreateResult) {
-                    var cardMethodStatus = {};
-                    if(err)
-                        return res.json(500, err);
-                    if (!customerCreateResult.success) {
-                            cardMethodStatus.verificationStatus = customerCreateResult.verification.status;
-                            cardMethodStatus.message = customerCreateResult.message;
-                            cardMethodStatus.cardStatus = customerCreateResult.success;
-                            return res.json(200, cardMethodStatus);
-                        } else {
-                            cardMethodStatus.verificationStatus = customerCreateResult.customer.creditCards[0].verifications[0].status;
-                            cardMethodStatus.cardStatus = customerCreateResult.success;
-                        }
-                    var pm = {
-                            id: req.body['userId'],
-                            userPaymentMethod:{
-                                paymentMethodToken: customerCreateResult.customer.paymentMethods[0].token,
-                                lastFour: customerCreateResult.customer.paymentMethods[0].last4,
-                                cardType: customerCreateResult.customer.paymentMethods[0].cardType,
-                                expirationDate: customerCreateResult.customer.paymentMethods[0].expirationDate
-                            }
-                        }
-                        //save the payment token user can have multiple payment methods
-                        sails.models['user'].update({id: req.body['userId']}, pm).exec(function(err, updateResult){
-                            if(err)
-                                return res.json(500, err);
-                            return res.json(200, cardMethodStatus);
-                        });
-                    });//create brackets
-                }
-            else{
-
-                sails.models['user'].findOne({ where: { id: req.params['userId'] } }).populate('userPaymentMethod').exec(function(err, results) {
-                    if (err)
-                        return res.json(500, err);
-
-                    //delete payment method if any exist
-                    if(results && results.userPaymentMethod) {
-                        getgateway().paymentMethod.delete(results.userPaymentMethod.paymentMethodToken, function (err) {
-                            if (err)
-                                return res.json(500, err);
-                            //destroy object from db
-                            sails.models['payments'].destroy({id: results.userPaymentMethod.id}).exec(function deleteCB(err) {
-                                if (err)
-                                    console.log('Error deleting record from our db');
-                            });
-                        });
-                    }
-                    //create new payment method
-                    getgateway().paymentMethod.create({
-                        customerId: req.body['userId'],
-                        paymentMethodNonce: req.body['paymentMethodNonce'],
-                        options: {
-                            verifyCard: true,
-                            verificationMerchantAccountId: sails.config.braintree.masterMerchantAccountId
-                        }
-                    }, function (err, PaymentResult) {
-                        var cardMethodStatus = {};
-                        if (err) 
-                            return res.json(500, err);
-                        if (!PaymentResult.success) {
-                            cardMethodStatus.verificationStatus = PaymentResult.verification.status;
-                            cardMethodStatus.message = PaymentResult.message;
-                            cardMethodStatus.cardStatus = PaymentResult.success;
-                            return res.json(200, cardMethodStatus);
-                        } else {
-                            cardMethodStatus.verificationStatus = PaymentResult.creditCard.verification.status;
-                            cardMethodStatus.cardStatus = PaymentResult.success;
-                        }
-                        var pm = {
-                            id: req.body['userId'],
-                            userPaymentMethod: {
-                                paymentMethodToken: PaymentResult.paymentMethod.token,
-                                lastFour: PaymentResult.paymentMethod.last4,
-                                cardType: PaymentResult.paymentMethod.cardType,
-                                expirationDate: PaymentResult.paymentMethod.expirationDate
-                            }
-                        };
-
-                        //save the payment token user can have multiple payment methods
-                        sails.models['user'].update({id: req.body['userId']}, pm).exec(function (err) {
-                            if (err)
-                                return res.json(500, err);
-
-                            return res.json(200, cardMethodStatus);
-                        });
-                    }); //create payment method
-                });
-            } //else
-        }); // customer find end brackets
-    },
-    findCustomer: function (req, res){
-        getgateway().customer.find(req.params['userId'], function(err, customer) {
+        //check for required params
+        if(!req.body['userId'] || !req.body['paymentMethodNonce']){
+                return res.json(500, 'userId or paymentMethodNonce is missing.');
+        }
+        //make a service paymentsservice call
+        sails.services['paymentsservice'].createCustomerAndPaymentMethod(req.body['userId'], req.body['firstName'], req.body['lastName'], req.body['paymentMethodNonce'], function(err, result){
             if(err)
                 return res.json(500, err);
-            return res.json(customer);
+            return res.json(200, result);
         });
     },
-    getPayments: function (req, res){
-        sails.models['user'].findOne({ where: { id: req.params['userId'] } }).exec(function(err, results){
+    findCustomer: function (req, res){
+        //check for required params
+        if(!req.params['userId']){
+            return res.json(500, 'userId is missing.');
+        }
+        //make a service paymentsservice call
+        sails.services['paymentsservice'].findCustomerOnBraintree(req.params['userId'], function(err, result){
             if(err)
                 return res.json(500, err);
-
-            sails.models['payments'].findOne({ where: { id: results.userPaymentMethod } }).exec(function(err, paymentsResult) {
-                if (err)
-                    return res.json(500, err);
-
-                sails.models['merchant'].findOne({where: {id: results.userMerchant}}).exec(function (err, merchantResult) {
-                    if (err)
-                        return res.json(500, err);
-
-                    var userPaymentMethod = {};
-                    var userMerchant = {};
-                    if(paymentsResult) {
-                        userPaymentMethod = {
-                            lastFour: paymentsResult.lastFour,
-                            cardType: paymentsResult.cardType,
-                            expirationDate: paymentsResult.expirationDate
-                        }
-                    }
-
-                    if(userMerchant)
-                    {
-                        userMerchant = {
-                            accountNumberLast4: merchantResult.accountNumberLast4,
-                            routingNumber: merchantResult.routingNumber,
-                            fundingDestination: merchantResult.fundingDestination,
-                            mobilePhone: merchantResult.mobilePhone
-                        }
-                    }
-                    var result = {
-                        userId:  req.params['userId'] ,
-                        userPaymentMethod: userPaymentMethod,
-                        userMerchant: userMerchant
-                    }
-
-                    return res.json(result);
-                });
-            });
+            return res.json(200, result);
+        });
+    },
+    getPayments: function (req, res) {
+        //check for required params
+        if (!req.params['userId']) {
+            return res.json(500, 'userId is missing.');
+        }
+        //make a service paymentsservice call
+        sails.services['paymentsservice'].getPayments(req.params['userId'], function (err, result) {
+            if (err)
+                return res.json(500, err);
+            return res.json(200, result);
         });
     },
     deletePaymentMethod: function (req, res){
-        sails.models['user'].findOne({ where: { id: req.params['userId'] } }).populate('userPaymentMethod').exec(function(err, results){
+        //check for required params
+        if(!req.params['userId']){
+            return res.json(500, 'userId is missing.');
+        }
+        //make a service paymentsservice call
+        sails.services['paymentsservice'].deletePaymentMethod(req.params['userId'], function(err, result){
             if(err)
                 return res.json(500, err);
-
-            getgateway().paymentMethod.delete(results.userPaymentMethod.paymentMethodToken, function (err) {
-                if(err)
-                    return res.json(500, err);
-                //destroy object from db
-                sails.models['payments'].destroy({id: results.userPaymentMethod.id}).exec(function deleteCB(err, delResult){
-                    if(err)
-                        console.log('Error deleting record from our db');
-
-                    return res.json(delResult);
-                });
-            });
+            return res.json(200, result);
         });
     },
     createSubMerchantAccount: function (req, res){
@@ -229,7 +101,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             masterMerchantAccountId: sails.config.braintree.masterMerchantAccountId,
             id:  req.body['id']
         };
-
+        //If there is no venmo then merchant is using a bank account
         if(req.body['venmo']) {
             merchantAccountParams.funding.destination = braintree.MerchantAccount.FundingDestination.Mobile;
             merchantAccountParams.funding.mobilePhone = req.body['funding'].mobilePhone;
@@ -239,70 +111,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             merchantAccountParams.funding.routingNumber = req.body['funding'].routingNumber;
         }
 
-        //1) check if this user has a merchant
-        sails.models['user'].findOne({ where: { id: req.body['id'] } }).populate('userMerchant').exec(function(err, merchResults){
+        sails.services['paymentsservice'].createSubMerchantAccount(merchantAccountParams, req.body['id'], function(err, result){
             if(err)
                 return res.json(500, err);
-
-            if(merchResults.userMerchant)
-            {
-                //Merchant Account cannot be updated
-                delete merchantAccountParams['id'];
-                //update merchant on braintree
-                getgateway().merchantAccount.update(merchResults.userMerchant.merchantId, merchantAccountParams, function (err, merchantUpdateResult) {
-                    if(err)
-                        return res.json(500, err);
-                    if(!merchantUpdateResult.success)
-                        return res.json(500, merchantUpdateResult.message);
-                    var merchantUpdateObj = {
-                        id: req.body['userId'],
-                        userMerchant:{
-                            accountNumberLast4: merchantUpdateResult.merchantAccount.funding.accountNumberLast4,
-                            routingNumber:  merchantUpdateResult.merchantAccount.funding.routingNumber,
-                            mobilePhone:  merchantUpdateResult.merchantAccount.funding.mobilePhone,
-                            fundingDestination:  merchantUpdateResult.merchantAccount.funding.destination
-                        }
-                    }
-                    //create the merchant info in selbi db
-                    sails.models['user'].update({id: req.body['id']}, merchantUpdateObj).exec(function(err){
-                        if(err)
-                            return res.json(500, err);
-
-                        return res.json(200, { success: true })
-                    });
-                });
-            }
-            //No merchant was found on selbi so create a new merchant on braintree
-            else
-            {
-                getgateway().merchantAccount.create(merchantAccountParams, function (err, merchCreateResult) {
-                if(!merchCreateResult.success)
-                    return res.json(500, merchCreateResult.message);
-
-                    getgateway().merchantAccount.find(merchCreateResult.merchantAccount.id, function (err, merchFindResult) {
-                        if(err)
-                            return res.json(500, err);
-
-                            var merchantCreateObj = {
-                                id: req.body['userId'],
-                                userMerchant:{
-                                    merchantId: merchFindResult.id,
-                                    accountNumberLast4: merchFindResult.funding.accountNumberLast4,
-                                    routingNumber: merchFindResult.funding.routingNumber,
-                                    mobilePhone: merchFindResult.funding.mobilePhone,
-                                    fundingDestination:  merchFindResult.funding.destination
-                                }
-                            }
-                        //create the merchant info in selbi db
-                        sails.models['user'].update({id: req.body['id']}, merchantCreateObj).exec(function(err){
-                            if(err)
-                                return res.json(500, err);
-
-                            return res.json(200, { success: true })
-                        });
-                    });
-                });
-            }
+            return res.json(200, result);
         });
     },
     getMerchantAccount: function (req, res){
