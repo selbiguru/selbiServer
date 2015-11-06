@@ -43,6 +43,7 @@ module.exports.routes = {
 
   //Listing routes
   'GET /userlistings/:userId': 'ListingController.getUserListings',
+  'GET /userlistings/userName/:username': 'ListingController.getUsernameListings',
 
   //Get User
   'GET /userData/:userId': 'UserController.getUserData',
