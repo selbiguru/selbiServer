@@ -23,5 +23,16 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     			return res.json(500, err);
     		return res.json(results);
     	});
+    },
+    getUsernameListings: function(req, res){
+        sails.models['user'].find({ where: { username: req.params['username'] } }).exec(function(err, userResult) {
+            if(err)
+                return res.json(500, err);
+            sails.models['listing'].find({ where: { userId: userResult[0].id, sort: 'createdAt DESC' } }).exec(function(err, results){
+                if(err) 
+                    return res.json(500, err);
+                return res.json(results);
+            });
+        });
     }
 });
