@@ -154,7 +154,7 @@
                     if (err)
                         return cb(err, null);
 
-                    sails.models['merchant'].findOne({where: {id: results.userMerchant | {} }}).exec(function (err, merchantResult) {
+                    sails.models['merchant'].findOne({where: {id: results.userMerchant || {} }}).exec(function (err, merchantResult) {
                         if (err)
                             return cb(err, null);
 
@@ -229,26 +229,28 @@
                 //Merchant Account cannot be updated
                 delete merchantAccountParams['id'];
                 //update merchant on braintree
-                getgateway().merchantAccount.update(merchResults.userMerchant.merchantId, merchantAccountParams, function (err, merchantUpdateResult) {
+                //userId is the merchantId on braintree
+                getgateway().merchantAccount.update(userId, merchantAccountParams, function (err, merchantUpdateResult) {
                     if(err)
                         return cb(err, null);
                     if(!merchantUpdateResult.success)
-                        cb(null, merchantUpdateResult.message);
+                        return cb(merchantUpdateResult.message, null);
                     var merchantUpdateObj = {
                         id: userId,
                         userMerchant:{
                             accountNumberLast4: merchantUpdateResult.merchantAccount.funding.accountNumberLast4,
                             routingNumber:  merchantUpdateResult.merchantAccount.funding.routingNumber,
                             mobilePhone:  merchantUpdateResult.merchantAccount.funding.mobilePhone,
-                            fundingDestination:  merchantUpdateResult.merchantAccount.funding.destination
+                            fundingDestination:  merchantUpdateResult.merchantAccount.funding.destination,
+                            merchantId : userId
                         }
                     }
                     //create the merchant info in selbi db
-                    sails.models['user'].update({id: userId}, merchantUpdateObj).exec(function(err){
+                    sails.models['user'].update({id: userId}, merchantUpdateObj).exec(function(err, updateResults){
                         if(err)
                             return cb(err, null);
 
-                       cb(null, { success: true });
+                       cb(null, updateResults);
                     });
                 });
             }
@@ -259,6 +261,7 @@
                     if(!merchCreateResult.success)
                         return cb(merchCreateResult.message, null);
 
+                    //merchCreateResult.merchantAccount.id is the userId
                     getgateway().merchantAccount.find(merchCreateResult.merchantAccount.id, function (err, merchFindResult) {
                         if(err)
                             return cb(err, null);
