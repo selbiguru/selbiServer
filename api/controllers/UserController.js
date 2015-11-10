@@ -77,7 +77,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     		if(err)
     			return res.json(500, err);
     		if(results === undefined)
-    			return res.json(500, 'Sorry, this user does not exist!');
+    			return res.json(404, 'Sorry, this user does not exist!');
     		return res.json(results);
     	});
     }
