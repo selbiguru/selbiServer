@@ -65,5 +65,8 @@ module.exports.routes = {
   'POST /twilio/sendValidationMessage': 'TwilioController.sendValidationMessage',
 
   //Mandrill Email
-  'POST /email/contactSelbi': 'EmailController.contactSelbi'
+  'POST /email/contactSelbi': 'EmailController.contactSelbi',
+
+  //FAQ routes
+  'GET /faq': 'FAQController.getFAQ',
 };
