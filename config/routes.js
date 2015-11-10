@@ -46,6 +46,7 @@ module.exports.routes = {
 
   //Get User
   'GET /userData/:userId': 'UserController.getUserData',
+  'GET /userData/userName/:username': 'UserController.getUserByUsername',
   'PUT /userData/:userId': 'UserController.updateUserData',
   'POST /userData/uniqueUsername': 'UserController.uniqueUsername',
 
