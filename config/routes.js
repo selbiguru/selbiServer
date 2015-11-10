@@ -68,5 +68,6 @@ module.exports.routes = {
   'POST /email/contactSelbi': 'EmailController.contactSelbi',
 
   //FAQ routes
-  'GET /faq': 'FAQController.getFAQ',
+
+  //AboutUs routes
 };
