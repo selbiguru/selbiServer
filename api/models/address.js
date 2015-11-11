@@ -41,7 +41,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       required: true
     },
     owner: {
-            model:'user'
+      model:'user'
     }
   }
 });
