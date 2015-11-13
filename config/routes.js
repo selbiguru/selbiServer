@@ -43,10 +43,13 @@ module.exports.routes = {
 
   //Listing routes
   'GET /userlistings/:userId': 'ListingController.getUserListings',
+  'GET /userlistings/userName/:username': 'ListingController.getUsernameListings',
 
   //Get User
   'GET /userData/:userId': 'UserController.getUserData',
+  'GET /userData/userName/:username': 'UserController.getUserByUsername',
   'PUT /userData/:userId': 'UserController.updateUserData',
+  'POST /userData/uniqueUsername': 'UserController.uniqueUsername',
   'POST /user/byphone': 'UserController.getUsersByPhones',
 
   //braintree payments routes
@@ -57,7 +60,7 @@ module.exports.routes = {
   'DELETE /payments/paymentMethod/:userId': 'PaymentsController.deletePaymentMethod',
   'POST /payments/createSubMerchantAccount/:userId': 'PaymentsController.createSubMerchantAccount',
   'GET /payments/getMerchantAccount/:merchantAccountId': 'PaymentsController.getMerchantAccount',
-  'POST /payments/createSaleTransaction': 'PaymentsController.createSaleTransaction',
+  'POST /payments/createOrder': 'PaymentsController.createOrder',
 
   //Twilio routes
   'POST /twilio/sendValidationMessage': 'TwilioController.sendValidationMessage',
@@ -68,6 +71,10 @@ module.exports.routes = {
   //Friend
   'POST /friend/request': 'InvitationController.sendFriendInvitation',
   'PUT /friend/request/:invitationId/:status': 'InvitationController.updateFriendInvitation',
-  'GET /friends/:userId': 'FriendController.getFriendsByUser'
+  'GET /friends/:userId': 'FriendController.getFriendsByUser',
+
+  //FAQ routes
+
+  //AboutUs routes
 
 };

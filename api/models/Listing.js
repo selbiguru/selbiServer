@@ -62,9 +62,35 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       required: true,
       defaultsTo: false
     },
+    isSold: {
+      type: 'boolean',
+      required: true,
+      defaultsTo: false
+    },
     user: {
       model: 'user',
       columnName: 'userId'
-    }
+    },
+      buyerId: {
+          type: 'string',
+          required: false
+      },
+      transactionId: {
+          type: 'string',
+          required: false
+      },
+      transactionAmount: {
+          type: 'float',
+          required: false
+      },
+      //Money that we keep as commission
+      serviceFee: {
+          type: 'float',
+          required: false
+      },
+      transactionDate: {
+          type: 'string',
+          required: false
+      }
   }
 });
