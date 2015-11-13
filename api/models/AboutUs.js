@@ -18,6 +18,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     aboutus: {
       type: 'string',
       required: true
-    },
+    }
   }
 });

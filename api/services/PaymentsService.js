@@ -5,8 +5,8 @@
      *
      * @description :: Provides payment related calls to talk to Braintree
      */
-
-    var braintree = require('braintree');
+    var async = require('async'),
+    braintree = require('braintree');
 
     /**
      *  This is a public methods to get a braintree client token to make calls to Braintree
@@ -162,17 +162,19 @@
                             userPaymentMethod = {
                                 lastFour: paymentsResult.lastFour,
                                 cardType: paymentsResult.cardType,
-                                expirationDate: paymentsResult.expirationDate
+                                expirationDate: paymentsResult.expirationDate,
+                                paymentMethodToken: paymentsResult.paymentMethodToken
                             }
                         }
 
-                        if(userMerchant)
+                        if(merchantResult)
                         {
                             userMerchant = {
                                 accountNumberLast4: merchantResult.accountNumberLast4,
                                 routingNumber: merchantResult.routingNumber,
                                 fundingDestination: merchantResult.fundingDestination,
-                                mobilePhone: merchantResult.mobilePhone
+                                mobilePhone: merchantResult.mobilePhone,
+                                merchantId: merchantResult.merchantId
                             }
                         }
                         var result = {
@@ -287,6 +289,93 @@
         });
     }
 
+    module.exports.createOrder = function (listingId, buyerId, sellerId, cb){
+        async.waterfall([
+            function(cb) {
+                //Get listing data
+                sails.models['listing'].findOne({ where: { id: listingId } }).exec(function(err, listingResult){
+                    if(err)
+                        return cb(err, null);
+
+                    cb(null, listingResult);
+                });
+            },
+            function(listingResult, cb) {
+                //get payments data for the buyer
+                sails.services['paymentsservice'].getPayments(buyerId, function (err, buyerPaymentResult) {
+                    if(err)
+                        return cb(err, null);
+
+                    cb(null, listingResult, buyerPaymentResult);
+                });
+            },
+            function(listingResult, buyerPaymentResult, cb) {
+                //get payments data for the seller
+                sails.services['paymentsservice'].getPayments(sellerId, function (err, sellerPaymentResult) {
+                    if(err)
+                        return cb(err, null);
+
+                    cb(null, listingResult, buyerPaymentResult, sellerPaymentResult);
+                });
+            },
+            function(listingResult, buyerPaymentResult, sellerPaymentResult, cb) {
+                //get payments data for the seller
+                sails.services['paymentsservice'].createSaleTransaction(listingResult.price, sellerPaymentResult.userMerchant.merchantId,
+                    buyerPaymentResult.userPaymentMethod.paymentMethodToken, function (err, sellerPaymentResult) {
+                    if(err)
+                        return cb(err, null);
+
+                    cb(null, sellerPaymentResult, listingResult.id);
+                });
+            },
+            function(sellerPaymentResult, listingId, cb) {
+                var transactionData = {
+                    isSold: true,
+                    transactionId: sellerPaymentResult.transaction.id,
+                    transactionAmount: sellerPaymentResult.transaction.amount,
+                    serviceFee: sellerPaymentResult.transaction.serviceFeeAmount,
+                    transactionDate: sellerPaymentResult.transaction.createdAt,
+                    buyerId: buyerId
+                }
+                //get payments data for the seller
+                sails.models['listing'].update({id: listingId}, transactionData).exec(function(err, updateResult){
+                        if(err)
+                            return cb(err, null);
+
+                        cb(null, updateResult);
+                    });
+            },
+        ], function (err, result) {
+            // result now equals 'done'
+            if(err)
+                return cb(err, null);
+
+            cb(null, result);
+        });
+        //on success create an order record locally and update the listing to being sold
+        //send an email or something to notify user
+        //rate the merchant (from buyer)
+    }
+
+    module.exports.createSaleTransaction = function (amount, merchantId, buyerPaymentMethodToken, cb){
+        if(!amount || !merchantId || !buyerPaymentMethodToken)
+            return cb(500, "Amount or userId or MerchantUserId is missing!");
+
+            getgateway().transaction.sale({
+                amount: parseFloat(amount).toFixed(2),
+                merchantAccountId: merchantId,
+                paymentMethodToken: buyerPaymentMethodToken,
+                serviceFeeAmount: (parseFloat(amount) * parseFloat(sails.config.braintree.serviceFeePercent)/100).toFixed(2),
+                options: {
+                    submitForSettlement: true
+                }
+            }, function (err, saleResult) {
+                if(err)
+                    return cb(err, saleResult);
+
+                cb(null, saleResult);
+            });
+    }
 
     //** helper functions **//
     /**

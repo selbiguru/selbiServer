@@ -23,6 +23,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     answer: {
       type: 'string',
       required: true
-    },
+    }
   }
 });
