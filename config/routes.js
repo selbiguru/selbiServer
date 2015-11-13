@@ -50,10 +50,11 @@ module.exports.routes = {
   'GET /userData/userName/:username': 'UserController.getUserByUsername',
   'PUT /userData/:userId': 'UserController.updateUserData',
   'POST /userData/uniqueUsername': 'UserController.uniqueUsername',
+  'POST /user/byphone': 'UserController.getUsersByPhones',
 
   //braintree payments routes
   'GET /payments/getClientToken': 'PaymentsController.getClientToken',
-  'POST /payments/createCustomerAndPaymentMethod': 'PaymentsController.createCustomerAndPaymentMethod', 
+  'POST /payments/createCustomerAndPaymentMethod': 'PaymentsController.createCustomerAndPaymentMethod',
   'GET /payments/findCustomer/:userId': 'PaymentsController.findCustomer',
   'GET /payments/:userId': 'PaymentsController.getPayments',
   'DELETE /payments/paymentMethod/:userId': 'PaymentsController.deletePaymentMethod',
@@ -67,7 +68,13 @@ module.exports.routes = {
   //Mandrill Email
   'POST /email/contactSelbi': 'EmailController.contactSelbi',
 
+  //Friend
+  'POST /friend/request': 'InvitationController.sendFriendInvitation',
+  'PUT /friend/request/:invitationId/:status': 'InvitationController.updateFriendInvitation',
+  'GET /friends/:userId': 'FriendController.getFriendsByUser',
+
   //FAQ routes
 
   //AboutUs routes
+
 };

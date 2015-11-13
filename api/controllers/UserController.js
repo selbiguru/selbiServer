@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
+var async = require('async');
 
 /**
  * UserController
@@ -29,7 +30,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 				}
 			});
 		});
-	}, 
+	},
 	getUserData: function(req, res){
         //TODO Add code here to accept an options object to pupulate objects that are asked for in the call
         /*
@@ -39,7 +40,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         }
         */
     	sails.models['user'].findOne({ where: { id: req.params['userId'] } }).populate('userAddress').exec(function(err, results){
-    		if(err) 
+    		if(err)
     			return res.json(500, err);
     		return res.json(results);
     	});
@@ -48,9 +49,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     	sails.models['user'].update({id: req.params['userId']}, req.body).exec(function(err, updateResult){
     		if(err)
     			return res.json(500, err);
-    			//do a find and populate again to populate address. 
+    			//do a find and populate again to populate address.
 	    	sails.models['user'].findOne({ where: { id: req.params['userId'] } }).populate('userAddress').exec(function(err, results){
-	    		if(err) 
+	    		if(err)
 	    			return res.json(500, err);
 	    		return res.json(results);
     		});
@@ -80,5 +81,33 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     			return res.json(404, 'Sorry, this user does not exist!');
     		return res.json(results);
     	});
-    }
+    },
+    getUsersByPhones: function(req, res){
+		var userList = req.body.users;
+		var responseList = [];
+
+		async.eachLimit(userList, 50, function(phoneNumber, cbEach){
+			sails.models['user'].findOne({ where: {phoneNumber: phoneNumber }}).exec(function(err, result){
+				if(err) {
+					responseList.push({
+						phoneNumber: phoneNumber,
+						id: 0,
+						isActiveUser: false
+					});
+				} else {
+					responseList.push({
+						phoneNumber: phoneNumber,
+						id: result ? result.id : 0,
+						isActiveUser: result && result.id ? true : false
+					});
+				}
+				cbEach();
+	    	});
+		}, function(err){
+			if(err) {
+				return res.json(500, err);
+			}
+			return res.json(responseList);
+		});
+	}
 });
