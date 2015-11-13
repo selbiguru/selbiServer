@@ -44,7 +44,6 @@
                     if(err)
                          return cb(err, null);
                     if (!customerCreateResult.success) {
-                        cardMethodStatus.verificationStatus = customerCreateResult.verification.status;
                         cardMethodStatus.message = customerCreateResult.message;
                         cardMethodStatus.cardStatus = customerCreateResult.success;
                         cb(null, cardMethodStatus);
@@ -100,10 +99,9 @@
                         if (err)
                             return cb(err, null);
                         if (!PaymentResult.success) {
-                            cardMethodStatus.verificationStatus = PaymentResult.verification.status;
                             cardMethodStatus.message = PaymentResult.message;
                             cardMethodStatus.cardStatus = PaymentResult.success;
-                            cb(null, cardMethodStatus);
+                            return cb(null, cardMethodStatus);
                         } else {
                             cardMethodStatus.verificationStatus = PaymentResult.creditCard.verification.status;
                             cardMethodStatus.cardStatus = PaymentResult.success;
