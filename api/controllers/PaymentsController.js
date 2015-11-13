@@ -125,50 +125,15 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             return res.json(merchantAccount);
         });
     },
-    createSaleTransaction: function (req, res){
-        if(!req.body['amount'] || !req.body['userId'] || !req.body['merchantUserId'])
-            return res.json(500, "Amoount or userId or MerchantUserId is missing in the request");
-
-        sails.models['user'].findOne({ where: { id: req.body['userId'] } }).exec(function(err, results){
+    createOrder: function (req, res){
+        //check for required params
+        if (!req.body['buyerId'], !req.body['sellerId'], !req.body['listingId']) {
+            return res.json(500, 'buyerId or sellerId or listingId is missing.');
+        }
+        sails.services['paymentsservice'].createOrder(req.body['listingId'], req.body['buyerId'], req.body['sellerId'], function(err, result){
             if(err)
                 return res.json(500, err);
-
-            sails.models['payments'].findOne({ where: { id: results.userPaymentMethod } }).exec(function(err, paymentsResult) {
-                if (err)
-                    return res.json(500, err);
-
-                sails.models['user'].findOne({where: {id: req.body['merchantUserId']}}).populate('userMerchant').exec(function (err, merchantResult) {
-                    if (err)
-                        return res.json(500, err);
-
-                    getgateway().transaction.sale({
-                        amount: parseFloat(req.body['amount']).toFixed(2),
-                        merchantAccountId: merchantResult.userMerchant.merchantId,
-                        paymentMethodToken: paymentsResult.paymentMethodToken,
-                        serviceFeeAmount: (parseFloat(req.body['amount']) * parseFloat(sails.config.braintree.serviceFeePercent)/100).toFixed(2),
-                        options: {
-                            submitForSettlement: true
-                        }
-                    }, function (err, merchantAccount) {
-                        if(err)
-                            return res.json(500, err);
-
-                        return res.json(merchantAccount);
-                    });
-                });
-            });
+            return res.json(200, result);
         });
     }
-
 });
-
-function getgateway(){
-        //All calls to braintree will need this gateway to connect
-        return braintree.connect({
-            environment: braintree.Environment.Sandbox,
-            merchantId: sails.config.braintree.merchantId,
-            publicKey: sails.config.braintree.publicKey,
-            privateKey: sails.config.braintree.privateKey
-
-    });
-}
