@@ -73,6 +73,22 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     		}
     	});
     },
+    uniquePhones: function (req, res){
+    	sails.models['user'].find({where : {phoneNumber: req.body['phone']} }).exec(function(err, results) {
+    		if(err)
+    			return res.json(500, err);
+    		if(results.length > 0) {
+    			for(var i in results) {
+    				if(results[i].id !== req.body['userId']) {
+    					return res.json(false)
+    				}
+    			}
+    			return res.json(true);
+    		} else {
+    			return res.json(true);
+    		}
+    	});
+    },
     getUserByUsername: function (req, res){
     	sails.models['user'].findOne({where : {username: req.params['username']} }).exec(function(err, results) {
     		if(err)
@@ -83,7 +99,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     	});
     },
     getUsersByPhones: function(req, res){
-		var userList = req.body.users;
+		var userList = req.body;
 		var responseList = [];
 
 		async.eachLimit(userList, 50, function(phoneNumber, cbEach){

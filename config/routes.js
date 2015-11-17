@@ -51,6 +51,7 @@ module.exports.routes = {
   'PUT /userData/:userId': 'UserController.updateUserData',
   'POST /userData/uniqueUsername': 'UserController.uniqueUsername',
   'POST /user/byphone': 'UserController.getUsersByPhones',
+  'POST /userData/uniquePhone': 'UserController.uniquePhones',
 
   //braintree payments routes
   'GET /payments/getClientToken': 'PaymentsController.getClientToken',
