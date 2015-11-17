@@ -103,16 +103,20 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 		var responseList = [];
 
 		async.eachLimit(userList, 50, function(phoneNumber, cbEach){
-			sails.models['user'].findOne({ where: {phoneNumber: phoneNumber }}).exec(function(err, result){
+			sails.models['user'].findOne({ where: {phoneNumber: phoneNumber.newNumber }}).exec(function(err, result){
 				if(err) {
 					responseList.push({
-						phoneNumber: phoneNumber,
+						newNumber: phoneNumber.newNumber,
+						originalNumber: phoneNumber.originalNumber,
+						contactName: phoneNumber.contactName,
 						id: 0,
 						isActiveUser: false
 					});
 				} else {
 					responseList.push({
-						phoneNumber: phoneNumber,
+						newNumber: phoneNumber.newNumber,
+						originalNumber: phoneNumber.originalNumber,
+						contactName: phoneNumber.contactName,
 						id: result ? result.id : 0,
 						isActiveUser: result && result.id ? true : false
 					});
