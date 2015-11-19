@@ -66,6 +66,18 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             return res.json(200, result);
         });
     },
+    deleteMerchant: function (req, res){
+        //check for required params
+        if(!req.params['userId']){
+            return res.json(500, 'userId is missing.');
+        }
+        //make a service paymentsservice call
+        sails.services['paymentsservice'].deleteMerchant(req.params['userId'], function(err, result){
+            if(err)
+                return res.json(500, err);
+            return res.json(200, result);
+        });
+    },
     createSubMerchantAccount: function (req, res){
         //create merchant object
         var merchantAccountParams = {

@@ -213,16 +213,34 @@
         });
     }
 
+    module.exports.deleteMerchant = function (userId, cb){
+        if(!userId)
+            return cb('userId is missing!', null);
+
+        sails.models['user'].findOne({ where: { id: userId } }).populate('userMerchant').exec(function(err, results){
+            if(err)
+                return cb(err, null);
+
+                sails.models['merchant'].destroy({id: results.userMerchant.id}).exec(function deleteCB(err, delResult){
+                    if(err)
+                        console.log('Error deleting record from our db');
+
+                    return cb(null, delResult);
+                });
+        });
+    }
+
     module.exports.createSubMerchantAccount = function (merchantAccountParams, userId, cb){
         //TODO need to add more checks here for required fields
         if(!merchantAccountParams.id || !userId)
             return cb('userId is missing!', null);
         //1) check if this user has a merchant
-        sails.models['user'].findOne({ where: { id: merchantAccountParams.id } }).populate('userMerchant').exec(function(err, merchResults){
+        //sails.models['user'].findOne({ where: { id: merchantAccountParams.id } }).populate('userMerchant').exec(function(err, merchResults){
+        getgateway().merchantAccount.find(merchantAccountParams.id, function (err, merchResults) {
             if(err)
                 return cb(err, null);
 
-            if(merchResults.userMerchant)
+            if(merchResults.id)
             {
                 //Merchant Account cannot be updated
                 delete merchantAccountParams['id'];
