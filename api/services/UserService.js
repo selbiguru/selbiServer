@@ -8,7 +8,7 @@
     var async = require('async');
 
     /**
-     *  This is a public methods to get a braintree client token to make calls to Braintree
+     *  This is a public methods to get a user by username
      *  @param      userName is the username to find
      *  @param      cb is a callback
      */

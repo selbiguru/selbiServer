@@ -74,6 +74,7 @@ module.exports.routes = {
   'POST /friend/request': 'InvitationController.sendFriendInvitation',
   'PUT /friend/request/:invitationId/:status': 'InvitationController.updateFriendInvitation',
   'GET /friend/:userId/:friendId': 'InvitationController.getInvitationByUserIds',
+  'GET /friend/username/:userId/:username': 'InvitationController.getInvitationByUsername',
   'GET /friends/:userId': 'FriendController.getFriendsByUser',
 
   //FAQ routes

@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var async = require('async');
+var self = this;
 
 /**
  * InvitationController
@@ -29,30 +30,21 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 		});
 	},
 	getInvitationByUserIds: function(req, res) {
-		var userId = req.params['userId'];
-		var friendId = req.params['friendId'];
-		async.parallel([
-			function(cb){
-				sails.models['invitation'].findOne().where({
-					userTo: userId,
-					userFrom: friendId
-				}).exec(cb);
-			},
-			function(cb){
-				sails.models['invitation'].findOne().where({
-					userFrom: userId,
-					userTo: friendId
-				}).exec(cb);
-			}
-		], function(err, results){
-			if(err) {
-				return res.json(500, err);
-			} else {
-				var invitationList = [];
-				results[0] ? invitationList.push(results[0]) : '';
-				results[1] ? invitationList.push(results[1]) : '';
-				return res.json(invitationList);
-			}
-		});
-	}
+		sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], req.params['friendId'], function(err, invitationsResponse){
+            if(err)
+                return res.json(500, err);
+            return res.json(invitationsResponse);
+        });
+	},
+	getInvitationByUsername: function(req, res) {
+		sails.services['userservice'].getUserByUsernameService( req.params['username'], function(err, usernameResponse){
+            if(err)
+                return res.json(500, err);
+            sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], usernameResponse.id, function(err, invitationsResponse){
+	            if(err)
+	                return res.json(500, err);
+	            return res.json(invitationsResponse);
+	        });
+        });
+	},
 });
