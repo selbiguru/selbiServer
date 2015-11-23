@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
+var async = require('async');
 
 /**
  * InvitationController
@@ -25,6 +26,33 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 			}
 			//todo: send email
 			res.json(invitation);
+		});
+	},
+	getInvitationByUserIds: function(req, res) {
+		var userId = req.params['userId'];
+		var friendId = req.params['friendId'];
+		async.parallel([
+			function(cb){
+				sails.models['invitation'].findOne().where({
+					userTo: userId,
+					userFrom: friendId
+				}).exec(cb);
+			},
+			function(cb){
+				sails.models['invitation'].findOne().where({
+					userFrom: userId,
+					userTo: friendId
+				}).exec(cb);
+			}
+		], function(err, results){
+			if(err) {
+				return res.json(500, err);
+			} else {
+				var invitationList = [];
+				results[0] ? invitationList.push(results[0]) : '';
+				results[1] ? invitationList.push(results[1]) : '';
+				return res.json(invitationList);
+			}
 		});
 	}
 });

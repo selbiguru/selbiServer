@@ -25,8 +25,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     },
     status: {
         type: 'string',
-        enum: ['pending', 'approved', 'denied', 'unfriended'],
-        defaultsTo: 'pending'
+        enum: ['pending', 'approved', 'denied'],
+        defaultsTo: 'approved'
     }
   }
 });
