@@ -38,12 +38,14 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	},
 	getInvitationByUsername: function(req, res) {
 		sails.services['userservice'].getUserByUsernameService( req.params['username'], function(err, usernameResponse){
+            var invitationUser = usernameResponse
             if(err)
                 return res.json(500, err);
-            sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], usernameResponse.id, function(err, invitationsResponse){
+            sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], usernameResponse.id, function(err, invitationResponse){
+	           invitationUser.invitation = invitationResponse;
 	            if(err)
 	                return res.json(500, err);
-	            return res.json(invitationsResponse);
+	            return res.json(invitationUser);
 	        });
         });
 	},
