@@ -21,7 +21,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 		});
 	},
 	updateFriendInvitation: function(req, res) {
-		sails.models['invitation'].update({ id: req.params['invitationId']}, { status: req.params['status']}).exec(function (err, invitation) {
+		sails.models['invitation'].update({ id: req.params['invitationId']}, req.body).exec(function (err, invitation) {
 			if(err) {
 				return res.send(500, err.message);
 			}
