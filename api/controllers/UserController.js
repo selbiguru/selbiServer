@@ -90,13 +90,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     	});
     },
     getUserByUsername: function (req, res){
-    	sails.models['user'].findOne({where : {username: req.params['username']} }).exec(function(err, results) {
-    		if(err)
-    			return res.json(500, err);
-    		if(results === undefined)
-    			return res.json(404, 'Sorry, this user does not exist!');
-    		return res.json(results);
-    	});
+    	sails.services['userservice'].getUserByUsernameService( req.params['username'], function(err, usernameUser){
+            if(err)
+                return res.json(500, err);
+            return res.json(usernameUser);
+        });
     },
     getUsersByPhones: function(req, res){
 		var userList = req.body;
