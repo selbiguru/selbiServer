@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
+var async = require('async');
 
 /**
  * ListingController
@@ -34,5 +35,34 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 return res.json(results);
             });
         });
-    }
+    },
+    getFriendsListings: function(req, res){
+        /*1.) have UserId need to get all friends ids
+        2.) Find friends that have at least one listing not sold
+            a.) sort by newest
+        3.) return*/
+
+        sails.services['friendservice'].getFriendsByUserService( req.params['userId'], function(err, friendsResult) {
+            //friendsResult = array of friend objects
+            var friendsArray = friendsResult;
+            var plop = [];
+            if(err)
+                return res.json(500,err);
+            async.eachLimit(friendsArray, 100, function(friend, cbEach){
+                var friendId = friend.id;
+                sails.models['listing'].find({ where: { userId: friendId}, sort: 'title DESC' }).exec(function(err, listingResult){
+                    if(err) {
+                        return res.json(500, err);
+                    }
+                    friend.listing = listingResult
+                    plop.push(friend);
+                    cbEach();
+                });
+            }, function(err) {
+                if(err)
+                    return res.json(500, err);
+                return res.json(plop);
+            });
+        });
+    },
 });

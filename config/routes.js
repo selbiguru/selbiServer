@@ -44,6 +44,7 @@ module.exports.routes = {
   //Listing routes
   'GET /userlistings/:userId': 'ListingController.getUserListings',
   'GET /userlistings/userName/:username': 'ListingController.getUsernameListings',
+  'GET /userlistings/friendlistings/:userId': 'ListingController.getFriendsListings',
 
   //Get User
   'GET /userData/:userId': 'UserController.getUserData',
