@@ -19,7 +19,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     	});
     },
     getUserListings: function(req, res){
-    	sails.models['listing'].find({ where: { userId: req.params['userId'], skip: 10 } }).exec(function(err, results){
+    	sails.models['listing'].find({ where: { userId: req.params['userId'], sort: 'createdAt DESC' } }).exec(function(err, results){
     		if(err) 
     			return res.json(500, err);
     		return res.json(results);
