@@ -86,7 +86,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             }, function(err, results) {
                 if(err)
                     return res.json(500, err);
-                return res.json(friendListings);
+                return res.json(_.sortByOrder(friendListings, ['createdAt'], ['desc']));
             });
         });
     },
