@@ -39,4 +39,37 @@
         });
     };
 
+
+    /**
+     *  This is a public methods to update an invitation by invitationId
+     *  @param      invitationId is the ID of the invitation to update
+     *  @param      invitationBody is the object with the fields from the model that needs to be updated
+     *  @param      cb is a callback
+     */
+    module.exports.updateFriendInvitationService = function(invitationId, invitationBody, cb) {
+        sails.models['invitation'].update({ id: invitationId}, invitationBody).exec(function (err, invitation) {
+            if(err) {
+                return cb(500, err.message);
+            }
+            //todo: send email
+            return cb(err, invitation);
+        });
+    };
+
+
+    /**
+     *  This is a public method to create an invitation
+     *  @param      createInvite is the object with data of the invitation model to create
+     *  @param      cb is a callback
+     */
+    module.exports.createFriendInvitationService = function(createInvite, cb) {
+        sails.models['invitation'].create(createInvite).exec(function (err, invitation) {
+            if(err) {
+                return cb(500, err.message);
+            }
+            //todo: send email
+            return cb(err, invitation);
+        });
+    };
+
 })();

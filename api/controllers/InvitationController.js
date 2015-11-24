@@ -12,22 +12,18 @@ var self = this;
  */
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	sendFriendInvitation: function(req, res) {
-		sails.models['invitation'].create(req.params.all()).exec(function (err, invitation) {
-			if(err) {
-				return res.send(500, err.message);
-			}
-			//todo: send email
-			res.json(invitation);
-		});
+		sails.services['invitationservice'].createFriendInvitationService( req.params.all(), function(err, createResponse){
+            if(err)
+                return res.json(500, err);
+            return res.json(createResponse);
+        });
 	},
 	updateFriendInvitation: function(req, res) {
-		sails.models['invitation'].update({ id: req.params['invitationId']}, req.body).exec(function (err, invitation) {
-			if(err) {
-				return res.send(500, err.message);
-			}
-			//todo: send email
-			res.json(invitation);
-		});
+		sails.services['invitationservice'].updateFriendInvitationService( req.params['invitationId'], req.body, function(err, invitationResponse){
+            if(err)
+                return res.json(500, err);
+            return res.json(invitationResponse);
+        });
 	},
 	getInvitationByUserIds: function(req, res) {
 		sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], req.params['friendId'], function(err, invitationsResponse){
