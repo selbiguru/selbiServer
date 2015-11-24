@@ -39,11 +39,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 			populatePaymentMethod = true
         }
         */
-    	sails.models['user'].findOne({ where: { id: req.params['userId'] } }).populate('userAddress').exec(function(err, results){
-    		if(err)
-    			return res.json(500, err);
-    		return res.json(results);
-    	});
+        sails.services['userservice'].getUserDataService( req.params['userId'] , function(err, userResult){
+            if(err)
+                return res.json(500, err);
+            return res.json(userResult);
+        });
     },
     updateUserData: function (req, res){
     	sails.models['user'].update({id: req.params['userId']}, req.body).exec(function(err, updateResult){

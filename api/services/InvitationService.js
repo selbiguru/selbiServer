@@ -72,4 +72,32 @@
         });
     };
 
+
+    /**
+     *  This is a public methods to get all approved (friends) invitations
+     *  @param      userId is the userID of the user
+     *  @param      cb is a callback
+     */
+    module.exports.getApprovedInvitesByIdService = function(userId, cb) {
+        async.parallel([
+            function(cb){
+                sails.models['invitation'].find().where({
+                    userTo: userId,
+                    status: 'approved'
+                }).exec(cb);
+            },
+            function(cb){
+                sails.models['invitation'].find().where({
+                    userFrom: userId,
+                    status: 'approved'
+                }).exec(cb);
+            }
+        ], function(err, results){
+            var friendsResult = results[0].concat(results[1]);
+            if(err)
+                return cb(500, err);
+            return cb(err, friendsResult);
+        });
+    };
+
 })();
