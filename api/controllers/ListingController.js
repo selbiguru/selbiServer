@@ -89,7 +89,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                         var counter = results[0].ext === 'count' ? results[0] : results[1].ext === 'count' ? results[1] : results[2];
                         listing.friend = user;
                         listing.invitation = [inv];
-                        listing.count = counter;
+                        listing.counter = counter;
                         friendListings.push(listing);
 
                     }
