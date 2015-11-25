@@ -61,25 +61,37 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                                 return cb(err);
                             };
                             if(listingResult.length > 0 ) {
-                                listingResult.ext = 'listing';
-                               newResults =  _.sortByOrder(listingResult, ['createdAt'], ['desc'])[0];
+                                newResults =  _.sortByOrder(listingResult, ['createdAt'], ['desc'])[0];
+                                newResults.ext = 'listing';
                             };
                             cb(err, newResults);
                         });
-                    }
+                    },
+                    function(cb){
+                        var counter = {};
+                        sails.models['listing'].count({where: {userId: friendId, isSold: false}}).exec(function(err, countResult){
+                            if(err)
+                                return cb(err);
+                            if(countResult) {
+                                counter.count = countResult;
+                                counter.ext =  'count';
+                            };
+                            cb(err, counter);
+                        });
+                    },
                 ], function(err, results){
                     if(err)
                         return cbEach(err);
-                    if(results[0] && results[1]) {
-                        if(results[0].ext === 'listing') {
-                            results[0].friend = results[1];
-                            results[0].invitation = [inv];
-                            friendListings.push(results[0]);
-                        } else {
-                            results[1].friend = results[0];
-                            results[1].invitation = [inv];
-                            friendListings.push(results[1]);
-                        }
+                    if(results[0] && results[1] && results[2]) {
+
+                        var listing = results[0].ext === 'listing' ? results[0] : results[1].ext === 'listing' ? results[1] : results[2];
+                        var user = results[0].ext === 'user' ? results[0] : results[1].ext === 'user' ? results[1] : results[2];
+                        var counter = results[0].ext === 'count' ? results[0] : results[1].ext === 'count' ? results[1] : results[2];
+                        listing.friend = user;
+                        listing.invitation = [inv];
+                        listing.count = counter;
+                        friendListings.push(listing);
+
                     }
                     return cbEach();
                 });
@@ -104,6 +116,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                         return res.json(500, err);
                     };
                     if(listingResult.length > 0 ) {
+                        sails.models['listing'].count({where: {userId: friendId, isSold: false}}).exec(function(err, countResult){
+                            console.log("9090909090909090", countResult);
+                        });
                         friend.listing = _.sortByOrder(listingResult, ['createdAt'], ['desc'])[0];
                         friend.listingDate = friend.listing.createdAt;
                         plop.push(friend);
@@ -115,9 +130,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                     return res.json(500, err);
                 return res.json(_.sortByOrder(plop, ['listingDate'], ['desc']));
             });
-        });*/
-
-
-
+        });
+    }*/
 
 });
