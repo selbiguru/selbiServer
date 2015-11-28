@@ -103,20 +103,31 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 		async.eachLimit(userList, 50, function(user, cbEach){
 			sails.models['user'].findOne({ where: {phoneNumber: user.newNumber }}).exec(function(err, result){
 				if(err) {
-					responseList.push({
-						newNumber: user.newNumber,
-						originalNumber: user.originalNumber,
-						contactName: user.contactName,
-						id: 0,
-						isActiveUser: false
+					return res.json(500, err);
+				}
+				if(result && result.id) {
+					sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], result.id, function(err, results) {
+						if(err) {
+							return res.json(500, err);
+						} else {
+							responseList.push({
+								newNumber: user.newNumber,
+								originalNumber: user.originalNumber,
+								contactName: user.contactName,
+								id: result ? result.id : 0,
+								isActiveUser: result && result.id ? true : false,
+								invitation: results
+							});
+						}
 					});
 				} else {
 					responseList.push({
 						newNumber: user.newNumber,
 						originalNumber: user.originalNumber,
 						contactName: user.contactName,
-						id: result ? result.id : 0,
-						isActiveUser: result && result.id ? true : false
+						id: 0,
+						isActiveUser: false,
+						invitation: []
 					});
 				}
 				cbEach();
@@ -128,4 +139,3 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 			return res.json(responseList);
 		});
 	}
-});
