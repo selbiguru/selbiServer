@@ -114,10 +114,12 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 								newNumber: user.newNumber,
 								originalNumber: user.originalNumber,
 								contactName: user.contactName,
+								username: result.username,
 								id: result ? result.id : 0,
 								isActiveUser: result && result.id ? true : false,
 								invitation: results
 							});
+							cbEach();
 						}
 					});
 				} else {
@@ -125,12 +127,13 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 						newNumber: user.newNumber,
 						originalNumber: user.originalNumber,
 						contactName: user.contactName,
+						username: false,
 						id: 0,
 						isActiveUser: false,
 						invitation: []
 					});
+					cbEach();
 				}
-				cbEach();
 	    	});
 		}, function(err){
 			if(err) {
@@ -139,3 +142,4 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 			return res.json(responseList);
 		});
 	}
+});
