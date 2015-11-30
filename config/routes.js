@@ -82,4 +82,12 @@ module.exports.routes = {
 
   //AboutUs routes
 
+  //Notification
+  'POST /notification/create': 'NotificationController.createNotification',
+  'PUT /notification/update/:notificationId': 'NotificationController.updateNotificationById',
+  'PUT /notification/update/userids': 'NotificationController.updateNotificationByUsers',
+  'DELETE /notification/delete/:notificationId': 'NotificationController.deleteNotification',
+  'GET /notification/userid/:userId': 'NotificationController.getNotificationByUserId',
+  'GET /notification/notificationid/:notificationId': 'NotificationController.getByNotificationId',
+
 };
