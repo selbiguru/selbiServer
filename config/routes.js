@@ -74,6 +74,7 @@ module.exports.routes = {
   //Friend
   'POST /friend/request': 'InvitationController.sendFriendInvitation',
   'PUT /friend/request/:invitationId': 'InvitationController.updateFriendInvitation',
+  'PUT /friend/friendinvitation': 'InvitationController.updateFriendInvitationByUserIds',
   'GET /friend/:userId/:friendId': 'InvitationController.getInvitationByUserIds',
   'GET /friend/username/:userId/:username': 'InvitationController.getInvitationByUsername',
   'GET /friends/:userId': 'FriendController.getFriendsByUser',
@@ -84,8 +85,8 @@ module.exports.routes = {
 
   //Notification
   'POST /notification/create': 'NotificationController.createNotification',
-  'PUT /notification/update/:notificationId': 'NotificationController.updateNotificationById',
-  'PUT /notification/update/userids': 'NotificationController.updateNotificationByUsers',
+  //'PUT /notification/update/:notificationId': 'NotificationController.updateNotificationById',
+  //'PUT /notification/update/userids': 'NotificationController.updateNotificationByUsers',
   'DELETE /notification/delete/:notificationId': 'NotificationController.deleteNotification',
   'GET /notification/userid/:userId': 'NotificationController.getNotificationByUserId',
   'GET /notification/notificationid/:notificationId': 'NotificationController.getByNotificationId',
