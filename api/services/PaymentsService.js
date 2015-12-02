@@ -337,7 +337,7 @@
                 });
             },
             function(listingResult, buyerPaymentResult, sellerPaymentResult, cb) {
-                //get payments data for the seller
+                //create sale transaction with Braintree
                 sails.services['paymentsservice'].createSaleTransaction(listingResult.price, sellerPaymentResult.userMerchant.merchantId,
                     buyerPaymentResult.userPaymentMethod.paymentMethodToken, function (err, sellerPaymentResult) {
                     if(err)
@@ -357,12 +357,24 @@
                 }
                 //get payments data for the seller
                 sails.models['listing'].update({id: listingId}, transactionData).exec(function(err, updateResult){
-                        if(err)
-                            return cb(err, null);
+                    if(err)
+                        return cb(err, null);
 
-                        cb(null, updateResult);
-                    });
+                    cb(null, updateResult);
+                });
             },
+            function(updateResult, cb) {
+                var notificationObj = {
+                    userFrom: buyerId,
+                    userTo: sellerId,
+                    type: 'sold'
+                }
+                sails.services['notificationservice'].createNotificationService( notificationObj, function(err, createResponse){
+                    if(err)
+                        return cb(500, err);
+                    cb(null, updateResult);
+                }); 
+            }
         ], function (err, result) {
             // result now equals 'done'
             if(err)
