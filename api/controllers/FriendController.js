@@ -16,5 +16,37 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 return res.json(500, err);
             return res.json(friendsResult);
 		});
-	}
+	},
+	addFriendsByPhone: function(req, res) {
+		var phoneList = req.body;
+		var responseList = [];
+
+		async.eachLimit(phoneList, 10, function(newPhone, cbEach){
+			sails.models['user'].findOne({ where: {phoneNumber: newPhone }}).exec(function(err, result){
+				if(err)
+					return res.json(500, err);
+				if(result && result.id) {
+					var createInvitationObject = {
+						userFrom: req.params['userId'],
+						userTo: result.id,
+						status: 'approved',
+					};
+					sails.services['invitationservice'].createFriendInvitationService( createInvitationObject, function(err, createResult) {
+						if(err) {
+							return res.json(500, err);
+						}
+						responseList.push(createResult);
+						cbEach();
+					});
+				} else {
+					cbEach();
+				}
+			});
+		}, function(err){
+			if(err) {
+				return res.json(500, err);
+			}
+			return res.json(responseList);
+		});
+	},
 });
