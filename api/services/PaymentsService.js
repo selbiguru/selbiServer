@@ -80,7 +80,7 @@
                             if (err)
                                 return cb(err, null);
                             //destroy object from db
-                            sails.models['payments'].destroy({id: results.userPaymentMethod.id}).exec(function deleteCB(err) {
+                            sails.models['payments'].destroy({where: {id: results.userPaymentMethod.id } }).exec(function deleteCB(err) {
                                 if (err)
                                     console.log('Error deleting record from our db');
                             });
@@ -205,7 +205,7 @@
                 if(err)
                     return cb(err, null);
                 //destroy object from db
-                sails.models['payments'].destroy({id: results.userPaymentMethod.id}).exec(function deleteCB(err, delResult){
+                sails.models['payments'].destroy({where: {id: results.userPaymentMethod.id } }).exec(function deleteCB(err, delResult){
                     if(err)
                         console.log('Error deleting record from our db');
 
@@ -223,7 +223,7 @@
             if(err)
                 return cb(err, null);
 
-                sails.models['merchant'].destroy({id: results.userMerchant.id}).exec(function deleteCB(err, delResult){
+                sails.models['merchant'].destroy({where: {id: results.userMerchant.id } }).exec(function deleteCB(err, delResult){
                     if(err)
                         console.log('Error deleting record from our db');
 
