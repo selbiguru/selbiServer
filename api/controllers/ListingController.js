@@ -11,6 +11,20 @@ var async = require('async');
  */
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
+    deleteListing: function(req, res) {
+        sails.services['listingservice'].deleteListingService( req.params['id'], function(err, deleteResponse){
+            if(err)
+                return res.json(500, err);
+            return res.json(deleteResponse);
+        });
+    },
+    updateListing: function(req, res){
+        sails.models['listing'].update({where : { id: req.params['id'] } }, req.body).exec(function(err, updateResults){     
+            if(err) 
+                return res.json(500, err);
+            return res.json(updateResults);
+        });
+    },
     findOne: function(req, res){
         sails.models['listing'].findOne({where: {id: req.params['id']}}).populate('user').exec(function(err, results){     
             if(err) 
@@ -23,13 +37,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             if(err) 
                 return res.json(500, err);
             return res.json(results);
-        });
-    },
-    updateListing: function(req, res){
-        sails.models['listing'].update({where : { id: req.params['id'] } }, req.body).exec(function(err, updateResults){     
-            if(err) 
-                return res.json(500, err);
-            return res.json(updateResults);
         });
     },
     getUserListings: function(req, res){

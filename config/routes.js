@@ -43,10 +43,11 @@ module.exports.routes = {
 
   //Listing routes
   'PUT /userlistings/update/:id': 'ListingController.updateListing',
-  'GET /userlistings/listing/:id': 'ListingController.getListing',
   'PUT /userlistings/:userId': 'ListingController.getUserListings',
   'PUT /userlistings/userName/:username': 'ListingController.getUsernameListings',
+  'GET /userlistings/listing/:id': 'ListingController.getListing',
   'GET /userlistings/friendlistings/:userId': 'ListingController.getFriendsListings',
+  'DELETE /userlistings/delete/:id': 'ListingController.deleteListing',
 
   //Get User
   'GET /userData/:userId': 'UserController.getUserData',
@@ -58,13 +59,13 @@ module.exports.routes = {
 
   //braintree payments routes
   'GET /payments/getClientToken': 'PaymentsController.getClientToken',
-  'POST /payments/createCustomerAndPaymentMethod': 'PaymentsController.createCustomerAndPaymentMethod',
+  'GET /payments/getMerchantAccount/:merchantAccountId': 'PaymentsController.getMerchantAccount',
   'GET /payments/findCustomer/:userId': 'PaymentsController.findCustomer',
   'GET /payments/:userId': 'PaymentsController.getPayments',
   'DELETE /payments/paymentMethod/:userId': 'PaymentsController.deletePaymentMethod',
   'DELETE /payments/merchant/:userId': 'PaymentsController.deleteMerchant',
   'POST /payments/createSubMerchantAccount/:userId': 'PaymentsController.createSubMerchantAccount',
-  'GET /payments/getMerchantAccount/:merchantAccountId': 'PaymentsController.getMerchantAccount',
+  'POST /payments/createCustomerAndPaymentMethod': 'PaymentsController.createCustomerAndPaymentMethod',
   'POST /payments/createOrder': 'PaymentsController.createOrder',
 
   //Twilio routes
