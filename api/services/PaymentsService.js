@@ -61,7 +61,7 @@
                         }
                     }
                     //save the payment token user can have multiple payment methods
-                    sails.models['user'].update({id: userId}, pm).exec(function(err, updateResult){
+                    sails.models['user'].update({ where: {id: userId } }, pm).exec(function(err, updateResult){
                         if(err)
                              return cb(err, null);
 
@@ -117,7 +117,7 @@
                         };
 
                         //save the payment token user can have multiple payment methods
-                        sails.models['user'].update({id: userId}, pm).exec(function (err) {
+                        sails.models['user'].update({ where: {id: userId } }, pm).exec(function (err) {
                             if (err)
                                 return cb(err, null);
 
@@ -264,7 +264,7 @@
                         }
                     }
                     //create the merchant info in selbi db
-                    sails.models['user'].update({id: userId}, merchantUpdateObj).exec(function(err, updateResults){
+                    sails.models['user'].update({ where: {id: userId } }, merchantUpdateObj).exec(function(err, updateResults){
                         if(err)
                             return cb(err, null);
 
@@ -295,7 +295,7 @@
                             }
                         }
                         //create the merchant info in selbi db
-                        sails.models['user'].update({id: userId}, merchantCreateObj).exec(function(err){
+                        sails.models['user'].update({ where: {id: userId } }, merchantCreateObj).exec(function(err){
                             if(err)
                                 return cb(err, null);
 
@@ -356,7 +356,7 @@
                     buyerId: buyerId
                 }
                 //get payments data for the seller
-                sails.models['listing'].update({id: listingId}, transactionData).exec(function(err, updateResult){
+                sails.models['listing'].update({ where: {id: listingId } }, transactionData).exec(function(err, updateResult){
                     if(err)
                         return cb(err, null);
 

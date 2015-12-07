@@ -12,10 +12,24 @@ var async = require('async');
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     findOne: function(req, res){
-        sails.models['listing'].findOne(req.params['id']).populate('user').exec(function(err, results){     
+        sails.models['listing'].findOne({where: {id: req.params['id']}}).populate('user').exec(function(err, results){     
             if(err) 
                 return res.json(500, err);
             return res.json(results);
+        });
+    },
+    getListing: function(req, res){
+        sails.models['listing'].findOne({ where: { id: req.params['id'] } }).populate('user').exec(function(err, results){
+            if(err) 
+                return res.json(500, err);
+            return res.json(results);
+        });
+    },
+    updateUserListing: function(req, res){
+        sails.models['listing'].update({where : { id: req.params['userId'] } }, req.body).exec(function(err, updateResults){     
+            if(err) 
+                return res.json(500, err);
+            return res.json(updateResults);
         });
     },
     getUserListings: function(req, res){
