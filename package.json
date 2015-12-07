@@ -35,7 +35,6 @@
     "rc": "0.5.1",
     "sails": "git://github.com/balderdashy/sails",
     "sails-couchdb": "git://github.com/codeswarm/sails-couchdb-orm.git",
-    "sails-couchdb-orm": "git://github.com/codeswarm/sails-couchdb-orm",
     "sails-disk": "^0.10.8",
     "sails-hook-apianalytics": "git://github.com/mikermcneil/sails-hook-apianalytics",
     "sails-mongo": "^0.11.5",
