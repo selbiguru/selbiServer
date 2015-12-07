@@ -47,7 +47,7 @@
      *  @param      cb is a callback
      */
     module.exports.updateFriendInvitationService = function(invitationId, invitationBody, cb) {
-        sails.models['invitation'].update({ id: invitationId}, invitationBody).exec(function (err, invitation) {
+        sails.models['invitation'].update({where : { id: invitationId } }, invitationBody).exec(function (err, invitation) {
             if(err) {
                 return cb(500, err.message);
             }
