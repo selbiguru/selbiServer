@@ -62,7 +62,7 @@
      *  @param      cb is a callback
      */
     module.exports.deleteNotificationService = function(notificationId, cb) {
-        sails.models['notification'].destroy({id: notificationId}).exec(function (err, deleteResult) {
+        sails.models['notification'].destroy({where: {id: notificationId } }).exec(function (err, deleteResult) {
             if (err)
                 return cb(500, err);
             return cb(err, deleteResult);

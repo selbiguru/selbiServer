@@ -47,7 +47,7 @@
      *  @param      cb is a callback
      */
     module.exports.updateFriendInvitationService = function(invitationId, invitationBody, cb) {
-        sails.models['invitation'].update({ id: invitationId}, invitationBody).exec(function (err, invitation) {
+        sails.models['invitation'].update({where : { id: invitationId } }, invitationBody).exec(function (err, invitation) {
             if(err) {
                 return cb(500, err.message);
             }
@@ -79,21 +79,7 @@
      *  @param      cb is a callback
      */
     module.exports.getApprovedInvitesByIdService = function(userId, cb) {
-        async.parallel([
-            function(cb){
-                sails.models['invitation'].find().where({
-                    userTo: userId,
-                    status: 'approved'
-                }).exec(cb);
-            },
-            function(cb){
-                sails.models['invitation'].find().where({
-                    userFrom: userId,
-                    status: 'approved'
-                }).exec(cb);
-            }
-        ], function(err, results){
-            var friendsResult = results[0].concat(results[1]);
+        sails.models['invitation'].find().where({or: [{ userTo: userId },{userFrom: userId}], status: 'approved'}).exec(function(err, friendsResult) {
             if(err)
                 return cb(500, err);
             return cb(err, friendsResult);

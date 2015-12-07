@@ -11,8 +11,7 @@ var _ = require('lodash');
 module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
   attributes: {
     id:{
-      type: 'string',
-      unique: true,
+      type: 'integer',
       primaryKey: true
     },
     address: {

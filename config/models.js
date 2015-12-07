@@ -17,7 +17,7 @@ module.exports.models = {
    * connections (see `config/connections.js`)                                *
    *                                                                          *
    ***************************************************************************/
-  connection: 'someCouchDBServer',
-  adapter: 'couch',
+  connection: 'someMongodbServer',
+  adapter: 'sails-mongo',
   migrate: 'safe'
 };

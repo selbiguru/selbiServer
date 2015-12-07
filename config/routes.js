@@ -42,8 +42,10 @@ module.exports.routes = {
   'GET /image/sign/:referenceId': 'ImageController.getListingSignature',
 
   //Listing routes
-  'GET /userlistings/:userId': 'ListingController.getUserListings',
-  'GET /userlistings/userName/:username': 'ListingController.getUsernameListings',
+  'PUT /userlistings/update/:id': 'ListingController.updateListing',
+  'GET /userlistings/listing/:id': 'ListingController.getListing',
+  'PUT /userlistings/:userId': 'ListingController.getUserListings',
+  'PUT /userlistings/userName/:username': 'ListingController.getUsernameListings',
   'GET /userlistings/friendlistings/:userId': 'ListingController.getFriendsListings',
 
   //Get User

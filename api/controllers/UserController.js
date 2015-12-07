@@ -46,7 +46,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         });
     },
     updateUserData: function (req, res){
-    	sails.models['user'].update({id: req.params['userId']}, req.body).exec(function(err, updateResult){
+    	sails.models['user'].update({where : { id: req.params['userId'] } }, req.body).exec(function(err, updateResult){
     		if(err)
     			return res.json(500, err);
     			//do a find and populate again to populate address.

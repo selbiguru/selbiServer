@@ -12,7 +12,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
   attributes: {
     // title of the listing
     id: {
-      type: 'string',
+      type: 'integer',
       unique: true,
       primaryKey: true,
       index: true

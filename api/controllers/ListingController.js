@@ -12,33 +12,81 @@ var async = require('async');
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     findOne: function(req, res){
-    	sails.models['listing'].findOne(req.params['id']).populate('user').exec(function(err, results){		
-    		if(err) 
-    			return res.json(500, err);
-    		return res.json(results);
-    	});
+        sails.models['listing'].findOne({where: {id: req.params['id']}}).populate('user').exec(function(err, results){     
+            if(err) 
+                return res.json(500, err);
+            return res.json(results);
+        });
+    },
+    getListing: function(req, res){
+        sails.models['listing'].findOne({ where: { id: req.params['id'] } }).populate('user').exec(function(err, results){
+            if(err) 
+                return res.json(500, err);
+            return res.json(results);
+        });
+    },
+    updateListing: function(req, res){
+        sails.models['listing'].update({where : { id: req.params['id'] } }, req.body).exec(function(err, updateResults){     
+            if(err) 
+                return res.json(500, err);
+            return res.json(updateResults);
+        });
     },
     getUserListings: function(req, res){
-    	sails.models['listing'].find({ where: { userId: req.params['userId'], sort: 'createdAt DESC' } }).exec(function(err, results){
-    		if(err) 
-    			return res.json(500, err);
-    		return res.json(results);
-    	});
+        sails.models['user'].findOne({ where: { id: req.params['userId'] } }).exec(function(err, userResult) {
+            var query;
+            if(err) {
+                return res.json(500, err);
+            }
+            var listingByIdObj = {
+                firstName: userResult.firstName,
+                lastName: userResult.lastName
+            };
+            if(req.body['myself']) {
+                query = {where: {userId: req.params['userId'], sort: 'createdAt DESC' } };
+            } else if(req.body['friends']) {
+                query = {where: {userId: req.params['userId'], isSold: false, sort: 'createdAt DESC' } };
+            } else {
+                query = {where: {userId: req.params['userId'], isSold: false, isPrivate: false, sort: 'createdAt DESC' } };
+            }
+            sails.models['listing'].find(query).exec(function(err, results){
+                if(err) {
+                    return res.json(500, err);
+                }
+                listingByIdObj.listings = results;
+                return res.json(listingByIdObj);
+            });
+        });
     },
     getUsernameListings: function(req, res){
-        sails.models['user'].find({ where: { username: req.params['username'] } }).exec(function(err, userResult) {
-            if(err)
+        sails.models['user'].findOne({ where: { username: req.params['username'] } }).exec(function(err, userResult) {
+            var query;
+            if(err) {
                 return res.json(500, err);
-            sails.models['listing'].find({ where: { userId: userResult[0].id, sort: 'createdAt DESC' } }).exec(function(err, results){
-                if(err) 
+            }
+            var listingByUsernameObj = {
+                firstName: userResult.firstName,
+                lastName: userResult.lastName
+            };
+            if(req.body['myself']) {
+                query = {where: {userId: req.params['userId'], sort: 'createdAt DESC' } };
+            } else if(req.body['friends']) {
+                query = {where: {userId: req.params['userId'], isSold: false, sort: 'createdAt DESC' } };
+            } else {
+                query = {where: {userId: req.params['userId'], isSold: false, isPrivate: false, sort: 'createdAt DESC' } };
+            }
+            sails.models['listing'].find(query).exec(function(err, results){
+                if(err) {
                     return res.json(500, err);
-                return res.json(results);
+                }
+                listingByUsernameObj.listings = results;
+                return res.json(listingByUsernameObj);
             });
         });
     },
     getFriendsListings: function(req, res){        
         sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
-            //friendsApproved = array of invitation objects
+            //friendsApproved is an array of invitation objects
             var friendsApproved = invitationResult;
             var friendListings = [];
             if(err)
@@ -56,12 +104,12 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                     },
                     function(cb){
                         var newResults;
-                        sails.models['listing'].find({ where: { userId: friendId, isSold: false} }).exec(function(err, listingResult){
+                        sails.models['listing'].find({ where: { userId: friendId, isSold: false, sort: 'createdAt DESC'} }).exec(function(err, listingResult){
                             if(err) {
                                 return cb(err);
                             };
                             if(listingResult.length > 0 ) {
-                                newResults =  _.sortByOrder(listingResult, ['createdAt'], ['desc'])[0];
+                                newResults =  listingResult[0];
                                 newResults.ext = 'listing';
                             };
                             cb(err, newResults);
@@ -102,35 +150,4 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             });
         });
     },
-
-        /*sails.services['friendservice'].getFriendsByUserService( req.params['userId'], function(err, friendsResult) {
-            //friendsResult = array of friend objects
-            var friendsArray = friendsResult;
-            var plop = [];
-            if(err)
-                return res.json(500,err);
-            async.eachLimit(friendsArray, 100, function(friend, cbEach){
-                var friendId = friend.id;
-                sails.models['listing'].find({ where: { userId: friendId } }).exec(function(err, listingResult){
-                    if(err) {
-                        return res.json(500, err);
-                    };
-                    if(listingResult.length > 0 ) {
-                        sails.models['listing'].count({where: {userId: friendId, isSold: false}}).exec(function(err, countResult){
-                            console.log("9090909090909090", countResult);
-                        });
-                        friend.listing = _.sortByOrder(listingResult, ['createdAt'], ['desc'])[0];
-                        friend.listingDate = friend.listing.createdAt;
-                        plop.push(friend);
-                    };
-                    cbEach();
-                });
-            }, function(err) {
-                if(err)
-                    return res.json(500, err);
-                return res.json(_.sortByOrder(plop, ['listingDate'], ['desc']));
-            });
-        });
-    }*/
-
 });
