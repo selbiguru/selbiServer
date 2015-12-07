@@ -36,7 +36,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	},*/
 	deleteNotification: function(req, res) {
 		sails.services['notificationservice'].deleteNotificationService( req.params['notificationId'], function(err, deleteResponse){
-            console.log('Delete notification ',err, deleteResponse);
             if(err)
                 return res.json(500, err);
             return res.json(deleteResponse);

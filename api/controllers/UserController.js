@@ -12,7 +12,6 @@ var async = require('async');
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	signUp: function signUp(request, response){
 		sails.models['user'].create(request.params.all()).exec(function (err, user) {
-			console.log('~~~~~~~~~~~ ', user, err);
 			if(err) {
 				return response.send(500, err.message);
 			}
@@ -48,8 +47,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     },
     updateUserData: function (req, res){
     	sails.models['user'].update({where : { id: req.params['userId'] } }, req.body).exec(function(err, updateResult){
-    		console.log('^^^^^^^^^ ', err, updateResult);
-    		console.log('#########', err, req.params['userId']);
     		if(err)
     			return res.json(500, err);
     			//do a find and populate again to populate address.
