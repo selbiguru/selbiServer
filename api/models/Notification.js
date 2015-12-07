@@ -27,6 +27,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
         type: 'string',
         enum: ['default', 'sold', 'friendrequest'],
         defaultsTo: 'default'
-    }
+    },
+    user: {
+      model: 'user',
+      columnName: 'userTo'
+    },
   }
 });

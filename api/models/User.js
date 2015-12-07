@@ -81,6 +81,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     },
     userMerchant: {
       model: 'merchant'
+    },
+    userNotifications: {
+      collection: 'Notification',
+      via: 'user'
     }
   }
 });

@@ -52,7 +52,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                     if(err) {
                         return res.json(500, err);
                     };
-                    notification.user = userResult;
+                    notification.userFromInfo = userResult;
                     notifcationArray.push(notification);
                     cbEach();
                 });
@@ -73,7 +73,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 if(err) {
                     return res.json(500, err);
                 };
-                notification.user = userResult;
+                notification.userFromInfo = userResult;
                 notifcationArray.push(notification);
                 return res.json(notifcationArray);
             });
