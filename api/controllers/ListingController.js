@@ -76,11 +76,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 lastName: userResult.lastName
             };
             if(req.body['myself']) {
-                query = {where: {userId: req.params['userId'], sort: 'createdAt DESC' } };
+                query = {where: {userId: userResult.id, sort: 'createdAt DESC' } };
             } else if(req.body['friends']) {
-                query = {where: {userId: req.params['userId'], isSold: false, sort: 'createdAt DESC' } };
+                query = {where: {userId: userResult.id, isSold: false, sort: 'createdAt DESC' } };
             } else {
-                query = {where: {userId: req.params['userId'], isSold: false, isPrivate: false, sort: 'createdAt DESC' } };
+                query = {where: {userId: userResult.id, isSold: false, isPrivate: false, sort: 'createdAt DESC' } };
             }
             sails.models['listing'].find(query).exec(function(err, results){
                 if(err) {
@@ -102,16 +102,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 var friendId = inv.userFrom !== req.params['userId'] ? inv.userFrom : inv.userTo;
                 async.parallel([
                     function(cb){
-                        sails.services['userservice'].getUserDataService( friendId , function(err, userResult){
-                            if(err)
-                                return cb(err);
-                            userResult.ext = 'user';
-                            cb(err, userResult);
-                        });
-                    },
-                    function(cb){
                         var newResults;
-                        sails.models['listing'].find({ where: { userId: friendId, isSold: false, sort: 'createdAt DESC'} }).exec(function(err, listingResult){
+                        sails.models['listing'].find({ where: { userId: friendId, isSold: false, sort: 'createdAt DESC'} }).populate('user').exec(function(err, listingResult){
                             if(err) {
                                 return cb(err);
                             };
@@ -137,16 +129,12 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 ], function(err, results){
                     if(err)
                         return cbEach(err);
-                    if(results[0] && results[1] && results[2]) {
-
-                        var listing = results[0].ext === 'listing' ? results[0] : results[1].ext === 'listing' ? results[1] : results[2];
-                        var user = results[0].ext === 'user' ? results[0] : results[1].ext === 'user' ? results[1] : results[2];
-                        var counter = results[0].ext === 'count' ? results[0] : results[1].ext === 'count' ? results[1] : results[2];
-                        listing.friend = user;
+                    if(results[0] && results[1] ) {
+                        var listing = results[0].ext === 'listing' ? results[0] : results[1]
+                        var counter = results[0].ext === 'count' ? results[0] : results[1]
                         listing.invitation = [inv];
                         listing.counter = counter;
                         friendListings.push(listing);
-
                     }
                     return cbEach();
                 });
