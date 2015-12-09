@@ -15,7 +15,7 @@
      */
     module.exports.getFriendsByUserService = function(userId, cb) {
         sails.services['invitationservice'].getApprovedInvitesByIdService( userId, function(err, approvedInvites){
-            var friendsApproved = approvedInvites;
+            var friendsApproved = approvedInvites.invitationArray;
             var friendList = [];
             if(err)
                 return cb(500, err);
