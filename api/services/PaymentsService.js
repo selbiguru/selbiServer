@@ -314,7 +314,9 @@
                 sails.models['listing'].findOne({ where: { id: listingId } }).exec(function(err, listingResult){
                     if(err)
                         return cb(err, null);
-
+                    if(listingResult.isSold === true) {
+                        return cb(500, 'Item has been sold');
+                    }
                     cb(null, listingResult);
                 });
             },

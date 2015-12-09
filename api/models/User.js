@@ -73,6 +73,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       collection: 'Listing',
       via: 'user'
     },
+    hasListings: {
+      type: 'boolean',
+      defaultsTo: false
+    },
     userAddress: {
       model: 'address'
     },
