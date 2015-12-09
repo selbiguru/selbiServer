@@ -89,11 +89,11 @@
 
 
     /**
-     *  This is a public methods to get all approved (friends) invitations
+     *  This is a public method to get all IDs of approved (friends)
      *  @param      userId is the userID of the user
      *  @param      cb is a callback
      */
-    module.exports.poopservice = function(userId, cb) {
+    module.exports.friendIdService = function(userId, cb) {
         var idArray = [];
         sails.models['invitation'].find({where:{or: [{ userTo: userId },{userFrom: userId}], status: 'approved'}, select:['userTo','userFrom']}).exec(function(err, friendsResult) {
             for(var i in friendsResult) {

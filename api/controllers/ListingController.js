@@ -169,7 +169,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
 
     getSelbiListings: function(req, res) {
-       sails.services['invitationservice'].poopservice( req.params['userId'], function(err, invitationResult) {
+       sails.services['invitationservice'].friendIdService( req.params['userId'], function(err, invitationResult) {
             //friendsApproved is an array of invitation objects
             var friendsApproved = invitationResult;
             var skipUsers = 2;
