@@ -35,4 +35,18 @@
         });
     };
 
+
+    /**
+     *  This is a public methods to update a user by userId
+     *  @param      userId is the id of the user to find
+     *  @param      fieldsUpdating are the fields you wish to update
+     *  @param      cb is a callback
+     */
+    module.exports.updateUserDataService = function(userId, fieldsUpdating, cb) {
+        sails.models['user'].update({ where: { id: userId } }, fieldsUpdating).exec(function(err, updatedResults){
+            if(err)
+                return cb(500, err);
+            return cb(err, updatedResults);
+        });
+    };
 })();

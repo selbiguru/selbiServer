@@ -145,7 +145,25 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         sails.services['paymentsservice'].createOrder(req.body['listingId'], req.body['buyerId'], req.body['sellerId'], function(err, result){
             if(err)
                 return res.json(500, err);
-            return res.json(200, result);
+            sails.services['listingservice'].countListingService(req.body['sellerId'], function(err, countResult){
+                if(err){
+                    console.log('Unable to get count of listings for user');
+                    return res.json(200, result);
+                }
+                if(countResult === 0) {
+                    var updateObj = {
+                        hasListings: false
+                    };
+                    sails.services['userservice'].updateUserDataService(req.body['sellerId'], updateObj, function(err, updateResult) {
+                        if(err) {
+                            console.log('User not updated when creating a listing');
+                        }
+                        return res.json(200, result);
+                    });
+                } else {
+                    return res.json(200, result);
+                }
+            });
         });
     }
 });
