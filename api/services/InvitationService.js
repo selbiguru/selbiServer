@@ -79,35 +79,23 @@
      *  @param      cb is a callback
      */
     module.exports.getApprovedInvitesByIdService = function(userId, cb) {
+        var friendsObj = {
+            invitationArray: [],
+            idArray: []
+        }
         sails.models['invitation'].find().where({or: [{ userTo: userId },{userFrom: userId}], status: 'approved'}).exec(function(err, friendsResult) {
             if(err)
                 return cb(500, err);
-            return cb(err, friendsResult);
-        });
-    };
-
-
-
-    /**
-     *  This is a public method to get all IDs of approved (friends)
-     *  @param      userId is the userID of the user
-     *  @param      cb is a callback
-     */
-    module.exports.friendIdService = function(userId, cb) {
-        var idArray = [];
-        sails.models['invitation'].find({where:{or: [{ userTo: userId },{userFrom: userId}], status: 'approved'}, select:['userTo','userFrom']}).exec(function(err, friendsResult) {
+            friendsObj.invitationArray = friendsResult;
+            friendsObj.idArray.push(userId);
             for(var i in friendsResult) {
                 if(friendsResult[i].userTo != userId) {
-                    idArray.push(friendsResult[i].userTo);
+                    friendsObj.idArray.push(friendsResult[i].userTo);
                 } else {
-                    idArray.push(friendsResult[i].userFrom);
+                    friendsObj.idArray.push(friendsResult[i].userFrom);
                 }
-                idArray.push(userId);
             }
-            if(err)
-                return cb(500, err);
-            return cb(err, idArray);
+            return cb(err, friendsObj);
         });
     };
-
 })();

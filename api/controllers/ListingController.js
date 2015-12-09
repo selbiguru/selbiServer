@@ -138,16 +138,16 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     getFriendsListings: function(req, res){        
         sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
             //friendsApproved is an array of invitation objects
-            var friendsApproved = invitationResult;
+            var friendsApproved = invitationResult.invitationArray;
             var friendListings = [];
             if(err)
                 return res.json(500, err);
-            async.eachLimit(friendsApproved, 100, function(inv, cbEach){
+            async.eachLimit(friendsApproved, 20, function(inv, cbEach){
                 var friendId = inv.userFrom !== req.params['userId'] ? inv.userFrom : inv.userTo;
                 var newResults;
                 sails.models['listing'].find({ where: { userId: friendId, isSold: false, sort: 'createdAt DESC'} }).populate('user').exec(function(err, listingResult){
                     if(err) {
-                        return cb(err);
+                        return cbEach(err);
                     };
                     if(listingResult.length > 0 ) {
                         newResults =  listingResult[0];
@@ -164,43 +164,47 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             });
         });
     },
-
-
-
-
     getSelbiListings: function(req, res) {
-       sails.services['invitationservice'].friendIdService( req.params['userId'], function(err, invitationResult) {
-            //friendsApproved is an array of invitation objects
-            var friendsApproved = invitationResult;
+       sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
+            //friendsApproved is an array of friend's IDs
+            var friendsApproved = invitationResult.idArray;
             var skipUsers = 2;
-            /*sails.models['listing'].native(function(err, collection) {
-                collection.find({$group:{ id: 'userId', total : { $sum : 1 }  } }).toArray(function (err, results) {
-                    console.log('~~~~~~~~~ ', results);
-                    if (err) return res.json(err);
-                    return res.json(results);
-                  });
-            });*/
-           sails.models['user'].find({where: {id: {'!':friendsApproved} } } ).populate('listings', {where:{title: 'Shoe'}},{sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
+            var selbiArray = [];
+            sails.models['user'].find({where: {id: {'!':friendsApproved}, hasListings: true, sort: 'updatedAt DESC' } } ).populate('listings', {where:{isSold: false, isPrivate: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
                 if(err)
                     return res.json(err);
-                return res.json(listingResult);
+                async.eachLimit(listingResult, 20, function(userList, cbEach){
+                    async.parallel([
+                        function(cb){
+                            sails.models['listing'].count({ 
+                                where: { userId: userList.id, isSold: false, isPrivate: false} 
+                            }).exec(cb);
+                        },
+                        function(cb){
+                            sails.services['invitationservice'].getInvitationByUserIdsService( userList.id, req.params['userId'], function(err, inviteResult) {
+                                if(err) {
+                                    cb(err);
+                                }
+                                cb(null, inviteResult);
+                            });
+                        }
+                    ], function(err, results){
+                        if(err) {
+                            return cbEach(500, err);
+                        } else {
+                            results[0].length === undefined ? userList.count = results[0] : userList.count = results[1];
+                            results[1].length != undefined ? userList.invitation = results[1] : userList.invitation = results[0];
+                            selbiArray.push(userList);
+                            cbEach();
+                        }
+                    });
+                }, function(err, results) {
+                    if(err)
+                        return res.json(500, err);
+                    return res.json(selbiArray);
+                });
             });
-            /*sails.models['listing'].find({ where: { userId: {'!': friendsApproved}, isSold: false, sort: 'createdAt DESC'} }).exec(function(err, listingResult){
-                if(err) {
-                    return res.json(err);
-                };
-                /*if(listingResult.length > 0 ) {
-                    newResults =  listingResult[0];
-                    newResults.invitation = [inv];
-                    newResults.count = listingResult.length;
-                    friendListings.push(newResults);
-                };
-                return res.json(listingResult);
-            });*/
-       });
-
-
-        
+       });        
     }
 
 
