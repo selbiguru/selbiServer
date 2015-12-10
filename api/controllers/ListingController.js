@@ -137,32 +137,47 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     },
     getFriendsListings: function(req, res){        
         sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
-            //friendsApproved is an array of invitation objects
-            var friendsApproved = invitationResult.invitationArray;
-            var friendListings = [];
-            if(err)
-                return res.json(500, err);
-            async.eachLimit(friendsApproved, 20, function(inv, cbEach){
-                var friendId = inv.userFrom !== req.params['userId'] ? inv.userFrom : inv.userTo;
-                var newResults;
-                sails.models['listing'].find({ where: { userId: friendId, isSold: false, sort: 'createdAt DESC'} }).populate('user').exec(function(err, listingResult){
-                    if(err) {
-                        return cbEach(err);
-                    };
-                    if(listingResult.length > 0 ) {
-                        newResults =  listingResult[0];
-                        newResults.invitation = [inv];
-                        newResults.count = listingResult.length;
-                        friendListings.push(newResults);
-                    };
-                    cbEach();
-                });
-            }, function(err, results) {
+            //friendsApproved is an array of friend's IDs
+            var friendsApproved = invitationResult.idArray;
+            var i = friendsApproved.indexOf(req.params['userId']);
+            friendsApproved.splice(i, 1);
+            var skipUsers = 2;
+            var selbiArray = [];
+            sails.models['user'].find({where: {id: friendsApproved, hasListings: true, sort: 'updatedAt DESC' } } ).populate('listings', {where:{isSold: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
                 if(err)
-                    return res.json(500, err);
-                return res.json(_.sortByOrder(friendListings, ['createdAt'], ['desc']));
+                    return res.json(err);
+                async.eachLimit(listingResult, 20, function(userList, cbEach){
+                    async.parallel([
+                        function(cb){
+                            sails.models['listing'].count({ 
+                                where: { userId: userList.id, isSold: false} 
+                            }).exec(cb);
+                        },
+                        function(cb){
+                            sails.services['invitationservice'].getInvitationByUserIdsService( userList.id, req.params['userId'], function(err, inviteResult) {
+                                if(err) {
+                                    cb(err);
+                                }
+                                cb(null, inviteResult);
+                            });
+                        }
+                    ], function(err, results){
+                        if(err) {
+                            return cbEach(500, err);
+                        } else {
+                            results[0].length === undefined ? userList.count = results[0] : userList.count = results[1];
+                            results[1].length != undefined ? userList.invitation = results[1] : userList.invitation = results[0];
+                            selbiArray.push(userList);
+                            cbEach();
+                        }
+                    });
+                }, function(err, results) {
+                    if(err)
+                        return res.json(500, err);
+                    return res.json(_.sortByOrder(selbiArray, ['updatedAt'], ['desc']));
+                });
             });
-        });
+       });
     },
     getSelbiListings: function(req, res) {
        sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
@@ -201,11 +216,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 }, function(err, results) {
                     if(err)
                         return res.json(500, err);
-                    return res.json(selbiArray);
+                    return res.json(_.sortByOrder(selbiArray, ['updatedAt'], ['desc']));
                 });
             });
        });        
     }
-
-
 });
