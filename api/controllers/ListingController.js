@@ -12,6 +12,10 @@ var async = require('async');
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     deleteListing: function(req, res) {
+        sails.services['imageservice'].deleteCloudinaryImageService(req.body['images'], function(err, deletedImagesResult) {
+            if(err)
+                console.log('Could not delete cloudinary images from listing ', err);
+        });
         sails.services['listingservice'].deleteListingService( req.params['id'], function(err, deleteResponse){
             if(err)
                 return res.json(500, err);

@@ -10,9 +10,16 @@ var _ = require('lodash');
  */
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	
-	getListingSignature: function getSignature(request, response){
+	getListingSignature: function(request, response){
 		var referenceId = request.param('referenceId');
-		return response.json(200, sails.services['image'].getListingSignature(referenceId, request.token));
+		return response.json(200, sails.services['imageservice'].getListingSignature(referenceId, request.token));
+	},
+	deleteCloudinaryImages: function(request, response){
+		sails.services['imageservice'].deleteCloudinaryImageService(images, function(err, deleteSignature) {
+			if(err)
+				return response.json(500, err)
+			return response.json(deleteSignature);
+		});
 	}
 });
 
