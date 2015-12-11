@@ -26,7 +26,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             function(cb){
                 sails.services['listingservice'].updateListingService(req.params['id'], updateObj, function(err, updateResults) {
                     if(err) 
-                        return cb(500, err);
+                        return cb(500, updateResults);
                     sails.services['listingservice'].countListingService(updateResults[0].user, function(err, countResult){
                         if(err){
                             console.log('Unable to get count of listings for user');
@@ -114,7 +114,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     updateListing: function(req, res){
         sails.services['listingservice'].updateListingService(req.params['id'], req.body, function(err, updateResults) {
             if(err) 
-                return res.json(500, err);
+                return res.json(500, updateResults);
             return res.json(updateResults);
         });
     },

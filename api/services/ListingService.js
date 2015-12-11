@@ -24,14 +24,14 @@
 
     /**
      *  This is a public methods to updates a listing
-     *  @param      listingId is the ID of the listing to delete
+     *  @param      listingId is the ID of the listing to update
      *  @param      updateObj is the Obj containg the data of the listing to update
      *  @param      cb is a callback
      */
     module.exports.updateListingService = function(listingId, updateObj, cb) {
         sails.models['listing'].update({where : { id: listingId } }, updateObj).exec(function(err, updateResults){     
             if(err) 
-                return cb(err, updateResults);
+                return cb(500, err);
             return cb(null, updateResults);
         });
     };
