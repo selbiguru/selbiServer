@@ -11,6 +11,50 @@ var async = require('async');
  */
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
+    archiveListing: function(req, res) {
+        var updateObj = {
+            isArchived: req.body['isArchived']
+        }
+        async.parallel([
+            function(cb){
+                sails.services['imageservice'].deleteCloudinaryImageService(req.body['images'], function(err, deletedImagesResult) {
+                    if(err) 
+                        return cb(500, 'Could not delete cloudinary images from listing');
+                    return cb();
+                });
+            },
+            function(cb){
+                sails.services['listingservice'].updateListingService(req.params['id'], updateObj, function(err, updateResults) {
+                    if(err) 
+                        return cb(500, err);
+                    sails.services['listingservice'].countListingService(updateResults[0].user, function(err, countResult){
+                        if(err){
+                            console.log('Unable to get count of listings for user');
+                            return cb(500, countResult);
+                        }
+                        if(countResult === 0) {
+                            var updateUserObj = {
+                                hasListings: false
+                            };
+                            sails.services['userservice'].updateUserDataService(updateResults[0].user, updateUserObj, function(err, updateUserResult) {
+                                if(err) {
+                                    console.log('User not updated when updating a listing');
+                                    return cb(500, updateUserResult);
+                                }
+                                return cb(null, updateResults);
+                            });
+                        } else {
+                            return cb(null, updateResults);
+                        }
+                    });
+                });
+            }
+        ], function(err, results) {
+            if(err)
+                return res.json(500, err);
+            return res.json(results);
+        });
+    },
     deleteListing: function(req, res) {
         sails.services['imageservice'].deleteCloudinaryImageService(req.body['images'], function(err, deletedImagesResult) {
             if(err)
@@ -22,7 +66,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             sails.services['listingservice'].countListingService(deleteResponse[0].userId, function(err, countResult){
                 if(err){
                     console.log('Unable to get count of listings for user');
-                    return res.json(deleteResponse);
+                    return res.json(500, countResult);
                 }
                 if(countResult === 0) {
                     var updateObj = {
@@ -30,7 +74,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                     };
                     sails.services['userservice'].updateUserDataService(deleteResponse[0].userId, updateObj, function(err, updateResult) {
                         if(err) {
-                            console.log('User not updated when creating a listing');
+                            console.log('User not updated when deleting a listing');
+                            return res.json(500, updateResult);
                         }
                         return res.json(deleteResponse);
                     });
@@ -67,7 +112,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         });
     },
     updateListing: function(req, res){
-        sails.models['listing'].update({where : { id: req.params['id'] } }, req.body).exec(function(err, updateResults){     
+        sails.services['listingservice'].updateListingService(req.params['id'], req.body, function(err, updateResults) {
             if(err) 
                 return res.json(500, err);
             return res.json(updateResults);
@@ -98,11 +143,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 lastName: userResult.lastName
             };
             if(req.body['myself']) {
-                query = {where: {userId: req.params['userId'], sort: 'createdAt DESC' } };
+                query = {where: {userId: req.params['userId'], isArchived: false, sort: 'createdAt DESC' } };
             } else if(req.body['friends']) {
-                query = {where: {userId: req.params['userId'], isSold: false, sort: 'createdAt DESC' } };
+                query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, sort: 'createdAt DESC' } };
             } else {
-                query = {where: {userId: req.params['userId'], isSold: false, isPrivate: false, sort: 'createdAt DESC' } };
+                query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, isPrivate: false, sort: 'createdAt DESC' } };
             }
             sails.models['listing'].find(query).exec(function(err, results){
                 if(err) {
@@ -124,11 +169,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 lastName: userResult.lastName
             };
             if(req.body['myself']) {
-                query = {where: {userId: userResult.id, sort: 'createdAt DESC' } };
+                query = {where: {userId: userResult.id, isArchived: false, sort: 'createdAt DESC' } };
             } else if(req.body['friends']) {
-                query = {where: {userId: userResult.id, isSold: false, sort: 'createdAt DESC' } };
+                query = {where: {userId: userResult.id, isSold: false, isArchived: false, sort: 'createdAt DESC' } };
             } else {
-                query = {where: {userId: userResult.id, isSold: false, isPrivate: false, sort: 'createdAt DESC' } };
+                query = {where: {userId: userResult.id, isSold: false, isArchived: false, isPrivate: false, sort: 'createdAt DESC' } };
             }
             sails.models['listing'].find(query).exec(function(err, results){
                 if(err) {
@@ -147,14 +192,14 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             friendsApproved.splice(i, 1);
             var skipUsers = 2;
             var selbiArray = [];
-            sails.models['user'].find({where: {id: friendsApproved, hasListings: true, sort: 'updatedAt DESC' } } ).populate('listings', {where:{isSold: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
+            sails.models['user'].find({where: {id: friendsApproved, hasListings: true, sort: 'updatedAt DESC' } } ).populate('listings', {where:{isSold: false, isArchived: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
                 if(err)
                     return res.json(err);
                 async.eachLimit(listingResult, 20, function(userList, cbEach){
                     async.parallel([
                         function(cb){
                             sails.models['listing'].count({ 
-                                where: { userId: userList.id, isSold: false} 
+                                where: { userId: userList.id, isSold: false, isArchived: false} 
                             }).exec(cb);
                         },
                         function(cb){
@@ -189,14 +234,14 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             var friendsApproved = invitationResult.idArray;
             var skipUsers = 2;
             var selbiArray = [];
-            sails.models['user'].find({where: {id: {'!':friendsApproved}, hasListings: true, sort: 'updatedAt DESC' } } ).populate('listings', {where:{isSold: false, isPrivate: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
+            sails.models['user'].find({where: {id: {'!':friendsApproved}, hasListings: true, sort: 'updatedAt DESC' } } ).populate('listings', {where:{isSold: false, isArchived: false, isPrivate: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
                 if(err)
                     return res.json(err);
                 async.eachLimit(listingResult, 20, function(userList, cbEach){
                     async.parallel([
                         function(cb){
                             sails.models['listing'].count({ 
-                                where: { userId: userList.id, isSold: false, isPrivate: false} 
+                                where: { userId: userList.id, isSold: false, isArchived: false, isPrivate: false} 
                             }).exec(cb);
                         },
                         function(cb){

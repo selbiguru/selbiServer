@@ -46,6 +46,7 @@ module.exports.routes = {
   'POST /userlistings/create': 'ListingController.createListing',
   'PUT /userlistings/update/:id': 'ListingController.updateListing',
   'PUT /userlistings/:userId': 'ListingController.getUserListings',
+  'PUT /userlistings/archive/:id': 'ListingController.archiveListing',
   'PUT /userlistings/userName/:username': 'ListingController.getUsernameListings',
   'GET /userlistings/listing/:id': 'ListingController.getListing',
   'GET /userlistings/friendlistings/:userId': 'ListingController.getFriendsListings',
