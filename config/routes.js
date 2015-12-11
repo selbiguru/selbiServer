@@ -40,6 +40,7 @@ module.exports.routes = {
 
   // Image routes
   'GET /image/sign/:referenceId': 'ImageController.getListingSignature',
+  'DELETE /image/deleteimage': 'ImageController.deleteCloudinaryImages',
 
   //Listing routes
   'POST /userlistings/create': 'ListingController.createListing',
