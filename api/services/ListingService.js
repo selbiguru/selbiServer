@@ -23,6 +23,21 @@
 
 
     /**
+     *  This is a public methods to updates a listing
+     *  @param      listingId is the ID of the listing to update
+     *  @param      updateObj is the Obj containg the data of the listing to update
+     *  @param      cb is a callback
+     */
+    module.exports.updateListingService = function(listingId, updateObj, cb) {
+        sails.models['listing'].update({where : { id: listingId } }, updateObj).exec(function(err, updateResults){     
+            if(err) 
+                return cb(500, err);
+            return cb(null, updateResults);
+        });
+    };
+
+
+    /**
      *  This is a public methods to create a listing
      *  @param      createListingObj
      *      @param      title is the title of the listing
@@ -51,7 +66,7 @@
      *  @param      cb is a callback
      */
     module.exports.countListingService = function(userId, cb) {
-        sails.models['listing'].count({where: {userId: userId, isSold: false, isPrivate: false } }).exec(function (err, countResult) {
+        sails.models['listing'].count({where: {userId: userId, isSold: false, isArchived: false, isPrivate: false } }).exec(function (err, countResult) {
             if (err)
                 return cb(500, err);
             return cb(err, countResult);
