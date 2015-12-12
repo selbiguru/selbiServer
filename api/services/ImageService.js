@@ -41,7 +41,7 @@
         }, function(err, results) {
             if(err)
                 return cb(500, err);
-            return cb(null, results);
+            return cb(null, 'success');
         });
     };
 

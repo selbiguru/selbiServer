@@ -15,7 +15,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 		return response.json(200, sails.services['imageservice'].getListingSignature(referenceId, request.token));
 	},
 	deleteCloudinaryImages: function(request, response){
-		sails.services['imageservice'].deleteCloudinaryImageService(images, function(err, deleteSignature) {
+		sails.services['imageservice'].deleteCloudinaryImageService(request.body['images'], function(err, deleteSignature) {
 			if(err)
 				return response.json(500, err)
 			return response.json(deleteSignature);
