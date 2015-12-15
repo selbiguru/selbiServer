@@ -25,7 +25,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 				if(err) {
 					response.json(500, err.message);
 				} else {
-					sails.services['emailservice'].sendWelcomeEmail(user.email, user.firstName || user.email);
+					sails.services['emailservice'].sendWelcomeEmail(user.email, user.firstName, user.lastName);
 					response.json(200, user);
 				}
 			});
