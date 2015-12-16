@@ -89,6 +89,12 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     userNotifications: {
       collection: 'Notification',
       via: 'user'
-    }
+    },
+    resetPasswordToken: {
+      type: 'string'
+    },
+    resetPasswordExpires: {
+      type: 'integer'
+    },
   }
 });

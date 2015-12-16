@@ -60,6 +60,9 @@ module.exports.routes = {
   'POST /userData/uniqueUsername': 'UserController.uniqueUsername',
   'POST /user/byphone/:userId': 'UserController.getUsersByPhones',
   'POST /userData/uniquePhone': 'UserController.uniquePhones',
+  'PUT /userData/forgot/password': 'UserController.forgotPassword',
+  'PUT /userData/reset/password/:token': 'UserController.resetPassword',
+  'PUT /userData/reset/validate/:token': 'UserController.validateLinkPassword',
 
   //braintree payments routes
   'GET /payments/getClientToken': 'PaymentsController.getClientToken',

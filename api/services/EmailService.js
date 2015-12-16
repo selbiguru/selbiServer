@@ -162,4 +162,33 @@
         sendEmail(to, 'purchase', templateVariables);
     };
 
+
+    /**
+     *  Send reset password email to the user
+     * @example:
+     *      sails.services['emailservice'].resetPasswordEmail('xxxxx@gmail.com', 'Bill', 'Bucks', '222 main street, USA', 'buyerx@some.domain');
+     * @param  {String} to           Destination Email address
+     * @param  {String} toFirst      First Name of the buyer
+     * @param  {String} toLast       Last Name of the buyer
+     * @param  {String} email        Email of seller
+     * @param  {String} item         Item purchased from the seller
+     * @return
+     */
+    module.exports.resetPasswordEmail = function(to, toName, last, email, item) {
+
+        var templateVariables = [{
+            name: "USERNAME",
+            content: toName
+        },
+        {   name: "LASTNAME",
+            content: last
+        },
+        {   name: "email",
+            content: email
+        },
+        ]
+
+        sendEmail(to, 'purchase', templateVariables);
+    };
+
 })();;
