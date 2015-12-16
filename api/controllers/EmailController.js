@@ -19,4 +19,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     		}
     	});
     },
+
+    sendWelcome: function(req, res){
+        sails.services['emailservice'].sendWelcomeEmail('selbiguru@gmail.com', req.body['firstName'], req.body['lastName']);
+        res.json(200, "Success");
+    },
 });

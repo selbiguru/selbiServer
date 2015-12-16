@@ -74,14 +74,92 @@
     }   
 
 
-    module.exports.sendWelcomeEmail = function(to, toName) {
+    /**
+     *  Send welcome to Selbi email to the new user
+     * @example:
+     *      sails.services['emailservice'].sendWelcomeEmail('xxxxx@gmail.com', 'Bill', 'Bucks');
+     * @param  {String} to           Destination Email address
+     * @param  {String} toFirst      First Name of new user
+     * @param  {String} toLast       Last Name of new user
+     * @return
+     */
+    module.exports.sendWelcomeEmail = function(to, toFirst, toLast) {
+
+        var templateVariables = [{
+            name: "USERNAME",
+            content: toFirst
+        },
+        {   name: "LASTNAME",
+            content: toLast
+        }]
+
+        sendEmail(to, 'welcome', templateVariables);
+    };
+
+
+
+    /**
+     *  Send sold email to the seller
+     * @example:
+     *      sails.services['emailservice'].sendSoldEmail('xxxxx@gmail.com', 'Bill', 'Bucks', '222 main street, USA', 'buyerx@some.domain');
+     * @param  {String} to           Destination Email address
+     * @param  {String} toFirst      First Name of the buyer
+     * @param  {String} toLast       Last Name of the buyer
+     * @param  {String} address      Address of the buyer
+     * @param  {String} email        Email of buyer
+     * @param  {String} email        Item purchased by the buyer
+     * @return
+     */
+    module.exports.sendSoldEmail = function(to, toName, last, address, email, item) {
 
         var templateVariables = [{
             name: "USERNAME",
             content: toName
-        }]
+        },
+        {   name: "LASTNAME",
+            content: last
+        },
+        {   name: "address",
+            content: address
+        },
+        {   name: "email",
+            content: email
+        },
+        {   name: "item",
+            content: item
+        },
+        ]
 
-        sendEmail(to, 'welcome', templateVariables);
+        sendEmail(to, 'sold', templateVariables);
+    };
+
+
+    /**
+     *  Send purchased email to the buyer
+     * @example:
+     *      sails.services['emailservice'].sendPurchaseEmail('xxxxx@gmail.com', 'Bill', 'Bucks', '222 main street, USA', 'buyerx@some.domain');
+     * @param  {String} to           Destination Email address
+     * @param  {String} toFirst      First Name of the buyer
+     * @param  {String} toLast       Last Name of the buyer
+     * @param  {String} email        Email of seller
+     * @param  {String} item         Item purchased from the seller
+     * @return
+     */
+    module.exports.sendPurchaseEmail = function(to, toName, last, email, item) {
+
+        var templateVariables = [{
+            name: "USERNAME",
+            content: toName
+        },
+        {   name: "LASTNAME",
+            content: last
+        },
+        {   name: "email",
+            content: email
+        },
+        ]
+
+        sendEmail(to, 'purchase', templateVariables);
     };
 
 })();;

@@ -156,7 +156,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                     };
                     sails.services['userservice'].updateUserDataService(req.body['sellerId'], updateObj, function(err, updateResult) {
                         if(err) {
-                            console.log('User not updated when creating a listing');
+                            console.log('User not updated when buying an item');
                         }
                         return res.json(200, result);
                     });

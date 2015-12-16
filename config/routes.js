@@ -77,6 +77,7 @@ module.exports.routes = {
 
   //Mandrill Email
   'POST /email/contactSelbi': 'EmailController.contactSelbi',
+  'POST /email/welcomeSelbi': 'EmailController.sendWelcome',
 
   //Friend
   'POST /friend/request': 'InvitationController.sendFriendInvitation',
