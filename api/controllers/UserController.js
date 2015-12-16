@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var async = require('async');
+var bcrypt = require('bcryptjs');
 
 /**
  * UserController
@@ -31,6 +32,94 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 			});
 		});
 	},
+	forgotPassword: function(req, res){
+        async.waterfall([
+        	function(cb) {
+        		bcrypt.genSalt(10, function callback(error, salt) {
+        			if(error)
+        				cb(error, null);
+        			var token = salt.toString('hex');
+        			cb(null, token);
+      			});
+        	},
+        	function(token, cb) {
+        		sails.models['user'].findOne({where: {email: req.body['email'] } }).exec(function(err, userResult) {
+        			if(err) {
+        				cb(err, null)
+        			} else if(!userResult) {
+        				cb(userResult, null);
+        			} else {
+        				var passwordObject = {
+	        				resetPasswordToken: token,
+					        resetPasswordExpires: Date.now() + 1800000 // 1/2 hour
+					    }
+				        sails.models['user'].update({where: {email: req.body['email'] } }, passwordObject).exec(function(err, user) {
+				        	if(err)
+				        		cb(err, null);
+				        	cb(null, token, userResult);
+				        });
+        			}
+        		});
+        	},
+        	function(token, userResult, cb) {
+        		//sails.services['emailservice'].sendWelcomeEmail('selbiguru@gmail.com', req.body['firstName'], req.body['lastName']);
+        		cb(null, "Success");
+        	}
+       	], function(err, results) {
+       		if(err)
+       			res.json(500, err)
+       		res.json(results);
+       	});
+    },
+    validateLinkPassword: function(req, res) {
+    	sails.models['user'].findOne({resetPasswordToken: req.params['token'], resetPasswordExpires: {'>': Date.now()}}).exec(function(err, userResult) {
+			if(err){
+				cb(err, null);
+			} else if(!userResult) {
+				cb(userResult, null);
+			} else {
+				res.redirect('/error');
+			}
+		});
+    },
+    resetPassword: function(req, res) {
+    	var passportModel = sails.models['passport'];
+        async.waterfall([
+        	function(cb) {
+        		sails.models['user'].findOne({resetPasswordToken: req.params['token'], resetPasswordExpires: {'>': Date.now()}}).exec(function(err, userResult) {
+        			if(err){
+        				cb(err, null);
+        			} else if(!userResult) {
+        				cb(userResult, null);
+        			} else {
+        				var passwordObject = {
+	        				resetPasswordToken: undefined,
+					        resetPasswordExpires: undefined
+					    }
+				        sails.models['user'].update({where: {id: userResult.id } }, passwordObject).exec(function(err, user) {
+				        	if(err)
+				        		cb(err, null);
+				        	cb(null, user[0]);
+				        });
+        			}
+        		});
+        	},
+        	function(user, cb) {
+        		req.body.password
+        		passportModel.update({where: { user: user.id } },{ password: req.body['password'] }).exec(function(err, passport){
+					if(err) {
+						cb(err, null);
+					} else {
+						cb(null, 'Success');
+					}
+				});
+        	}
+       	], function(err, results) {
+       		if(err)
+       			res.json(500, err)
+       		res.json(results);
+       	});
+    },
 	getUserData: function(req, res){
         //TODO Add code here to accept an options object to pupulate objects that are asked for in the call
         /*

@@ -121,7 +121,6 @@ var Passport = {
     if (passport.hasOwnProperty('password')) {
       bcrypt.hash(passport.password, 10, function callback(error, hash) {
         passport.password = hash;
-
         next(error, passport);
       });
     } else {
