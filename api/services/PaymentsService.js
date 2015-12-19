@@ -142,22 +142,22 @@
     module.exports.getPayments = function (userId, cb){
         if(!userId)
             return cb('userId is missing!', null);
-
         sails.models['user'].findOne({ where: { id: userId } }).exec(function(err, results){
+            var result = {
+                userId: userId
+            };
             if(err)
                 return cb(err, null);
-            if(results)
-            {
-                sails.models['payments'].findOne({ where: { id: results.userPaymentMethod || {} } }).exec(function(err, paymentsResult) {
-                    if (err)
-                        return cb(err, null);
-
-                    sails.models['merchant'].findOne({where: {id: results.userMerchant || {} }}).exec(function (err, merchantResult) {
+            if(results === undefined) {
+                //no user found
+                return cb('No User found!', null);
+            }
+            async.parallel([
+                function(cb) {
+                    sails.models['payments'].findOne({ where: { id: results.userPaymentMethod || {} } }).exec(function(err, paymentsResult) {
                         if (err)
                             return cb(err, null);
-
                         var userPaymentMethod = {};
-                        var userMerchant = {};
                         if(paymentsResult) {
                             userPaymentMethod = {
                                 lastFour: paymentsResult.lastFour,
@@ -166,9 +166,16 @@
                                 paymentMethodToken: paymentsResult.paymentMethodToken
                             }
                         }
-
-                        if(merchantResult)
-                        {
+                        result.userPaymentMethod = userPaymentMethod,
+                        cb(null, paymentsResult);
+                    });
+                },
+                function(cb) {
+                    sails.models['merchant'].findOne({where: {id: results.userMerchant || {} }}).exec(function (err, merchantResult) {
+                        if (err)
+                            return cb(err, null);
+                        var userMerchant = {};
+                        if(merchantResult) {
                             userMerchant = {
                                 accountNumberLast4: merchantResult.accountNumberLast4,
                                 routingNumber: merchantResult.routingNumber,
@@ -177,19 +184,15 @@
                                 merchantId: merchantResult.merchantId
                             }
                         }
-                        var result = {
-                            userId: userId ,
-                            userPaymentMethod: userPaymentMethod,
-                            userMerchant: userMerchant
-                        }
-
-                        cb (null, result);
+                        result.userMerchant = userMerchant;
+                        cb(null, merchantResult);
                     });
-                });
-            }
-            else
-            //no user found
-            cb('No User found!', null);
+                }
+            ], function(err, paraResults) {
+                if(err)
+                    cb(err, null);
+                cb(null, result);
+            })
         });
     }
 
