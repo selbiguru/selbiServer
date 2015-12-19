@@ -240,13 +240,12 @@
         if(!merchantAccountParams.id || !userId)
             return cb('userId is missing!', null);
         //1) check if this user has a merchant
-        //sails.models['user'].findOne({ where: { id: merchantAccountParams.id } }).populate('userMerchant').exec(function(err, merchResults){
-        getgateway().merchantAccount.find(merchantAccountParams.id, function (err, merchResults) {
+        sails.models['user'].findOne({ where: { id: merchantAccountParams.id } }).exec(function(err, merchResults){
             if(err)
                 return cb(err, null);
-
-            if(merchResults.id)
-            {
+            if(merchResults === undefined)
+                return cb('No user found', null);
+            if(merchResults.userMerchant) {
                 //Merchant Account cannot be updated
                 delete merchantAccountParams['id'];
                 //update merchant on braintree
@@ -276,8 +275,7 @@
                 });
             }
             //No merchant was found on selbi so create a new merchant on braintree
-            else
-            {
+            else {
                 getgateway().merchantAccount.create(merchantAccountParams, function (err, merchCreateResult) {
                     if(!merchCreateResult.success)
                         return cb(merchCreateResult.message, null);
@@ -301,7 +299,6 @@
                         sails.models['user'].update({ where: {id: userId } }, merchantCreateObj).exec(function(err){
                             if(err)
                                 return cb(err, null);
-
                             cb(null,{ success: true });
                         });
                     });
