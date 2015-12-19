@@ -26,8 +26,12 @@
     module.exports.createCustomerAndPaymentMethod = function(userId, firstName, lastName, paymentMethodNonce, cb){
         if(!paymentMethodNonce || !userId)
             return cb('paymentMethodNonce or userId is missing!', null);
-        getgateway().customer.find(userId, function(err) {
-            if(err){
+        sails.models['user'].findOne({ where: { id: userId } }).exec(function(err, customerResults){
+            if(err)
+                return cb(err, null);
+            if(customerResults === undefined)
+                return cb('No user found', null);
+            if(!customerResults.userPaymentMethod){
                 //customer not found so create new customer and payment method
                 getgateway().customer.create({
                     id: userId,
@@ -200,18 +204,21 @@
         sails.models['user'].findOne({ where: { id: userId } }).populate('userPaymentMethod').exec(function(err, results){
             if(err)
                 return cb(err, null);
-
-            getgateway().paymentMethod.delete(results.userPaymentMethod.paymentMethodToken, function (err) {
-                if(err)
-                    return cb(err, null);
-                //destroy object from db
-                sails.models['payments'].destroy({where: {id: results.userPaymentMethod.id } }).exec(function deleteCB(err, delResult){
+            if(results && results.userPaymentMethod) {
+                getgateway().paymentMethod.delete(results.userPaymentMethod.paymentMethodToken, function (err) {
                     if(err)
-                        console.log('Error deleting record from our db');
+                        return cb(err, null);
+                    //destroy object from db
+                    sails.models['payments'].destroy({where: {id: results.userPaymentMethod.id } }).exec(function deleteCB(err, delResult){
+                        if(err)
+                            console.log('Error deleting record from our db');
 
-                    return cb(null, delResult);
+                        return cb(null, delResult);
+                    });
                 });
-            });
+            } else {
+                return cb(null, 'No Payment Method Found to Delete');
+            }
         });
     }
 
