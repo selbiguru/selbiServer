@@ -6,6 +6,7 @@
      * @description :: Provides payment related calls to talk to Braintree
      */
     var async = require('async'),
+    self = this,
     braintree = require('braintree');
 
     /**
@@ -23,10 +24,9 @@
     };
 
     module.exports.createCustomerAndPaymentMethod = function(userId, firstName, lastName, paymentMethodNonce, cb){
+        if(!paymentMethodNonce || !userId)
+            return cb('paymentMethodNonce or userId is missing!', null);
         getgateway().customer.find(userId, function(err) {
-            if(!paymentMethodNonce || !userId)
-                 return cb('paymentMethodNonce or userId is missing!', null);
-
             if(err){
                 //customer not found so create new customer and payment method
                 getgateway().customer.create({
@@ -70,60 +70,57 @@
                 });//create brackets
             }
             else{
-                sails.models['user'].findOne({ where: { id: userId } }).populate('userPaymentMethod').exec(function(err, results) {
-                    if (err)
-                         return cb(err, null);
-
-                    //delete payment method if any exist
-                    if(results && results.userPaymentMethod) {
-                        getgateway().paymentMethod.delete(results.userPaymentMethod.paymentMethodToken, function (err) {
+                async.waterfall([
+                    function(cb) {
+                        sails.services['paymentsservice'].deletePaymentMethod(userId, function(err, deleteResult) {
                             if (err)
                                 return cb(err, null);
-                            //destroy object from db
-                            sails.models['payments'].destroy({where: {id: results.userPaymentMethod.id } }).exec(function deleteCB(err) {
-                                if (err)
-                                    console.log('Error deleting record from our db');
-                            });
+                            cb(null, deleteResult);
                         });
-                    }
-                    //create new payment method
-                    getgateway().paymentMethod.create({
-                        customerId: userId,
-                        paymentMethodNonce: paymentMethodNonce,
-                        options: {
-                            verifyCard: true,
-                            verificationMerchantAccountId: sails.config.braintree.masterMerchantAccountId
-                        }
-                    }, function (err, PaymentResult) {
-                        var cardMethodStatus = {};
-                        if (err)
-                            return cb(err, null);
-                        if (!PaymentResult.success) {
-                            cardMethodStatus.message = PaymentResult.message;
-                            cardMethodStatus.cardStatus = PaymentResult.success;
-                            return cb(null, cardMethodStatus);
-                        } else {
-                            cardMethodStatus.verificationStatus = PaymentResult.creditCard.verification.status;
-                            cardMethodStatus.cardStatus = PaymentResult.success;
-                        }
-                        var pm = {
-                            id: userId,
-                            userPaymentMethod: {
-                                paymentMethodToken: PaymentResult.paymentMethod.token,
-                                lastFour: PaymentResult.paymentMethod.last4,
-                                cardType: PaymentResult.paymentMethod.cardType,
-                                expirationDate: PaymentResult.paymentMethod.expirationDate
+                    },
+                    function(deleteResult, cb) {
+                        //create new payment method
+                        getgateway().paymentMethod.create({
+                            customerId: userId,
+                            paymentMethodNonce: paymentMethodNonce,
+                            options: {
+                                verifyCard: true,
+                                verificationMerchantAccountId: sails.config.braintree.masterMerchantAccountId
                             }
-                        };
-
-                        //save the payment token user can have multiple payment methods
-                        sails.models['user'].update({ where: {id: userId } }, pm).exec(function (err) {
+                        }, function (err, PaymentResult) {
+                            var cardMethodStatus = {};
                             if (err)
                                 return cb(err, null);
+                            if (!PaymentResult.success) {
+                                cardMethodStatus.message = PaymentResult.message;
+                                cardMethodStatus.cardStatus = PaymentResult.success;
+                                return cb(null, cardMethodStatus);
+                            } else {
+                                cardMethodStatus.verificationStatus = PaymentResult.creditCard.verification.status;
+                                cardMethodStatus.cardStatus = PaymentResult.success;
+                            }
+                            var pm = {
+                                id: userId,
+                                userPaymentMethod: {
+                                    paymentMethodToken: PaymentResult.paymentMethod.token,
+                                    lastFour: PaymentResult.paymentMethod.last4,
+                                    cardType: PaymentResult.paymentMethod.cardType,
+                                    expirationDate: PaymentResult.paymentMethod.expirationDate
+                                }
+                            };
 
-                            cb(null, cardMethodStatus);
-                        });
-                    }); //create payment method
+                            //save the payment token user can have multiple payment methods
+                            sails.models['user'].update({ where: {id: userId } }, pm).exec(function (err) {
+                                if (err)
+                                    return cb(err, null);
+                                cb(null, cardMethodStatus);
+                            });
+                        }); //create payment method
+                    }
+                ], function(err, waterResult) {
+                    if(err)
+                        return cb(err, null);
+                    cb(null, waterResult);
                 });
             } //else
         }); // customer find end brackets
