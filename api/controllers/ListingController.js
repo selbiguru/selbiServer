@@ -190,12 +190,12 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             var friendsApproved = invitationResult.idArray;
             var i = friendsApproved.indexOf(req.params['userId']);
             friendsApproved.splice(i, 1);
-            var skipUsers = 2;
+            var updatedPaginate = req.body['updatedAt'] || new Date();
             var selbiArray = [];
-            sails.models['user'].find({where: {id: friendsApproved, hasListings: true, sort: 'updatedAt DESC' } } ).populate('listings', {where:{isSold: false, isArchived: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
+            sails.models['user'].find({where: {id: friendsApproved, hasListings: true, updatedAt: {'<': updatedPaginate }, sort: 'updatedAt DESC', limit: 30 } } ).populate('listings', {where:{isSold: false, isArchived: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
                 if(err)
                     return res.json(err);
-                async.eachLimit(listingResult, 20, function(userList, cbEach){
+                async.eachLimit(listingResult, 10, function(userList, cbEach){
                     async.parallel([
                         function(cb){
                             sails.models['listing'].count({ 
@@ -232,12 +232,12 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
        sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
             //friendsApproved is an array of friend's IDs
             var friendsApproved = invitationResult.idArray;
-            var skipUsers = 2;
+            var updatedPaginate = req.body['updatedAt'] || new Date();
             var selbiArray = [];
-            sails.models['user'].find({where: {id: {'!':friendsApproved}, hasListings: true, sort: 'updatedAt DESC' } } ).populate('listings', {where:{isSold: false, isArchived: false, isPrivate: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
+            sails.models['user'].find({where: {id: {'!':friendsApproved}, hasListings: true, updatedAt: {'<': updatedPaginate }, sort: 'updatedAt DESC', limit: 30 } } ).populate('listings', {where:{isSold: false, isArchived: false, isPrivate: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
                 if(err)
                     return res.json(err);
-                async.eachLimit(listingResult, 20, function(userList, cbEach){
+                async.eachLimit(listingResult, 10, function(userList, cbEach){
                     async.parallel([
                         function(cb){
                             sails.models['listing'].count({ 
