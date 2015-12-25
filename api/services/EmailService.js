@@ -174,7 +174,7 @@
      * @param  {String} item         Item purchased from the seller
      * @return
      */
-    module.exports.resetPasswordEmail = function(to, toName, last, email, item) {
+    module.exports.resetPasswordEmail = function(to, toName, last, reflink) {
 
         var templateVariables = [{
             name: "USERNAME",
@@ -183,12 +183,13 @@
         {   name: "LASTNAME",
             content: last
         },
-        {   name: "email",
-            content: email
+        {
+            name: "REFLINK",
+            content: reflink
         },
         ]
 
-        sendEmail(to, 'purchase', templateVariables);
+        sendEmail(to, 'practice', templateVariables);
     };
 
 })();;

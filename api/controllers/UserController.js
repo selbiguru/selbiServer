@@ -37,17 +37,18 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         	function(cb) {
         		bcrypt.genSalt(10, function callback(error, salt) {
         			if(error)
-        				cb(error, null);
+        				return cb(error, null);
         			var token = salt.toString('hex');
-        			cb(null, token);
+        			var newToken = token.replace(/\//g, "L");
+        			cb(null, newToken);
       			});
         	},
         	function(token, cb) {
         		sails.models['user'].findOne({where: {email: req.body['email'] } }).exec(function(err, userResult) {
         			if(err) {
-        				cb(err, null)
+        				return cb(err, null)
         			} else if(!userResult) {
-        				cb(userResult, null);
+        				return cb(404, null);
         			} else {
         				var passwordObject = {
 	        				resetPasswordToken: token,
@@ -55,30 +56,30 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 					    }
 				        sails.models['user'].update({where: {email: req.body['email'] } }, passwordObject).exec(function(err, user) {
 				        	if(err)
-				        		cb(err, null);
-				        	cb(null, token, userResult);
+				        		return cb(err, null);
+				        	cb(null, token, user[0]);
 				        });
         			}
         		});
         	},
-        	function(token, userResult, cb) {
-        		//sails.services['emailservice'].sendWelcomeEmail('selbiguru@gmail.com', req.body['firstName'], req.body['lastName']);
-        		cb(null, "Success");
+        	function(token, user, cb) {
+        		sails.services['emailservice'].resetPasswordEmail('selbiguru@gmail.com', user.firstName, user.lastName, "http://localhost:1337/userData/reset/validate/"+token);
+        		cb(null, user);
         	}
        	], function(err, results) {
        		if(err)
-       			res.json(500, err)
+       			return res.json(500, err)
        		res.json(results);
        	});
     },
     validateLinkPassword: function(req, res) {
     	sails.models['user'].findOne({resetPasswordToken: req.params['token'], resetPasswordExpires: {'>': Date.now()}}).exec(function(err, userResult) {
 			if(err){
-				cb(err, null);
+				res.redirect('http://localhost:3000/error');
 			} else if(!userResult) {
-				cb(userResult, null);
+				res.redirect('http://localhost:3000/error');
 			} else {
-				res.redirect('/error');
+				res.redirect('http://localhost:3000/resetpassword/'+req.params['token']);
 			}
 		});
     },
@@ -108,7 +109,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         		req.body.password
         		passportModel.update({where: { user: user.id } },{ password: req.body['password'] }).exec(function(err, passport){
 					if(err) {
-						cb(err, null);
+						return cb(err, null);
 					} else {
 						cb(null, 'Success');
 					}
@@ -116,7 +117,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         	}
        	], function(err, results) {
        		if(err)
-       			res.json(500, err)
+       			//res.redirect('http://localhost:3000/error');
+       			res.json(500, err);
+       		//res.redirect('http://localhost:3000/success');
        		res.json(results);
        	});
     },

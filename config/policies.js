@@ -67,7 +67,9 @@ module.exports.policies = {
     'update':   ['authenticated', 'addDataUpdate'],
     'destroy':  ['authenticated', 'isAdmin'],
     'add':      ['authenticated', 'isAdmin'],
-    'remove':   ['authenticated', 'isAdmin']
+    'remove':   ['authenticated', 'isAdmin'],
+    'validateLinkPassword':   [],
+    'resetPassword':   []
   },
 
   // UserLogin controller
