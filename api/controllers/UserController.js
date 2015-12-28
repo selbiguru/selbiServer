@@ -89,9 +89,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         	function(cb) {
         		sails.models['user'].findOne({resetPasswordToken: req.params['token'], resetPasswordExpires: {'>': Date.now()}}).exec(function(err, userResult) {
         			if(err){
-        				cb(err, null);
+        				return cb(err, null);
         			} else if(!userResult) {
-        				cb(userResult, null);
+        				return cb(404, null);
         			} else {
         				var passwordObject = {
 	        				resetPasswordToken: undefined,
@@ -99,7 +99,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 					    }
 				        sails.models['user'].update({where: {id: userResult.id } }, passwordObject).exec(function(err, user) {
 				        	if(err)
-				        		cb(err, null);
+				        		return cb(err, null);
 				        	cb(null, user[0]);
 				        });
         			}
@@ -118,7 +118,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
        	], function(err, results) {
        		if(err)
        			//res.redirect('http://localhost:3000/error');
-       			res.json(500, err);
+       			return res.json(500, err);
        		//res.redirect('http://localhost:3000/success');
        		res.json(results);
        	});
