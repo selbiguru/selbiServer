@@ -100,6 +100,7 @@ module.exports.routes = {
   //'PUT /notification/update/:notificationId': 'NotificationController.updateNotificationById',
   //'PUT /notification/update/userids': 'NotificationController.updateNotificationByUsers',
   'DELETE /notification/delete/:notificationId': 'NotificationController.deleteNotification',
+  'GET /notification/count/:userId': 'NotificationController.countNotifications',
   'GET /notification/userid/:userId': 'NotificationController.getNotificationByUserId',
   'GET /notification/notificationid/:notificationId': 'NotificationController.getByNotificationId',
 

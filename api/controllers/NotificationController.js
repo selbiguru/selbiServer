@@ -41,6 +41,13 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             return res.json(deleteResponse);
         });
 	},
+    countNotifications: function(req, res) {
+        sails.services['notificationservice'].countNotificationService( req.params['userId'], function(err, countResponse){
+            if(err)
+                return res.json(500, err);
+            return res.json(countResponse);
+        });
+    },
 	getNotificationByUserId: function(req, res) {
         var notifcationArray = [];
 		sails.services['notificationservice'].getNotificationByUserIdService( req.params['userId'], function(err, getResponse){

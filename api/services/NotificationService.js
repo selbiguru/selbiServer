@@ -71,6 +71,20 @@
 
 
     /**
+     *  This is a public methods to delete a notification
+     *  @param      userId is the ID of the user to count
+     *  @param      cb is a callback
+     */
+    module.exports.countNotificationService = function(userId, cb) {
+        sails.models['notification'].count({where: {user: userId } }).exec(function (err, countResult) {
+            if (err)
+                return cb(500, err);
+            return cb(err, countResult);
+        });
+    };
+
+
+    /**
      *  This is a public methods to get all notifications for a given user
      *  @param      userId is the userID of the user to return notifcations for
      *  @param      cb is a callback
