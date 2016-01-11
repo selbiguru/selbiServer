@@ -129,7 +129,12 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         sails.models['listing'].findOne({ where: { id: req.params['id'] } }).populate('user').exec(function(err, results){
             if(err) 
                 return res.json(500, err);
-            return res.json(results);
+            sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], results.user.id, function(err, inviteResult) {
+                if(err)
+                    return res.json(500, err);
+                results.invitation = inviteResult;
+                return res.json(results);
+            });
         });
     },
     getUserListings: function(req, res){

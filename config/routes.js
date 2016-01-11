@@ -48,7 +48,7 @@ module.exports.routes = {
   'PUT /userlistings/:userId': 'ListingController.getUserListings',
   'PUT /userlistings/archive/:id': 'ListingController.archiveListing',
   'PUT /userlistings/userName/:username': 'ListingController.getUsernameListings',
-  'GET /userlistings/listing/:id': 'ListingController.getListing',
+  'GET /userlistings/listing/:userId/:id': 'ListingController.getListing',
   'PUT /userlistings/friendlistings/:userId': 'ListingController.getFriendsListings',
   'PUT /userlistings/selbilistings/:userId': 'ListingController.getSelbiListings',
   'DELETE /userlistings/delete/:id': 'ListingController.deleteListing',
