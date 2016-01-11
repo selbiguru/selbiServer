@@ -99,8 +99,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     },
     searchCategory: {
       type: 'string',
-      enum: ['all', 'electronics', 'menclothing','womenclothing', 'household', 'menshoes','womenshoes','outdoors', 'sports', 'music', 'appliances', 'jewelry', 'games', 'toys', 'automotive'],
-      defaultsTo: 'all',
+      enum: ['all','Electronics', 'Menswear', 'Womenswear', 'Sports & Outdoors', 'Music', 'Furniture', 'Jewelry', 'Games & Toys', 'Automotive', 'Baby & Kids', 'Appliances', 'Other'],
+      defaultsTo: 'Other',
       required: true
     }
   }

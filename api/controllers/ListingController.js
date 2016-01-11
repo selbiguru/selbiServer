@@ -228,7 +228,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             });
        });
     },
-    getSelbiListings: function(req, res) {
+   /* getSelbiListings: function(req, res) {
        sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
             //friendsApproved is an array of friend's IDs
             var friendsApproved = invitationResult.idArray;
@@ -269,5 +269,66 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 });
             });
        });        
-    }
+    },*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+getSelbiListings: function(req, res) {
+   sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
+        if(err)
+            return res.json(err);
+        //friendsApproved is an array of friend's IDs
+        var friendsApproved = invitationResult.idArray;
+        var updatedPaginate = req.body['updatedAt'] || new Date();
+        var listingSelbiUSAObj = {};
+        sails.models['listing'].find({where: {userId: {'!':friendsApproved}, createdAt: {'<': updatedPaginate }, isSold: false, searchCategory: ['all', 'Other'], isArchived: false, isPrivate: false, sort: 'createdAt DESC', limit: 30 } } ).exec(function(err, listingResult){
+            if(err)
+                return res.json(err);
+            listingSelbiUSAObj.listings = listingResult;
+            return res.json(listingSelbiUSAObj);
+        });
+   });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 });
