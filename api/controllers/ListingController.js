@@ -138,6 +138,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         });
     },
     getUserListings: function(req, res){
+        var createdPaginate = req.body['createdAt'] || new Date();
         sails.models['user'].findOne({ where: { id: req.params['userId'] } }).exec(function(err, userResult) {
             var query;
             if(err) {
@@ -148,11 +149,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 lastName: userResult.lastName
             };
             if(req.body['myself']) {
-                query = {where: {userId: req.params['userId'], isArchived: false, sort: 'createdAt DESC' } };
+                query = {where: {userId: req.params['userId'], isArchived: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             } else if(req.body['friends']) {
-                query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, sort: 'createdAt DESC' } };
+                query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             } else {
-                query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, isPrivate: false, sort: 'createdAt DESC' } };
+                query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, isPrivate: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             }
             sails.models['listing'].find(query).exec(function(err, results){
                 if(err) {
@@ -164,6 +165,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         });
     },
     getUsernameListings: function(req, res){
+        var createdPaginate = req.body['createdAt'] || new Date();
         sails.models['user'].findOne({ where: { username: req.params['username'] } }).exec(function(err, userResult) {
             var query;
             if(err) {
@@ -174,11 +176,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 lastName: userResult.lastName
             };
             if(req.body['myself']) {
-                query = {where: {userId: userResult.id, isArchived: false, sort: 'createdAt DESC' } };
+                query = {where: {userId: userResult.id, isArchived: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             } else if(req.body['friends']) {
-                query = {where: {userId: userResult.id, isSold: false, isArchived: false, sort: 'createdAt DESC' } };
+                query = {where: {userId: userResult.id, isSold: false, isArchived: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             } else {
-                query = {where: {userId: userResult.id, isSold: false, isArchived: false, isPrivate: false, sort: 'createdAt DESC' } };
+                query = {where: {userId: userResult.id, isSold: false, isArchived: false, isPrivate: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             }
             sails.models['listing'].find(query).exec(function(err, results){
                 if(err) {
@@ -309,9 +311,11 @@ getSelbiListings: function(req, res) {
             return res.json(err);
         //friendsApproved is an array of friend's IDs
         var friendsApproved = invitationResult.idArray;
-        var updatedPaginate = req.body['updatedAt'] || new Date();
+        var createdPaginate = req.body['createdAt'] || new Date();
         var listingSelbiUSAObj = {};
-        sails.models['listing'].find({where: {userId: {'!':friendsApproved}, createdAt: {'<': updatedPaginate }, isSold: false, searchCategory: ['all', 'Other'], isArchived: false, isPrivate: false, sort: 'createdAt DESC', limit: 30 } } ).exec(function(err, listingResult){
+        sails.models['listing'].find({where: {userId: {'!':friendsApproved}, createdAt: {'<': createdPaginate }, isSold: false, searchCategory: ['Sports & Outdoors'], isArchived: false, isPrivate: false, sort: 'createdAt DESC', limit: 30 } } ).exec(function(err, listingResult){
+            console.log("1111111111111111111", listingResult);
+            console.log("2222222222222", createdPaginate);
             if(err)
                 return res.json(err);
             listingSelbiUSAObj.listings = listingResult;
