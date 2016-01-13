@@ -277,67 +277,21 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             });
        });        
     },*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-getSelbiListings: function(req, res) {
-   sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
-        if(err)
-            return res.json(err);
-        //friendsApproved is an array of friend's IDs
-        var friendsApproved = invitationResult.idArray;
-        var createdPaginate = req.body['createdAt'] || new Date();
-        var listingSelbiUSAObj = {};
-        sails.models['listing'].find({where: {userId: {'!':friendsApproved}, createdAt: {'<': createdPaginate }, isSold: false, searchCategory: ['Sports & Outdoors'], isArchived: false, isPrivate: false, sort: 'createdAt DESC', limit: 30 } } ).exec(function(err, listingResult){
-            console.log("1111111111111111111", listingResult);
-            console.log("2222222222222", createdPaginate);
+    getSelbiListings: function(req, res) {
+       sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
             if(err)
                 return res.json(err);
-            listingSelbiUSAObj.listings = listingResult;
-            return res.json(listingSelbiUSAObj);
-        });
-   });
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            //friendsApproved is an array of friend's IDs
+            var friendsApproved = invitationResult.idArray;
+            var createdPaginate = req.body['createdAt'] || new Date();
+            var categories = req.body['categories'] || ['all','Electronics', 'Menswear', 'Womenswear', 'Sports & Outdoors', 'Music', 'Furniture', 'Jewelry', 'Games & Toys', 'Automotive', 'Baby & Kids', 'Appliances', 'Other'];
+            var listingSelbiUSAObj = {};
+            sails.models['listing'].find({where: {userId: {'!':friendsApproved}, createdAt: {'<': createdPaginate }, isSold: false, searchCategory: categories, isArchived: false, isPrivate: false, sort: 'createdAt DESC', limit: 30 } } ).exec(function(err, listingResult){
+                if(err)
+                    return res.json(err);
+                listingSelbiUSAObj.listings = listingResult;
+                return res.json(listingSelbiUSAObj);
+            });
+       });
+    }
 });
