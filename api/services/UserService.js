@@ -35,6 +35,19 @@
         });
     };
 
+    /**
+     *  This is a public methods to get a user by email
+     *  @param      userEmail is the email of the user to find
+     *  @param      cb is a callback
+     */
+    module.exports.getUserByEmailService = function(userEmail, cb) {
+        sails.models['user'].findOne({ where: { email: userEmail } }).populate('userAddress').exec(function(err, results){
+            if(err)
+                return cb(500, err);
+            return cb(err, results);
+        });
+    };
+
 
     /**
      *  This is a public methods to update a user by userId

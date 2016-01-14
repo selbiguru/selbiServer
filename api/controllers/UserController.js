@@ -12,25 +12,29 @@ var bcrypt = require('bcryptjs');
  */
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	signUp: function signUp(request, response){
-		sails.models['user'].create(request.params.all()).exec(function (err, user) {
-			if(err) {
-				return response.send(500, err.message);
-			}
-			var passportModel = sails.models['passport'];
+        sails.services['userservice'].getUserByEmailService( request.body['email'] , function(err, userResult){
+            if(err || userResult)
+                return response.json(500, "User already exists with this email!");
+            sails.models['user'].create(request.params.all()).exec(function (err, user) {
+                if(err) {
+                    return response.send(500, "Unable to register, please try again!");
+                }
+                var passportModel = sails.models['passport'];
 
-			passportModel.create({
-				protocol: 'local',
-				password: request.body['password'],
-				user: user.id
-			}).exec(function(err, passport){
-				if(err) {
-					response.json(500, err.message);
-				} else {
-					sails.services['emailservice'].sendWelcomeEmail(user.email, user.firstName, user.lastName);
-					response.json(200, user);
-				}
-			});
-		});
+                passportModel.create({
+                    protocol: 'local',
+                    password: request.body['password'],
+                    user: user.id
+                }).exec(function(err, passport){
+                    if(err) {
+                        response.json(500, "Unable to register, please try again!");
+                    } else {
+                        sails.services['emailservice'].sendWelcomeEmail(user.email, user.firstName, user.lastName);
+                        response.json(200, user);
+                    }
+                });
+            });
+        });
 	},
 	forgotPassword: function(req, res){
         async.waterfall([
