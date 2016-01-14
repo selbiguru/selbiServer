@@ -235,48 +235,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             });
        });
     },
-   /* getSelbiListings: function(req, res) {
-       sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
-            //friendsApproved is an array of friend's IDs
-            var friendsApproved = invitationResult.idArray;
-            var updatedPaginate = req.body['updatedAt'] || new Date();
-            var selbiArray = [];
-            sails.models['user'].find({where: {id: {'!':friendsApproved}, hasListings: true, updatedAt: {'<': updatedPaginate }, sort: 'updatedAt DESC', limit: 30 } } ).populate('listings', {where:{isSold: false, isArchived: false, isPrivate: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
-                if(err)
-                    return res.json(err);
-                async.eachLimit(listingResult, 10, function(userList, cbEach){
-                    async.parallel([
-                        function(cb){
-                            sails.models['listing'].count({ 
-                                where: { userId: userList.id, isSold: false, isArchived: false, isPrivate: false} 
-                            }).exec(cb);
-                        },
-                        function(cb){
-                            sails.services['invitationservice'].getInvitationByUserIdsService( userList.id, req.params['userId'], function(err, inviteResult) {
-                                if(err) {
-                                    cb(err);
-                                }
-                                cb(null, inviteResult);
-                            });
-                        }
-                    ], function(err, results){
-                        if(err) {
-                            return cbEach(500, err);
-                        } else {
-                            results[0].length === undefined ? userList.count = results[0] : userList.count = results[1];
-                            results[1].length != undefined ? userList.invitation = results[1] : userList.invitation = results[0];
-                            selbiArray.push(userList);
-                            cbEach();
-                        }
-                    });
-                }, function(err, results) {
-                    if(err)
-                        return res.json(500, err);
-                    return res.json(_.sortByOrder(selbiArray, ['updatedAt'], ['desc']));
-                });
-            });
-       });        
-    },*/
     getSelbiListings: function(req, res) {
        sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
             if(err)
