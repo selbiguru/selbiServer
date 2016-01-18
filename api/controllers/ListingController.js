@@ -195,8 +195,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         sails.services['invitationservice'].getApprovedInvitesByIdService( req.params['userId'], function(err, invitationResult) {
             //friendsApproved is an array of friend's IDs
             var friendsApproved = invitationResult.idArray;
-            var i = friendsApproved.indexOf(req.params['userId']);
-            friendsApproved.splice(i, 1);
+            var idx = friendsApproved.indexOf(req.params['userId']);
+            friendsApproved.splice(idx, 1);
             var updatedPaginate = req.body['updatedAt'] || new Date();
             var selbiArray = [];
             sails.models['user'].find({where: {id: friendsApproved, hasListings: true, updatedAt: {'<': updatedPaginate }, sort: 'updatedAt DESC', limit: 30 } } ).populate('listings', {where:{isSold: false, isArchived: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
