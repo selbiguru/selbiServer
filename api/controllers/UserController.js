@@ -67,7 +67,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         		});
         	},
         	function(token, user, cb) {
-        		sails.services['emailservice'].resetPasswordEmail('selbiguru@gmail.com', user.firstName, user.lastName, "http://localhost:1337/userData/reset/validate/"+token);
+        		sails.services['emailservice'].resetPasswordEmail('jordanburrows@gmail.com', "http://localhost:1337/userData/reset/validate/"+token);
         		cb(null, user);
         	}
        	], function(err, results) {

@@ -21,6 +21,9 @@
      * @return
      */
     var sendEmail = function(to, templateName, variables) {
+        console.log("======= ", to);
+        console.log("+++++++ ", templateName);
+        console.log("-------- ", variables);
         Mandrill.sendTemplateEmail({
             apiKey: sails.config.mandrill.apikey,
             toEmail: to,
@@ -29,11 +32,11 @@
         }).exec({
             // An unexpected error occurred.
             error: function(err) {
-                console.log(err);
+                console.log("errors", err);
             },
             // OK.
             success: function() {
-                console.log(arguments);
+                console.log("success", arguments);
             }
         });
     };
@@ -112,22 +115,28 @@
      */
     module.exports.sendSoldEmail = function(to, toName, last, address, email, item) {
 
-        var templateVariables = [{
-            name: "USERNAME",
-            content: toName
-        },
-        {   name: "LASTNAME",
-            content: last
-        },
-        {   name: "address",
-            content: address
-        },
-        {   name: "email",
-            content: email
-        },
-        {   name: "item",
-            content: item
-        },
+        var templateVariables = [
+            {   name: "LASTNAME",
+                content: last
+            },
+            {   name: "address",
+                content: address
+            },
+            {   name: "email",
+                content: email
+            },
+            {   name: "FIRSTNAME",
+                content: first
+            },
+            {   name: "PRICE",
+                content: price
+            },
+            {   name: "TITLE",
+                content: itemTitle
+            },
+            {   name: "REFNUM",
+                content: itemID
+            },
         ]
 
         sendEmail(to, 'sold', templateVariables);
@@ -147,16 +156,25 @@
      */
     module.exports.sendPurchaseEmail = function(to, toName, last, email, item) {
 
-        var templateVariables = [{
-            name: "USERNAME",
-            content: toName
-        },
-        {   name: "LASTNAME",
-            content: last
-        },
-        {   name: "email",
-            content: email
-        },
+        var templateVariables = [
+            {   name: "LASTNAME",
+                content: last
+            },
+            {   name: "email",
+                content: email
+            },
+            {   name: "FIRSTNAME",
+                content: first
+            },
+            {   name: "PRICE",
+                content: price
+            },
+            {   name: "TITLE",
+                content: itemTitle
+            },
+            {   name: "REFNUM",
+                content: itemID
+            },
         ]
 
         sendEmail(to, 'purchase', templateVariables);
@@ -168,28 +186,19 @@
      * @example:
      *      sails.services['emailservice'].resetPasswordEmail('xxxxx@gmail.com', 'Bill', 'Bucks', '222 main street, USA', 'buyerx@some.domain');
      * @param  {String} to           Destination Email address
-     * @param  {String} toFirst      First Name of the buyer
-     * @param  {String} toLast       Last Name of the buyer
-     * @param  {String} email        Email of seller
-     * @param  {String} item         Item purchased from the seller
+     * @param  {String} reflink      reference link to change password with token included
      * @return
      */
-    module.exports.resetPasswordEmail = function(to, toName, last, reflink) {
+    module.exports.resetPasswordEmail = function(to, reflink) {
 
-        var templateVariables = [{
-            name: "USERNAME",
-            content: toName
-        },
-        {   name: "LASTNAME",
-            content: last
-        },
-        {
-            name: "REFLINK",
-            content: reflink
-        },
+        var templateVariables = [
+            {
+                name: "REFLINK",
+                content: reflink
+            },
         ]
 
-        sendEmail(to, 'practice', templateVariables);
+        sendEmail(to, 'forgot-password', templateVariables);
     };
 
 })();;
