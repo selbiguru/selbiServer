@@ -389,8 +389,8 @@
                         sails.services['userservice'].getUserDataService(buyerId, function(err, buyerData){
                             if(err)
                                 return cbPar(500, err);
-                            //sails.services['emailservice'].sendSoldEmail(listingData.email, buyerData.firstName, buyerData.lastName, buyerData.address, buyerData.email);
-                            //sails.services['emailservice'].sendPurchaseEmail(buyerData.email, 'Bill', 'Bucks', '222 main street, USA', listingData.email);
+                            sails.services['emailservice'].sendSoldEmail(listingData, buyerData);
+                            sails.services['emailservice'].sendPurchaseEmail(buyerData, listingData);
                             cbPar(null, buyerData);
                         })
                     }

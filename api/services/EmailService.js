@@ -21,9 +21,6 @@
      * @return
      */
     var sendEmail = function(to, templateName, variables) {
-        console.log("======= ", to);
-        console.log("+++++++ ", templateName);
-        console.log("-------- ", variables);
         Mandrill.sendTemplateEmail({
             apiKey: sails.config.mandrill.apikey,
             toEmail: to,
@@ -89,14 +86,14 @@
     module.exports.sendWelcomeEmail = function(to, toFirst, toLast) {
 
         var templateVariables = [{
-            name: "USERNAME",
+            name: "FIRSTNAME",
             content: toFirst
         },
         {   name: "LASTNAME",
             content: toLast
         }]
 
-        sendEmail(to, 'welcome', templateVariables);
+        sendEmail(to, 'welcome-1', templateVariables);
     };
 
 
@@ -104,80 +101,79 @@
     /**
      *  Send sold email to the seller
      * @example:
-     *      sails.services['emailservice'].sendSoldEmail('xxxxx@gmail.com', 'Bill', 'Bucks', '222 main street, USA', 'buyerx@some.domain');
-     * @param  {String} to           Destination Email address
-     * @param  {String} toFirst      First Name of the buyer
-     * @param  {String} toLast       Last Name of the buyer
-     * @param  {String} address      Address of the buyer
-     * @param  {String} email        Email of buyer
-     * @param  {String} email        Item purchased by the buyer
+     *      sails.services['emailservice'].sendSoldEmail(listingData, buyerData);
+     * @param  {Object} listingData      Object containing the information of the Item purchased and the seller
+     * @param  {Object} buyerData        Object containing the information of the buyer
      * @return
      */
-    module.exports.sendSoldEmail = function(to, toName, last, address, email, item) {
+    module.exports.sendSoldEmail = function(listingData, buyerData) {
+
+        var lineOneAddress = buyerData.userAddress.address2 ? buyerData.userAddress.address + ' #' + buyerData.userAddress.address2 : buyerData.userAddress.address;
+        var lineTwoAddress = buyerData.userAddress.city + ', ' + buyerData.userAddress.state + ' ' + buyerData.userAddress.zip;
 
         var templateVariables = [
             {   name: "LASTNAME",
-                content: last
+                content: buyerData.lastName
             },
-            {   name: "address",
-                content: address
+            {   name: "ADDRESSONE",
+                content: lineOneAddress
             },
-            {   name: "email",
-                content: email
+            {   name: "ADDRESSTWO",
+                content: lineTwoAddress
+            },
+            {   name: "EMAIL",
+                content: buyerData.email
             },
             {   name: "FIRSTNAME",
-                content: first
+                content: buyerData.firstName
             },
             {   name: "PRICE",
-                content: price
+                content: listingData.price
             },
             {   name: "TITLE",
-                content: itemTitle
+                content: listingData.title
             },
             {   name: "REFNUM",
-                content: itemID
+                content: listingData.id
             },
         ]
 
-        sendEmail(to, 'sold', templateVariables);
+        sendEmail(listingData.user.email, 'item-sold', templateVariables);
     };
 
 
     /**
      *  Send purchased email to the buyer
      * @example:
-     *      sails.services['emailservice'].sendPurchaseEmail('xxxxx@gmail.com', 'Bill', 'Bucks', '222 main street, USA', 'buyerx@some.domain');
-     * @param  {String} to           Destination Email address
-     * @param  {String} toFirst      First Name of the buyer
-     * @param  {String} toLast       Last Name of the buyer
-     * @param  {String} email        Email of seller
-     * @param  {String} item         Item purchased from the seller
+     *      sails.services['emailservice'].sendPurchaseEmail(buyerData, listingData);
+     * @param  {Object} buyerData        Object containing the information of the buyer
+     * @param  {Object} listingData      Object containing the information of the Item purchased and the seller
      * @return
      */
-    module.exports.sendPurchaseEmail = function(to, toName, last, email, item) {
+    module.exports.sendPurchaseEmail = function(buyerData, listingData) {
 
         var templateVariables = [
             {   name: "LASTNAME",
-                content: last
+                content: listingData.user.lastName
             },
-            {   name: "email",
-                content: email
+            {   name: "EMAIL",
+                content: listingData.user.email
             },
             {   name: "FIRSTNAME",
-                content: first
+                content: listingData.user.firstName
             },
             {   name: "PRICE",
-                content: price
+                content: listingData.price
             },
             {   name: "TITLE",
-                content: itemTitle
+                content: listingData.Title
             },
             {   name: "REFNUM",
-                content: itemID
+                content: listingData.id
             },
         ]
 
-        sendEmail(to, 'purchase', templateVariables);
+        sendEmail(buyerData.email, 'item-bought', templateVariables);
     };
 
 
