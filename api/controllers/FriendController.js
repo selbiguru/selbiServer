@@ -17,6 +17,14 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             return res.json(friendsResult);
 		});
 	},
+	//Includes pending friends
+	getAllFriendsByUser: function(req, res) {
+		sails.services['friendservice'].getAllInvitationByUserService( req.params['userId'], function(err, allFriendsResult){
+			if(err)
+                return res.json(500, err);
+            return res.json(allFriendsResult);
+		});
+	},
 	addFriendsByPhone: function(req, res) {
 		var phoneList = req.body;
 		var responseList = [];

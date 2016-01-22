@@ -98,4 +98,31 @@
             return cb(err, friendsObj);
         });
     };
+
+
+    /**
+     *  This is a public methods to get all friends invitations
+     *  @param      userId is the userID of the user
+     *  @param      cb is a callback
+     */
+    module.exports.getAllInvitesByIdService = function(userId, cb) {
+        var friendsObj = {
+            invitationArray: [],
+            idArray: []
+        }
+        sails.models['invitation'].find().where({or: [{ userTo: userId },{userFrom: userId}], status: {'!': "denied"} }).exec(function(err, allFriendsResult) {
+            if(err)
+                return cb(500, err);
+            friendsObj.invitationArray = allFriendsResult;
+            friendsObj.idArray.push(userId);
+            for(var i in allFriendsResult) {
+                if(allFriendsResult[i].userTo != userId) {
+                    friendsObj.idArray.push(allFriendsResult[i].userTo);
+                } else {
+                    friendsObj.idArray.push(allFriendsResult[i].userFrom);
+                }
+            }
+            return cb(err, friendsObj);
+        });
+    };
 })();

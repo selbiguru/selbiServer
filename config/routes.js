@@ -90,6 +90,7 @@ module.exports.routes = {
   'GET /friend/:userId/:friendId': 'InvitationController.getInvitationByUserIds',
   'GET /friend/username/:userId/:username': 'InvitationController.getInvitationByUsername',
   'GET /friends/:userId': 'FriendController.getFriendsByUser',
+  'GET /friends/allinvites/:userId': 'FriendController.getAllFriendsByUser',
 
   //FAQ routes
 
