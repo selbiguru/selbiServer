@@ -372,17 +372,29 @@
                 });
             },
             function(updateResult, cb) {
-                var notificationObj = {
+                var soldNotificationObj = {
                     userFrom: buyerId,
                     userTo: sellerId,
                     type: 'sold'
-                }
+                };
+                var purchasedNotificationObj = {
+                    userFrom: sellerId,
+                    userTo: buyerId,
+                    type: 'purchased'
+                };
                 async.parallel([
                     function(cbPar) {
-                        sails.services['notificationservice'].createNotificationService( notificationObj, function(err, createResponse){
+                        sails.services['notificationservice'].createNotificationService( soldNotificationObj, function(err, createResponse){
                             if(err)
                                 return cbPar(500, err);
-                            cbPar(null, updateResult);
+                            cbPar(null, createResponse);
+                        }); 
+                    },
+                    function(cbPar) {
+                        sails.services['notificationservice'].createNotificationService( purchasedNotificationObj, function(err, createdResponse){
+                            if(err)
+                                return cbPar(500, err);
+                            cbPar(null, createdResponse);
                         }); 
                     },
                     function(cbPar) {
