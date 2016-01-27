@@ -408,8 +408,7 @@
             cb(null, result);
         });
         //on success create an order record locally and update the listing to being sold
-        //send an email or something to notify user
-        //rate the merchant (from buyer)
+        //send an email and notification to notify user
     }
 
     module.exports.createSaleTransaction = function (amount, merchantId, buyerPaymentMethodToken, cb){

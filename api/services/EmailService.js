@@ -109,7 +109,7 @@
     module.exports.sendSoldEmail = function(listingData, buyerData) {
 
         var lineOneAddress = buyerData.userAddress.address2 ? buyerData.userAddress.address + ' #' + buyerData.userAddress.address2 : buyerData.userAddress.address;
-        var lineTwoAddress = buyerData.userAddress.city + ', ' + buyerData.userAddress.state + ' ' + buyerData.userAddress.zip;
+        var lineTwoAddress = buyerData.userAddress.city + ' ' + buyerData.userAddress.state + ' ' + buyerData.userAddress.zip;
 
         var templateVariables = [
             {   name: "LASTNAME",
@@ -137,8 +137,8 @@
                 content: listingData.id
             },
         ]
-
-        sendEmail(listingData.user.email, 'item-sold', templateVariables);
+        console.log("email of listingData.user.email", listingData.user.email);
+        sendEmail('jordanburrows@gmail.com', 'item-sold', templateVariables);
     };
 
 
@@ -166,14 +166,14 @@
                 content: listingData.price
             },
             {   name: "TITLE",
-                content: listingData.Title
+                content: listingData.title
             },
             {   name: "REFNUM",
                 content: listingData.id
             },
         ]
-
-        sendEmail(buyerData.email, 'item-bought', templateVariables);
+        console.log("email of buyerData.email", buyerData.email);
+        sendEmail('jordanburrows@gmail.com', 'item-bought', templateVariables);
     };
 
 
