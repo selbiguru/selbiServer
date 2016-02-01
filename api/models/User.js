@@ -96,5 +96,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     resetPasswordExpires: {
       type: 'integer'
     },
+    //Money that we keep as commission
+    serviceFee: {
+        type: 'float',
+        defaultsTo: '20',
+        required: true
+    },
   }
 });

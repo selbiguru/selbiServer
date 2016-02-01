@@ -56,7 +56,7 @@ module.exports = {
         "merchantId" : "zw67j4nst8r33wms",
         "masterMerchantAccountId": "selbi",
         "fundingDescriptor": "Selbi Sale",
-        "serviceFeePercent": "10"
+        "serviceFeePercent": "20"
     },
     twilio: {
         "accountSid" : "AC21c328a896543f751d70f26702e77a7c",
