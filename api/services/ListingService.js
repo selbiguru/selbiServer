@@ -17,6 +17,9 @@
         sails.models['listing'].destroy({where: {id: listingId } }).exec(function (err, deleteResult) {
             if (err)
                 return cb(500, err);
+            if(deleteResult.length  <= 0) {
+                return cb(400, 'Listing not found!')
+            }
             return cb(err, deleteResult);
         });
     };
