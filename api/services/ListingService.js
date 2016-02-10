@@ -18,7 +18,7 @@
             if (err)
                 return cb(500, err);
             if(deleteResult.length  <= 0) {
-                return cb(400, 'Listing not found!')
+                return cb(404, 'Listing not found!')
             }
             return cb(err, deleteResult);
         });
