@@ -26,6 +26,8 @@
      *  @param      cb is a callback
      */
     module.exports.deleteCloudinaryImageService = function(images, cb) {
+        if(!images)
+            return cb(404, 'Images Not Found');
         var urlGenerator = new cloudinaryUrl(sails.config.cloudinary.api_key, sails.config.cloudinary.api_secret, 'selbi');
         var cloudinaryData = urlGenerator.sign({
                 invalidate: true

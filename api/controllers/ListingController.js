@@ -56,7 +56,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         });
     },
     deleteListing: function(req, res) {
-        sails.services['imageservice'].deleteCloudinaryImageService(req.body['images'], function(err, deletedImagesResult) {
+        var cloudinaryImages = req.body['images'] || false
+        sails.services['imageservice'].deleteCloudinaryImageService(cloudinaryImages, function(err, deletedImagesResult) {
             if(err)
                 console.log('Could not delete cloudinary images from listing ', err);
         });
