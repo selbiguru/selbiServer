@@ -121,21 +121,12 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         	}
        	], function(err, results) {
        		if(err) {
-       			//res.redirect('http://selbi.io/error');
        			return res.json(500, err);
             }
-       		//res.redirect('http://selbi.io/success');
        		res.json(results);
        	});
     },
 	getUserData: function(req, res){
-        //TODO Add code here to accept an options object to pupulate objects that are asked for in the call
-        /*
-        var options = {
-			populateAddress = true,
-			populatePaymentMethod = true
-        }
-        */
         sails.services['userservice'].getUserDataService( req.params['userId'] , function(err, userResult){
             if(err)
                 return res.json(500, err);
