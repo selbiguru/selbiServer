@@ -120,9 +120,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 				});
         	}
        	], function(err, results) {
-       		if(err)
+       		if(err) {
        			res.redirect('http://selbi.io/error');
        			return res.json(500, err);
+            }
        		res.redirect('http://selbi.io/success');
        		res.json(results);
        	});
