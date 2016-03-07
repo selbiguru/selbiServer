@@ -79,11 +79,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     validateLinkPassword: function(req, res) {
     	sails.models['user'].findOne({resetPasswordToken: req.params['token'], resetPasswordExpires: {'>': Date.now()}}).exec(function(err, userResult) {
 			if(err){
-				res.redirect('http://selbiweb.herokuapp.com/error');
+				res.redirect('http://selbi.io/error');
 			} else if(!userResult) {
-				res.redirect('http://selbiweb.herokuapp.com/error');
+				res.redirect('http://selbi.io/error');
 			} else {
-				res.redirect('http://selbiweb.herokuapp.com/resetpassword/'+req.params['token']);
+				res.redirect('http://selbi.io/resetpassword/'+req.params['token']);
 			}
 		});
     },
@@ -121,9 +121,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         	}
        	], function(err, results) {
        		if(err)
-       			//res.redirect('http://localhost:3000/error');
+       			res.redirect('http://selbi.io/error');
        			return res.json(500, err);
-       		//res.redirect('http://localhost:3000/success');
+       		res.redirect('http://selbi.io/success');
        		res.json(results);
        	});
     },
