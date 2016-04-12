@@ -45,7 +45,7 @@
         "subject" : emailSubject,
         "html" : emailBody
         }
-        data['to']= {};
+        data['to'] = {};
         data['to'][to] = toName;
         client.send_email(data).on('complete', function(data) {
             var dataParse = JSON.parse(data);
