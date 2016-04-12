@@ -40,7 +40,7 @@
      * @return
      */
     module.exports.plainTextEmail = function(to, toName, emailSubject, emailBody, from, fromName, cb ) {
-        var data = { "to" : {[to]: toName},
+        var data = { "to" : {to: toName},
         "from" : [from, fromName],
         "subject" : emailSubject,
         "html" : emailBody
