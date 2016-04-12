@@ -7,8 +7,7 @@
      * @help        :: See https://github.com/mailin-api/mailin-api-node-js
      */
     require('../Mailin/mailin.js');
-    var client = new Mailin("https://api.sendinblue.com/v2.0","djac5b8nLq3W7ZNR"),
-    self = this;
+    var client = new Mailin("https://api.sendinblue.com/v2.0","djac5b8nLq3W7ZNR");
 
 
     /**

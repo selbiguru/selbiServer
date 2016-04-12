@@ -23,6 +23,7 @@
     "include-all": "0.1.6",
     "jsonwebtoken": "3.2.2",
     "lodash": "^3.10.1",
+    "machinepack-mandrill": "^1.2.0",
     "moment-timezone": "0.3.0",
     "node-uuid": "^1.4.3",
     "passport": "0.2.1",
