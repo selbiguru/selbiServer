@@ -22,7 +22,7 @@ module.exports = {
         api_secret: "TLriaJe_kfUseLAKslsbR-s-3d0"
     },
     sendinblue: {
-        "apikey": "0Bii9cro9C34sjmr4cZzkw",
+        "apikey": "djac5b8nLq3W7ZNR",
         "fromEmail": "no-reply@selbi.io",
         "fromName": "Selbi",
         "toEmail": "selbiguru@gmail.com"
