@@ -3,39 +3,27 @@
     /**
      * Email Service
      *
-     * @description :: Server-side logic for managing emails through Mandrill
-     * @help        :: See http://node-machine.org/machinepack-mandrill
+     * @description :: Server-side logic for managing emails through Sendinblue.com
+     * @help        :: See https://github.com/mailin-api/mailin-api-node-js
      */
-    var Mandrill = require('machinepack-mandrill'),
-        self = this;
+    require('../Mailin/mailin.js');
+    var client = new Mailin("https://api.sendinblue.com/v2.0","djac5b8nLq3W7ZNR"),
+    self = this;
 
 
     /**
      *  Send email's to the given user with the given template name and template variables
      *  This is a private method to force to create a wrapper for sending templates that is handled by this module
      * @example:
-     *      sails.services['emailservice'].sendWelcomeEmail('tmjam.ahmed@gmail.com', 'Tauseef');
-     * @param  {String} to           Destination Email address
-     * @param  {String} templateName Template Name (stored on the provider)
-     * @param  {Array}  variables    Array of template variables and its contents
+     *      sails.services['emailservice'].sendWelcomeEmail('jordanxxxmmmxxxx@gmail.com', 'Jordan');
+     * @param  {String} data           Data for transactional template using Mailin API
      * @return
      */
-    var sendEmail = function(to, templateName, variables) {
-        Mandrill.sendTemplateEmail({
-            apiKey: sails.config.mandrill.apikey,
-            toEmail: to,
-            templateName: templateName,
-            mergeVars: variables,
-        }).exec({
-            // An unexpected error occurred.
-            error: function(err) {
-                console.log("errors", err);
-            },
-            // OK.
-            success: function() {
-                console.log("success", arguments);
-            }
+    var sendTransactionalEmail = function(data) {
+        client.send_transactional_template(data).on('complete', function(data) {
+          console.log('sending sending sending sending ',data);
         });
+
     };
 
 
@@ -53,23 +41,19 @@
      * @return
      */
     module.exports.plainTextEmail = function(to, toName, emailSubject, emailBody, from, fromName, cb ) {
-        Mandrill.sendPlaintextEmail({
-            apiKey: sails.config.mandrill.apikey,
-            toEmail: to,
-            toName: toName,
-            subject: emailSubject,
-            message: emailBody,
-            fromEmail: from,
-            fromName: fromName,
-        }).exec({
-            // An unexpected error occurred.
-            error: function(err) {
-                cb(err);
-            },
-            // OK.
-            success: function() {
+        var data = { "to" : {[to]: toName},
+        "from" : [from, fromName],
+        "subject" : emailSubject,
+        "html" : emailBody
+        }
+        client.send_email(data).on('complete', function(data) {
+            var dataParse = JSON.parse(data);
+            if(dataParse.code === "success") {
                 cb(null, 200);
+            } else {
+                cb(dataParse.message);
             }
+
         });
     }   
 
@@ -84,16 +68,11 @@
      * @return
      */
     module.exports.sendWelcomeEmail = function(to, toFirst, toLast) {
-
-        var templateVariables = [{
-            name: "FIRSTNAME",
-            content: toFirst
-        },
-        {   name: "LASTNAME",
-            content: toLast
-        }]
-
-        sendEmail(to, 'welcome-1', templateVariables);
+        var data = { "id" : 1,
+          "to" : "jordanburrows@gmail.com",
+          "attr" : {"FIRSTNAME":toFirst,"LASTNAME":toLast}
+        }
+        sendTransactionalEmail(data);
     };
 
 
@@ -108,37 +87,25 @@
      */
     module.exports.sendSoldEmail = function(listingData, buyerData) {
 
-        var lineOneAddress = buyerData.userAddress.address2 ? buyerData.userAddress.address + ' #' + buyerData.userAddress.address2 : buyerData.userAddress.address;
+        var lineOneAddress = buyerData.userAddress.address2 ? buyerData.userAddress.address + ' ' + buyerData.userAddress.address2 : buyerData.userAddress.address;
         var lineTwoAddress = buyerData.userAddress.city + ' ' + buyerData.userAddress.state + ' ' + buyerData.userAddress.zip;
 
-        var templateVariables = [
-            {   name: "LASTNAME",
-                content: buyerData.lastName
-            },
-            {   name: "ADDRESSONE",
-                content: lineOneAddress
-            },
-            {   name: "ADDRESSTWO",
-                content: lineTwoAddress
-            },
-            {   name: "EMAIL",
-                content: buyerData.email
-            },
-            {   name: "FIRSTNAME",
-                content: buyerData.firstName
-            },
-            {   name: "PRICE",
-                content: listingData.price
-            },
-            {   name: "TITLE",
-                content: listingData.title
-            },
-            {   name: "REFNUM",
-                content: listingData.id
-            },
-        ]
+        var data = { 
+            "id" : 4,
+            "to" : "jordanburrows@gmail.com",
+            "attr" : {
+                    "FIRSTNAME": buyerData.firstName,
+                    "LASTNAME": buyerData.lastName,
+                    "ADDRESSONE": lineOneAddress,
+                    "ADDRESSTWO": lineTwoAddress,
+                    "EMAIL": buyerData.email,
+                    "PRICE": listingData.price,
+                    "TITLE": listingData.title,
+                    "REFNUM": listingData.id,
+                    }
+        }
         console.log("email of listingData.user.email", listingData.user.email);
-        sendEmail('jordanburrows@gmail.com', 'item-sold', templateVariables);
+        sendTransactionalEmail(data);
     };
 
 
@@ -151,29 +118,20 @@
      * @return
      */
     module.exports.sendPurchaseEmail = function(buyerData, listingData) {
-
-        var templateVariables = [
-            {   name: "LASTNAME",
-                content: listingData.user.lastName
-            },
-            {   name: "EMAIL",
-                content: listingData.user.email
-            },
-            {   name: "FIRSTNAME",
-                content: listingData.user.firstName
-            },
-            {   name: "PRICE",
-                content: listingData.price
-            },
-            {   name: "TITLE",
-                content: listingData.title
-            },
-            {   name: "REFNUM",
-                content: listingData.id
-            },
-        ]
+        var data = { 
+            "id" : 3,
+            "to" : "jordanburrows@gmail.com",
+            "attr" : {
+                    "FIRSTNAME": listingData.user.firstName,
+                    "LASTNAME": listingData.user.lastName,
+                    "EMAIL": listingData.user.email,
+                    "PRICE": listingData.price,
+                    "TITLE": listingData.title,
+                    "REFNUM": listingData.id,
+                    }
+        }
         console.log("email of buyerData.email", buyerData.email);
-        sendEmail('jordanburrows@gmail.com', 'item-bought', templateVariables);
+        sendTransactionalEmail(data);
     };
 
 
@@ -186,15 +144,15 @@
      * @return
      */
     module.exports.resetPasswordEmail = function(to, reflink) {
+        var data = { 
+            "id" : 2,
+            "to" : to,
+            "attr" : {
+                    "REFLINK": reflink
+                    }
+        }
 
-        var templateVariables = [
-            {
-                name: "REFLINK",
-                content: reflink
-            },
-        ]
-
-        sendEmail(to, 'forgot-password', templateVariables);
+        sendTransactionalEmail(data);
     };
 
 })();;

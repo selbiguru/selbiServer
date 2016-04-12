@@ -78,7 +78,7 @@ module.exports.routes = {
   //Twilio routes
   'POST /twilio/sendValidationMessage': 'TwilioController.sendValidationMessage',
 
-  //Mandrill Email
+  //Sendinblue Email
   'POST /email/contactSelbi': 'EmailController.contactSelbi',
   'POST /email/welcomeSelbi': 'EmailController.sendWelcome',
 

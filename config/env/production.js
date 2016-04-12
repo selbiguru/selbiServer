@@ -44,7 +44,7 @@ module.exports = {
         api_key: "379521277533334",
         api_secret: "TLriaJe_kfUseLAKslsbR-s-3d0"
     },
-    mandrill: {
+    sendinblue: {
         "apikey": "0Bii9cro9C34sjmr4cZzkw",
         "fromEmail": "no-reply@selbi.io",
         "fromName": "Selbi",
