@@ -29,7 +29,7 @@
     /**
      *  Send email's from one user to another with a plain text email.  Not used for template emails!
      * @example:
-     *      sails.services['emailservice'].sendContactSelbiEmail('tmjam.ahmed@gmail.com', 'Tauseef');
+     *      sails.services['emailservice'].plainTextEmail('jordanxxxmmmxxxx@gmail.com', 'Jordan');
      * @param  {String} to              Destination Email address
      * @param  {String} toName          Receiver's Full Name
      * @param  {String} emailSubject    Email subject line

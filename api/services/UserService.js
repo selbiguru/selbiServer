@@ -62,4 +62,27 @@
             return cb(err, updatedResults);
         });
     };
+
+
+    /**
+     *  This is a public methods to get a user by username
+     *  @param      userName is the username to find
+     *  @param      cb is a callback
+     */
+    module.exports.uniqueUsername = function(userName, userId, cb) {
+        sails.models['user'].find({where : {username: userName } }).exec(function(err, results) {
+            if(err)
+                return cb(500, err);
+            if(results.length > 0) {
+                for(var i in results) {
+                    if(results[i].id !== userId) {
+                        return cb(err, false)
+                    }
+                }
+                return cb(err, true);
+            } else {
+                return cb(err, true);
+            }
+        });
+    };
 })();

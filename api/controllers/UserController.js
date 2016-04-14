@@ -15,23 +15,30 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         sails.services['userservice'].getUserByEmailService( request.body['email'] , function(err, userResult){
             if(err || userResult)
                 return response.json(500, "User already exists with this email!");
-            sails.models['user'].create(request.params.all()).exec(function (err, user) {
-                if(err) {
-                    return response.send(500, "Unable to register, please try again!");
+            sails.services['userservice'].uniqueUsername(request.body['username'], null, function(err, userNameResult){
+                if (err) {
+                    request.params.all().username = request.body['username'].slice(0,16) + (Math.floor(Math.random() * 9000)+1000);
+                } else if (!userNameResult) {
+                    request.params.all().username = request.body['username'].slice(0,16) + (Math.floor(Math.random() * 9000)+1000);
                 }
-                var passportModel = sails.models['passport'];
-
-                passportModel.create({
-                    protocol: 'local',
-                    password: request.body['password'],
-                    user: user.id
-                }).exec(function(err, passport){
+                sails.models['user'].create(request.params.all()).exec(function (err, user) {
                     if(err) {
-                        response.json(500, "Unable to register, please try again!");
-                    } else {
-                        sails.services['emailservice'].sendWelcomeEmail(user.email, user.firstName, user.lastName);
-                        response.json(200, user);
+                        return response.send(500, "Unable to register, please try again!");
                     }
+                    var passportModel = sails.models['passport'];
+
+                    passportModel.create({
+                        protocol: 'local',
+                        password: request.body['password'],
+                        user: user.id
+                    }).exec(function(err, passport){
+                        if(err) {
+                            response.json(500, "Unable to register, please try again!");
+                        } else {
+                            sails.services['emailservice'].sendWelcomeEmail(user.email, user.firstName, user.lastName);
+                            response.json(200, user);
+                        }
+                    });
                 });
             });
         });
@@ -146,20 +153,15 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     	});
     },
     uniqueUsername: function (req, res){
-    	sails.models['user'].find({where : {username: req.body['username']} }).exec(function(err, results) {
-    		if(err)
-    			return res.json(500, err);
-    		if(results.length > 0) {
-    			for(var i in results) {
-    				if(results[i].id !== req.body['userId']) {
-    					return res.json(false)
-    				}
-    			}
-    			return res.json(true);
-    		} else {
-    			return res.json(true);
-    		}
-    	});
+    	sails.services['userservice'].uniqueUsername(req.body['username'], req.body['userId'], function(err, results){
+            if (err) {
+                return res.json(500, err);
+            } else if (results) {
+                return res.json(true);
+            } else {
+                return res.json(false);
+            }
+        });
     },
     uniquePhones: function (req, res){
     	sails.models['user'].find({where : {phoneNumber: req.body['phone']} }).exec(function(err, results) {
