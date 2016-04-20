@@ -24,8 +24,8 @@ module.exports = {
     sendinblue: {
         "apikey": "djac5b8nLq3W7ZNR",
         "fromEmail": "no-reply@selbi.io",
-        "fromName": "Selbi",
-        "toEmail": "selbiguru@gmail.com"
+        "fromName": "Selbi Support",
+        "toEmail": "testing@selbi.io"
     },
     braintree: {
         "publicKey" : "nktzr995vy2sxwrx",

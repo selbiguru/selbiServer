@@ -40,15 +40,15 @@ module.exports = {
    * environment (see config/connections.js and config/models.js )           *
   ***************************************************************************/
   cloudinary: {
-        cloud_name: "selbi",
-        api_key: "379521277533334",
-        api_secret: "TLriaJe_kfUseLAKslsbR-s-3d0"
+        cloud_name: "selbi-io",
+        api_key: "823837749384676",
+        api_secret: "j_iaykSNvXWiZEnmkf10hUZgqGM"
     },
     sendinblue: {
         "apikey": "djac5b8nLq3W7ZNR",
         "fromEmail": "no-reply@selbi.io",
-        "fromName": "Selbi",
-        "toEmail": "selbiguru@gmail.com"
+        "fromName": "Selbi Support",
+        "toEmail": "support@selbi.io"
     },
     braintree: {
         "publicKey" : "nktzr995vy2sxwrx",
