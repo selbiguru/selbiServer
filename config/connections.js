@@ -56,8 +56,8 @@ module.exports.connections = {
    */
   someMongodbServer: {
     adapter: 'sails-mongo',
-    host: (process.env.NODE_ENV === "production") ? 'ec2-52-53-219-202.us-west-1.compute.amazonaws.com' : '', //localhost
-    port: 27017,
+    host: (process.env.NODE_ENV === "production") ? 'ec2-52-53-219-202.us-west-1.compute.amazonaws.com' : 'c2-52-7-210-171.compute-1.amazonaws.com', //localhost
+    port: (process.env.NODE_ENV === "production") ? 27017 : 5984,
     user: '',
     password: '',
     database: ''
