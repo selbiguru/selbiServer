@@ -70,7 +70,7 @@
      */
     module.exports.sendWelcomeEmail = function(to, toFirst, toLast) {
         var data = { "id" : 1,
-          "to" : "jordanburrows@gmail.com",
+          "to" : sails.config.sendinblue.toEmail,
           "attr" : {"FIRSTNAME":toFirst,"LASTNAME":toLast}
         }
         sendTransactionalEmail(data);
@@ -93,7 +93,7 @@
 
         var data = { 
             "id" : 4,
-            "to" : "jordanburrows@gmail.com",
+            "to" : sails.config.sendinblue.toEmail,
             "attr" : {
                     "FIRSTNAME": buyerData.firstName,
                     "LASTNAME": buyerData.lastName,
@@ -121,7 +121,7 @@
     module.exports.sendPurchaseEmail = function(buyerData, listingData) {
         var data = { 
             "id" : 3,
-            "to" : "jordanburrows@gmail.com",
+            "to" : sails.config.sendinblue.toEmail,
             "attr" : {
                     "FIRSTNAME": listingData.user.firstName,
                     "LASTNAME": listingData.user.lastName,
