@@ -1,7 +1,6 @@
 'use strict';
 
 var _ = require('lodash');
-console.log('11 11 11 11 11 11 11 11 11 ', process.env.NODE_ENV);
 /**
  * Emails controller
  *
@@ -11,7 +10,6 @@ console.log('11 11 11 11 11 11 11 11 11 ', process.env.NODE_ENV);
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     contactSelbi: function(req, res){
-        console.log('04 04 04 04 04 04 04 ', process.env.NODE_ENV);
     	sails.services['emailservice'].plainTextEmail(sails.config.sendinblue.toEmail, sails.config.sendinblue.fromName, req.body['subject'], req.body['body'], req.body['email'] , req.body['name'], function(err, results){
     		if (err) { 
     			return res.json(500, err);
