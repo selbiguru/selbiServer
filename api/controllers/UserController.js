@@ -74,7 +74,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         		});
         	},
         	function(token, user, cb) {
-        		sails.services['emailservice'].resetPasswordEmail('jordanburrows@gmail.com', "http://selbi-server.herokuapp.com/userData/reset/validate/"+token);
+        		sails.services['emailservice'].resetPasswordEmail('testing.selbi.io', sails.config.resetPasswordRef.passwordRefLink + token);
         		cb(null, user);
         	}
        	], function(err, results) {

@@ -45,5 +45,8 @@ module.exports = {
     },
     couchDBServer: {
         "awsEC2" : "ec2-52-7-210-171.compute-1.amazonaws.com",
+    },
+    resetPasswordRef: {
+        "passwordRefLink" : "http://development-selbi-server.herokuapp.com/userData/reset/validate/",
     }
 };
