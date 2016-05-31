@@ -7,6 +7,7 @@
      * @help        :: See https://github.com/mailin-api/mailin-api-node-js
      */
     require('../Mailin/mailin.js');
+    var helpers = require('./Helpers.js');
     var client = new Mailin("https://api.sendinblue.com/v2.0", sails.config.sendinblue.apikey);
 
 
@@ -100,7 +101,7 @@
                     "ADDRESSONE": lineOneAddress,
                     "ADDRESSTWO": lineTwoAddress,
                     "EMAIL": buyerData.email,
-                    "PRICE": listingData.price,
+                    "PRICE": (listingData.price).helpers.formatMoney(2),
                     "TITLE": listingData.title,
                     "REFNUM": listingData.id,
                     }
