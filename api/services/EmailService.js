@@ -100,7 +100,7 @@
                     "ADDRESSONE": lineOneAddress,
                     "ADDRESSTWO": lineTwoAddress,
                     "EMAIL": buyerData.email,
-                    "PRICE": (listingData.price).sails.services['helpers'].formatMoney(2),
+                    "PRICE": (listingData.price).formatMoney(2),
                     "TITLE": listingData.title,
                     "REFNUM": listingData.id,
                     }
@@ -126,7 +126,7 @@
                     "FIRSTNAME": listingData.user.firstName,
                     "LASTNAME": listingData.user.lastName,
                     "EMAIL": listingData.user.email,
-                    "PRICE": listingData.price,
+                    "PRICE": listingData.price.formatMoney(2),
                     "TITLE": listingData.title,
                     "REFNUM": listingData.id,
                     }
