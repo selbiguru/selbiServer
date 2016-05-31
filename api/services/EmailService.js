@@ -7,7 +7,7 @@
      * @help        :: See https://github.com/mailin-api/mailin-api-node-js
      */
     require('../Mailin/mailin.js');
-    var helpers = require('./Helpers.js');
+    var helpers = require('../Helpers.js');
     var client = new Mailin("https://api.sendinblue.com/v2.0", sails.config.sendinblue.apikey);
 
 
