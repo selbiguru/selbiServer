@@ -90,6 +90,7 @@ module.exports.policies = {
   ImageController: {
     '*': ['authenticated']
   },
+
   ListingController: {
     'count':    ['authenticated'],
     'find':     ['authenticated'],
@@ -99,5 +100,14 @@ module.exports.policies = {
     'destroy':  ['authenticated'],
     'add':      ['authenticated', 'isAdmin'],
     'remove':   ['authenticated', 'isAdmin']
-  }
+  },
+
+  InvitationController: {
+    '*': ['authenticated']
+  },
+
+  WebhooksController: {
+    'stripeEvent': []
+  },
+
 };

@@ -55,10 +55,7 @@ module.exports.getToken = function getToken(request, next, throwError) {
   sails.log.verbose(__filename + ':' + __line + ' [Service.Token.getToken() called]');
 
   var token = '';
-console.log('shit how is auth header 0', request.headers);
-console.log('shit how is auth header 1', request.headers.authorization);
-console.log('shit how is auth header 2', request.headers.request_id);
-console.log('shit how is auth header 2', request.request_id);
+
   // Yeah we got required 'authorization' header
   if (request.headers && request.headers.authorization) {
     var parts = request.headers.authorization.split(' ');
