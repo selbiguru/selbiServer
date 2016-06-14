@@ -39,6 +39,7 @@
     "sails-hook-apianalytics": "git://github.com/mikermcneil/sails-hook-apianalytics",
     "sails-mongo": "^0.11.5",
     "sails-mysql": "0.10.11",
+    "stripe": "^4.7.0",
     "twilio": "^2.4.0",
     "ua-parser": "0.3.5",
     "validator": "3.19.0"

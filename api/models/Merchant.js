@@ -27,12 +27,28 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
             type: 'string',
             required: false
         },
-        mobilePhone: {
+        publicKey: {
             type: 'string',
             required: false
         },
-        fundingDestination: {
+        secretKey: {
           type: 'string',
+          required: false
+        },
+        stripeBankId: {
+          type: 'string',
+          required: false
+        },
+        stripeManagedAccountId: {
+          type: 'string',
+          required: false
+        },
+        stripeVerified: {
+          type: 'boolean',
+          defaultsTo: false
+        },
+        fields_needed: {
+          type: 'array',
           required: false
         },
         owner: {

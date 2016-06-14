@@ -80,7 +80,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
         type: 'string',
         required: false
     },
-    transactionId: {
+    chargeId: {
         type: 'string',
         required: false
     },
@@ -89,12 +89,24 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
         required: false
     },
     //Money that we keep as commission
-    serviceFee: {
-        type: 'float',
+    application_fee: {
+        type: 'string',
         required: false
     },
     transactionDate: {
         type: 'string',
+        required: false
+    },
+    transferId: {
+        type: 'string',
+        required: false
+    },
+    destinationAccount: {
+        type: 'string',
+        required: false
+    },
+    amount_refunded: {
+        type: 'float',
         required: false
     },
     searchCategory: {

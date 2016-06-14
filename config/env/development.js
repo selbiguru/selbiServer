@@ -35,6 +35,11 @@ module.exports = {
         "fundingDescriptor": "Selbi Sale",
         "serviceFeePercent": "20"
     },
+    stripe: {
+        "publicKey" : "pk_test_pVgDzmnHbUaT9z8L7p5slTKB",
+        "privateKey" : "sk_test_MtXKfDYlQdtIYHTunUaw8cu4",
+        "serviceFeePercent": "20"
+    },
     twilio: {
         "accountSid" : "AC21c328a896543f751d70f26702e77a7c",
         "authToken" : "5e7ca65f34e2d19100cb01cf9b2fd67d",

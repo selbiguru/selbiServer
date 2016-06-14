@@ -11,7 +11,7 @@ var braintree = require('braintree');
 
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
-    getClientToken: function(req, res){
+    /*getClientToken: function(req, res){
         sails.services['paymentsservice'].getBraintreeClientToken(function(err, clientToken){
             if(err)
                 return res.json(500, err);
@@ -20,6 +20,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     },
     createCustomerAndPaymentMethod: function(req, res){
         //check for required params
+        console.log('wrong!!!!!!');
         if(!req.body['userId'] || !req.body['paymentMethodNonce']){
                 return res.json(500, 'userId or paymentMethodNonce is missing.');
         }
@@ -106,7 +107,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
              postalCode: req.body['firstName']
              }
              },*/
-            funding: {
+            /*funding: {
                 descriptor: sails.config.braintree.fundingDescriptor
             },
             tosAccepted: true,
@@ -165,5 +166,5 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 }
             });
         });
-    }
+    }*/
 });

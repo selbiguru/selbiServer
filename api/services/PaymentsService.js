@@ -14,7 +14,7 @@
      *  @param      cb is a callback
      *  @return     Returns Braintree Client Token
      */
-    module.exports.getBraintreeClientToken = function(cb) {
+    /*module.exports.getBraintreeClientToken = function(cb) {
         getgateway().clientToken.generate({}, function (err, response) {
             if(err)
                 return cb(err, null);
@@ -443,11 +443,11 @@
             });
     }
 
-    //** helper functions **//
+    //** helper functions **///
     /**
      *  This is a private method to get connected to braintree for making api calls
      */
-    function getgateway(){
+    /*function getgateway(){
         //All calls to braintree will need this gateway to connect
         return braintree.connect({
             environment: braintree.Environment.Sandbox,
@@ -455,5 +455,5 @@
             publicKey: sails.config.braintree.publicKey,
             privateKey: sails.config.braintree.privateKey
         });
-    }
+    }*/
 })();
