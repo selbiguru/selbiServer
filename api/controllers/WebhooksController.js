@@ -13,6 +13,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     stripeEvent: function(req, res){
         console.log('webhook stripe 0.00.00 ', req.body);
+        console.log('webhook stripe 1.1.1 ', req.body.livemode);
+        console.log('webhook stripe 1.1.1 ', typeof req.body);
         if(!req.body)
             return res.send(300);
         // Retrieve the request's body and parse it as JSON
