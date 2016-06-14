@@ -12,19 +12,20 @@ var stripe = require('stripe')(sails.config.stripe.privateKey);
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     stripeEvent: function(req, res){
-        if(!JSON.parse(req.body))
+        console.log('webhook stripe 0.00.00 ', req.body);
+        if(!req.body)
             return res.send(300);
         // Retrieve the request's body and parse it as JSON
         var event_json = JSON.parse(req.body);
         console.log('webhook stripe 0 ', event_json);
-        var updateEvent = {
+        var createEventObj = {
             eventId:event_json.id,
-            type: eventObj.type,
-            livemode: eventObj.livemode,
-            request: eventObj.request
+            type: event_json.type,
+            livemode: event_json.livemode,
+            request: event_json.request
         }
         //save the payment token user can have multiple payment methods
-        sails.models['stripeevent'].create(updateEvent).exec(function(err, createEventResult){
+        sails.models['stripeevent'].create(createEventObj).exec(function(err, createEventResult){
             console.log('webhook stripe 1 ', err);
             console.log('webhook stripe 2 ', createEventResult);
             if(err)
