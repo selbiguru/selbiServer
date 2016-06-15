@@ -107,7 +107,8 @@ module.exports.policies = {
   },
 
   WebhooksController: {
-    'stripeEvent': []
+    'stripeEvent': [],
+    'testStripeEvent': [],
   },
 
 };

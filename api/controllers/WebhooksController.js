@@ -53,7 +53,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         }
     },
 
-
     testStripeEvent: function(req, res){
         console.log('webhook stripe 0.00.00 ', req.body);
         console.log('webhook stripe 1.1.1 ', req.body.livemode);
