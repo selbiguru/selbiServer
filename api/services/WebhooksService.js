@@ -82,7 +82,7 @@
                     if(updateVerificationMerchant === null) {
                         console.log('No user found to update account on stripe event');
                     }
-                    return callback(null, updateVerificationMerchant);
+                    return cb(null, updateVerificationMerchant);
                 }); 
             //}
         /*], function (err, result) {

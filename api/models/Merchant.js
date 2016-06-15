@@ -44,7 +44,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
           required: false
         },
         stripeVerified: {
-          type: 'boolean',
+          type: 'string',
           defaultsTo: false
         },
         fields_needed: {
