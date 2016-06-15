@@ -549,24 +549,6 @@
                 return cb(err, chargeResult);
             cb(null, chargeResult);
         });
-
-
-
-
-            /*getgateway().transaction.sale({
-                amount: parseFloat(amount).toFixed(2),
-                merchantAccountId: merchantId,
-                paymentMethodToken: buyerPaymentMethodToken,
-                serviceFeeAmount: (parseFloat(amount) * parseFloat(sails.config.braintree.serviceFeePercent)/100).toFixed(2),
-                options: {
-                    submitForSettlement: true
-                }
-            }, function (err, saleResult) {
-                if(err)
-                    return cb(err, saleResult);
-
-                cb(null, saleResult);
-            });*/
     }
 
 })();

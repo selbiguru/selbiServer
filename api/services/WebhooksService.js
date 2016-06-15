@@ -47,52 +47,43 @@
     };
 
     /**
-     *  This is a public method to update Selbi account from Stripe Event
+     *  This is a public method to update Selbi merchant from Stripe Event
      *  @param      eventId is the id of the Stripe Event
      *  @param      cb is the callback
      *  @return     Returns Updated Selbi User Account
      */
     module.exports.stripeAccountUpdate = function(eventId, cb) {
-        /*async.waterfall([
+        async.waterfall([
             function(callback) {
                 sails.services['webhooksservice'].retrieveStripeEvent(eventId, function (err, retrievedEvent) {
-                    console.log('webhook stripe 5 ', err);
-                    console.log('webhook stripe 6 ', retrievedEvent);
                     if(err) {
                         console.log('error retrieving stripe event ', err);
                         return callback(err, null);
                     }
-                    console.log('NOOOOOOO!!!!! ', err);
                     return callback(null, retrievedEvent);
                 });
-            },*/
-            //function(retrievedEvent, callback) {
-               // console.log('SHOULD NOT BE HERE AT ALL!!!!!! UGH! ', retrievedEvent);
+            },
+            function(retrievedEvent, callback) {
                 var updateVerificationObj = {
-                    stripeVerified: eventId.data.object.legal_entity.verification.status,
-                    fields_needed: eventId.data.object.verification.fields_needed,
-                    due_by: new Date(parseFloat(eventId.data.object.verification.due_by )*1000).toISOString()
+                    stripeVerified: retrievedEvent.data.object.legal_entity.verification.status,
+                    fields_needed: retrievedEvent.data.object.verification.fields_needed,
+                    due_by: new Date(parseFloat(retrievedEvent.data.object.verification.due_by )*1000).toISOString()
                 }
-                console.log('webhook stripe 7 ', updateVerificationObj);
-                sails.models['merchant'].update({ where: {stripeManagedAccountId: 'acct_18L3JVJKU9VDzUG2' } }, updateVerificationObj).exec(function(err, updateVerificationMerchant){
-                    console.log('webhook stripe 8 ', err);
-                    console.log('webhook stripe 9 ', updateVerificationMerchant);
+                sails.models['merchant'].update({ where: {stripeManagedAccountId: retrievedEvent.data.object.id } }, updateVerificationObj).exec(function(err, updateVerificationMerchant){
                     if(err)
                         return callback(err, null);
                     if(updateVerificationMerchant === null) {
-                        console.log('No user found to update account on stripe event');
+                        console.log('No user found to update merchant on stripe event');
                     }
-                    return cb(null, updateVerificationMerchant);
+                    return callback(null, updateVerificationMerchant);
                 }); 
-            //}
-        /*], function (err, result) {
-            console.log('webhook stripe 10 ', err);
-            console.log('webhook stripe 11 ', result);
+            }
+        ], function (err, result) {
             if(err)
                 return cb(err, null);
 
             return cb(null, result);
-        });*/
+        });
     };
 
 
