@@ -13,12 +13,12 @@
      *  This is a public method to update a Stripe event 
      *  @param      eventId is the id of the Stripe Event
      *  @param      cb is the callback
-     *  @return     Returns Stripe/Selbi updated event
+     *  @return     Returns Stripe updated event
      */
     module.exports.updateStripeEvent = function(eventId, cb) {
         async.waterfall([
             function(callback) {
-                sails.services['webhookservice'].retrieveStripeEvent(eventId, function (err, retrievedEvent) {
+                sails.services['webhooksservice'].retrieveStripeEvent(eventId, function (err, retrievedEvent) {
                     if(err) {
                         console.log('error retrieving stripe event ', err.param,' ', err.message);
                         return callback(err.message, null);
@@ -47,15 +47,15 @@
     };
 
     /**
-     *  This is a public method to get a Stripe event 
+     *  This is a public method to update Selbi account from Stripe Event
      *  @param      eventId is the id of the Stripe Event
      *  @param      cb is the callback
-     *  @return     Returns Stripe updated event
+     *  @return     Returns Updated Selbi User Account
      */
     module.exports.stripeAccountUpdate = function(eventId, cb) {
         async.waterfall([
             function(callback) {
-                sails.services['webhookservice'].retrieveStripeEvent(eventId, function (err, retrievedEvent) {
+                sails.services['webhooksservice'].retrieveStripeEvent(eventId, function (err, retrievedEvent) {
                     console.log('webhook stripe 5 ', err);
                     console.log('webhook stripe 6 ', retrievedEvent);
                     if(err) {
@@ -76,6 +76,9 @@
                     console.log('webhook stripe 9 ', updateVerificationMerchant);
                     if(err)
                         return callback(err, null);
+                    if(updateVerificationMerchant === null) {
+                        console.log('No user found to update account on stripe event');
+                    }
                     return callback(null, updateVerificationMerchant);
                 }); 
             }
@@ -94,7 +97,7 @@
      *  This is a public method to retrieve a Stripe event 
      *  @param      eventId is the id of the Stripe Event
      *  @param      cb is the callback
-     *  @return     Returns Stripe updated event
+     *  @return     Returns Stripe event
      */
     module.exports.retrieveStripeEvent = function(eventId, cb) {
         stripe.events.retrieve(eventId, function(err, eventObj) {

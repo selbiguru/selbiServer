@@ -89,6 +89,7 @@ module.exports.routes = {
   
   //Stripe Webhooks
   'POST /payments/webhook/event': 'WebhooksController.stripeEvent',//
+  'POST /payments/webhook/test': 'WebhooksController.testStripeEvent',//
 
   //Twilio routes
   'POST /twilio/sendValidationMessage': 'TwilioController.sendValidationMessage',
