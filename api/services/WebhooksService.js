@@ -20,8 +20,8 @@
             function(callback) {
                 sails.services['webhooksservice'].retrieveStripeEvent(eventId, function (err, retrievedEvent) {
                     if(err) {
-                        console.log('error retrieving stripe event ', err.param,' ', err.message);
-                        return callback(err.message, null);
+                        console.log('error retrieving stripe event ', err);
+                        return callback(err, null);
                     }
                     return callback(null, retrievedEvent);
                 });
@@ -59,18 +59,20 @@
                     console.log('webhook stripe 5 ', err);
                     console.log('webhook stripe 6 ', retrievedEvent);
                     if(err) {
-                        console.log('error retrieving stripe event ', err.param,' ', err.message);
-                        return callback(err.message, null);
+                        console.log('error retrieving stripe event ', err);
+                        return callback(err, null);
                     }
+                    console.log('NOOOOOOO!!!!! ', err);
                     return callback(null, retrievedEvent);
                 });
             },
             function(retrievedEvent, callback) {
+                console.log('SHOULD NOT BE HERE AT ALL!!!!!! UGH! ', retrievedEvent);
                 var updateVerificationObj = {
                     stripeVerified: retrievedEvent.data.object.legal_entity.verification.status,
                     fields_needed: retrievedEvent.data.object.verification.fields_needed
                 }
-                console.log('webhook stripe 7 ', updateEvent);
+                console.log('webhook stripe 7 ', updateVerificationObj);
                 sails.models['merchant'].update({ where: {stripeManagedAccountId: retrievedEvent.data.object.id } }, updateVerificationObj).exec(function(err, updateVerificationMerchant){
                     console.log('webhook stripe 8 ', err);
                     console.log('webhook stripe 9 ', updateVerificationMerchant);
