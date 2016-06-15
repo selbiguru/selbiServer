@@ -71,7 +71,7 @@
                 var updateVerificationObj = {
                     stripeVerified: eventId.data.object.legal_entity.verification.status,
                     fields_needed: eventId.data.object.verification.fields_needed,
-                    due_by: eventId.data.object.verification.due_by
+                    due_by: new Date(parseFloat(eventId.data.object.verification.due_by )*1000).toISOString()
                 }
                 console.log('webhook stripe 7 ', updateVerificationObj);
                 sails.models['merchant'].update({ where: {stripeManagedAccountId: 'acct_18L3JVJKU9VDzUG2' } }, updateVerificationObj).exec(function(err, updateVerificationMerchant){
