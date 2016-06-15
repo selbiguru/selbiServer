@@ -461,7 +461,7 @@
                     chargeId: sellerPaymentResult.id,
                     transactionAmount: parseFloat((parseFloat(sellerPaymentResult.amount)/100).toFixed(2)),
                     application_fee: sellerPaymentResult.application_fee,
-                    transactionDate: new Date(parseFloat(sellerPaymentResult.created)).toISOString(),
+                    transactionDate: new Date(parseFloat(sellerPaymentResult.created)*1000).toISOString(),
                     transferId: sellerPaymentResult.transfer,
                     destinationAccount: sellerPaymentResult.destination,
                     buyerId: buyerId
