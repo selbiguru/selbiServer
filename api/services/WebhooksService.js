@@ -53,7 +53,7 @@
      *  @return     Returns Updated Selbi User Account
      */
     module.exports.stripeAccountUpdate = function(eventId, cb) {
-        async.waterfall([
+        /*async.waterfall([
             function(callback) {
                 sails.services['webhooksservice'].retrieveStripeEvent(eventId, function (err, retrievedEvent) {
                     console.log('webhook stripe 5 ', err);
@@ -65,15 +65,16 @@
                     console.log('NOOOOOOO!!!!! ', err);
                     return callback(null, retrievedEvent);
                 });
-            },
-            function(retrievedEvent, callback) {
-                console.log('SHOULD NOT BE HERE AT ALL!!!!!! UGH! ', retrievedEvent);
+            },*/
+            //function(retrievedEvent, callback) {
+               // console.log('SHOULD NOT BE HERE AT ALL!!!!!! UGH! ', retrievedEvent);
                 var updateVerificationObj = {
-                    stripeVerified: retrievedEvent.data.object.legal_entity.verification.status,
-                    fields_needed: retrievedEvent.data.object.verification.fields_needed
+                    stripeVerified: eventId.data.object.legal_entity.verification.status,
+                    fields_needed: eventId.data.object.verification.fields_needed,
+                    due_by: eventId.data.object.verification.due_by
                 }
                 console.log('webhook stripe 7 ', updateVerificationObj);
-                sails.models['merchant'].update({ where: {stripeManagedAccountId: retrievedEvent.data.object.id } }, updateVerificationObj).exec(function(err, updateVerificationMerchant){
+                sails.models['merchant'].update({ where: {stripeManagedAccountId: 'acct_18L3JVJKU9VDzUG2' } }, updateVerificationObj).exec(function(err, updateVerificationMerchant){
                     console.log('webhook stripe 8 ', err);
                     console.log('webhook stripe 9 ', updateVerificationMerchant);
                     if(err)
@@ -83,15 +84,15 @@
                     }
                     return callback(null, updateVerificationMerchant);
                 }); 
-            }
-        ], function (err, result) {
+            //}
+        /*], function (err, result) {
             console.log('webhook stripe 10 ', err);
             console.log('webhook stripe 11 ', result);
             if(err)
                 return cb(err, null);
 
             return cb(null, result);
-        });
+        });*/
     };
 
 

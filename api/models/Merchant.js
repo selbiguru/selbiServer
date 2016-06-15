@@ -51,6 +51,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
           type: 'array',
           required: false
         },
+        due_by: {
+          type: 'string',
+          required: false
+        },
         owner: {
             model:'user'
         }

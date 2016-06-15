@@ -153,7 +153,8 @@
                                 stripeManagedAccountId : merchantResult.stripeManagedAccountId,
                                 publicKey: merchantResult.publicKey,
                                 stripeVerified: merchantResult.stripeVerified,
-                                fields_needed: merchantResult.fields_needed
+                                fields_needed: merchantResult.fields_needed,
+                                due_by: merchantResult.due_by
                             }
                         }
                         result.userMerchant = userMerchant;
@@ -354,7 +355,8 @@
                         stripeBankId: managedAccountUpdate.external_accounts.data[0].id,
                         stripeManagedAccountId: managedAccountUpdate.id,
                         stripeVerified: managedAccountUpdate.legal_entity.verification.status,
-                        fields_needed: managedAccountUpdate.verification.fields_needed
+                        fields_needed: managedAccountUpdate.verification.fields_needed,
+                        due_by: managedAccountCreate.verification.due_by
                     }
                     //create the merchant info in selbi db
                     sails.models['merchant'].update({ where: {id: merchResults.id } }, managedAccountUpdateObj).exec(function(err, updateResults){
@@ -392,7 +394,8 @@
                             publicKey: managedAccountCreate.keys.publishable,
                             secretKey: managedAccountCreate.keys.secret,
                             stripeVerified: managedAccountCreate.legal_entity.verification.status,
-                            fields_needed: managedAccountCreate.verification.fields_needed
+                            fields_needed: managedAccountCreate.verification.fields_needed,
+                            due_by: managedAccountCreate.verification.due_by
                         }
                     }
                     //create the merchant info in selbi db

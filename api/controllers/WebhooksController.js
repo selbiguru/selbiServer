@@ -76,7 +76,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                  return res.send(300);
             res.send(200);
             if(event_json.type === 'account.updated'){
-                sails.services['webhooksservice'].stripeAccountUpdate(event_json.id, function(err, updateEventResult){
+                sails.services['webhooksservice'].stripeAccountUpdate(event_json, function(err, updateEventResult){
                     console.log('webhook stripe 3 ', err);
                     console.log('webhook stripe 4 ', updateEventResult);
                     if(err){
