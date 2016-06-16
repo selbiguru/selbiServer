@@ -20,7 +20,7 @@
      */
     var sendTransactionalEmail = function(data) {
         client.send_transactional_template(data).on('complete', function(data) {
-          console.log('sending sending sending sending ',data);
+          console.log('completed transactional email ',data);
         });
 
     };

@@ -65,8 +65,9 @@
 
 
     /**
-     *  This is a public methods to get a user by username
+     *  This is a public methods to find if username is unique
      *  @param      userName is the username to find
+     *  @param      userId is the userId of current user
      *  @param      cb is a callback
      */
     module.exports.uniqueUsername = function(userName, userId, cb) {
@@ -85,4 +86,29 @@
             }
         });
     };
+
+
+    /**
+     *  This is a public methods to find if phone number is unique
+     *  @param      phoneNum is the phone number to find
+     *  @param      userId is the userId of current user
+     *  @param      cb is a callback
+     */
+    module.exports.uniquePhones = function(phoneNum, userId, cb) {
+        sails.models['user'].find({where : {phoneNumber: phoneNum } }).exec(function(err, results) {
+            if(err)
+                return cb(500, err);
+            if(results.length > 0) {
+                for(var i in results) {
+                    if(results[i].id !== userId) {
+                        return cb(err, false)
+                    }
+                }
+                return cb(err, true);
+            } else {
+                return cb(err, true);
+            }
+        });
+    };
+
 })();

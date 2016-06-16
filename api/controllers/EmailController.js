@@ -14,7 +14,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     		if (err) { 
     			return res.json(500, err);
     		} else {
-    			console.log("Is it even hitting in here");
     			return res.json(200, {success: true});
     		}
     	});

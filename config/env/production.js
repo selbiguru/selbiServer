@@ -66,7 +66,7 @@ module.exports = {
     twilio: {
         "accountSid" : "AC21c328a896543f751d70f26702e77a7c",
         "authToken" : "5e7ca65f34e2d19100cb01cf9b2fd67d",
-        "twilioPhoneNumber": "+13477673524"
+        "twilioPhoneNumber": "+16505673524"
     },
     mongodbServer: {
         "awsEC2" : "ec2-52-9-235-109.us-west-1.compute.amazonaws.com",

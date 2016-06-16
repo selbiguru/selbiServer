@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
+var async = require('async');
 /**
  * TwilioController
  *
@@ -10,13 +11,33 @@ var _ = require('lodash');
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     sendValidationMessage: function(req, res){
-    	sails.services['smsservice'].sendValidationMessage(req.body['phoneNumber'], req.body['verifyPhone'], function(err, response){
-            console.log("#$@#$@#$@#$ ", err);
-            console.log("michigan go blue ", response);
-            if(err){
-                return res.send(err.status, err);
+        async.parallel([
+            function(cb) {
+                sails.services['userservice'].getUserByEmailService( req.body['email'] , function(err, userResult){
+                    if(err || userResult)
+                        return cb("A Selbi user already exists with this email", null);
+                    return cb(null, userResult);
+                });
+            },
+            function(cb) {
+                sails.services['userservice'].uniquePhones(req.body['phoneNumber'], null, function(err, phoneResult){
+                    if(err || !phoneResult)
+                        return cb("A Selbi user already exists with this phone number", null);
+                    return cb(null, phoneResult);
+                });
+            }
+        ], function(err, results) {
+            if(err) {
+                return res.json(500, err);
             } else {
-                return res.send({"success":200});
+                sails.services['smsservice'].sendValidationMessage(req.body['phoneNumber'], req.body['verifyPhone'], function(err, response){
+                    console.log("Twilio failed to send Phone Validation code ", err);
+                    if(err){
+                        return res.send(err.status, 'The phone number you entered is unable to receive a validation text from us, please check your phone number and try again');
+                    } else {
+                        return res.send({"success":200});
+                    }
+                });
             }
         });
     },

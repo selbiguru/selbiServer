@@ -12,7 +12,6 @@ var stripe = require('stripe')(sails.config.stripe.privateKey);
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     createCustomerAndPaymentMethod: function(req, res){
-        console.log('right!!!!!!');
         //check for required params
         if(!req.body['userId'] || !req.body['paymentStripeCardResponse']){
                 return res.json(500, 'userId or paymentStripeCardResponse is missing.');
@@ -139,7 +138,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             product_description: 'Selbi managed account for user '+req.body['individual'].firstName+' '+req.body['individual'].lastName,
             id:  req.body['id']
         };
-        console.log('create managed account 0 ' , managedAccountParams);
         sails.services['paymentstripeservice'].createManagedAccount(managedAccountParams, req.body['id'], function(err, result){
             if(err)
                 return res.json(500, err);
