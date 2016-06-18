@@ -152,9 +152,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             if(req.body['myself']) {
                 query = {where: {userId: req.params['userId'], isArchived: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             } else if(req.body['friends'] || userResult.admin) {
-                query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
+                query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, isFraud: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             } else {
-                query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, isPrivate: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
+                query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, isFraud: false, isPrivate: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             }
             sails.models['listing'].find(query).exec(function(err, results){
                 if(err) {
@@ -179,9 +179,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             if(req.body['myself']) {
                 query = {where: {userId: userResult.id, isArchived: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             } else if(req.body['friends'] || userResult.admin) {
-                query = {where: {userId: userResult.id, isSold: false, isArchived: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
+                query = {where: {userId: userResult.id, isSold: false, isArchived: false, isFraud: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             } else {
-                query = {where: {userId: userResult.id, isSold: false, isArchived: false, isPrivate: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
+                query = {where: {userId: userResult.id, isSold: false, isArchived: false, isFraud: false, isPrivate: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             }
             sails.models['listing'].find(query).exec(function(err, results){
                 if(err) {
@@ -200,14 +200,14 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             friendsApproved.splice(idx, 1);
             var updatedPaginate = req.body['updatedAt'] || new Date();
             var selbiArray = [];
-            sails.models['user'].find({where: {id: friendsApproved, hasListings: true, updatedAt: {'<': updatedPaginate }, sort: 'updatedAt DESC', limit: 30 } } ).populate('listings', {where:{isSold: false, isArchived: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
+            sails.models['user'].find({where: {id: friendsApproved, hasListings: true, updatedAt: {'<': updatedPaginate }, sort: 'updatedAt DESC', limit: 30 } } ).populate('listings', {where:{isSold: false, isArchived: false, isFraud: false }, sort: 'createdAt DESC', limit:1}).exec(function(err, listingResult){
                 if(err)
                     return res.json(err);
                 async.eachLimit(listingResult, 10, function(userList, cbEach){
                     async.parallel([
                         function(cb){
                             sails.models['listing'].count({ 
-                                where: { userId: userList.id, isSold: false, isArchived: false} 
+                                where: { userId: userList.id, isSold: false, isArchived: false, isFraud: false} 
                             }).exec(cb);
                         },
                         function(cb){
@@ -245,7 +245,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             var createdPaginate = req.body['createdAt'] || new Date();
             var categories = req.body['categories'] || ['all','Electronics', 'Menswear', 'Womenswear', 'Sports & Outdoors', 'Music', 'Furniture', 'Jewelry', 'Games & Toys', 'Automotive', 'Baby & Kids', 'Appliances', 'Other'];
             var listingSelbiUSAObj = {};
-            sails.models['listing'].find({where: {userId: {'!':friendsApproved}, createdAt: {'<': createdPaginate }, isSold: false, searchCategory: categories, isArchived: false, isPrivate: false, sort: 'createdAt DESC', limit: 30 } } ).exec(function(err, listingResult){
+            sails.models['listing'].find({where: {userId: {'!':friendsApproved}, createdAt: {'<': createdPaginate }, isSold: false, searchCategory: categories, isArchived: false, isFraud: false, isPrivate: false, sort: 'createdAt DESC', limit: 30 } } ).exec(function(err, listingResult){
                 if(err)
                     return res.json(err);
                 listingSelbiUSAObj.listings = listingResult;

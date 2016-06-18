@@ -72,6 +72,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       required: true,
       defaultsTo: false
     },
+    isFraud: {
+      type: 'boolean',
+      required: true,
+      defaultsTo: false
+    },
     user: {
       model: 'user',
       columnName: 'userId'

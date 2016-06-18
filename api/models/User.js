@@ -100,6 +100,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     },
     fraudAlert: {
       type: 'boolean',
+      required: true,
       defaultsTo: false
     },
     //Money that we keep as commission
