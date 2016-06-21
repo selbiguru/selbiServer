@@ -61,16 +61,13 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             livemode: event_json.livemode,
             request: event_json.request
         }
-        console.log('ahhhhhhhhh!!!!! ', event_json);
-        res.send(200);
-        return;
         //save the payment token user can have multiple payment methods
         sails.models['teststripeevent'].create(createEventObj).exec(function(err, createEventResult){
             if(err)
                  return res.send(300);
             res.send(200);
             if(event_json.type === 'account.updated'){
-                sails.services['webhooksservice'].stripeAccountUpdate(event_json.id, function(err, updateEventResult){
+                sails.services['webhooksservice'].stripeAccountUpdate(event_json, function(err, updateEventResult){
                     if(err){
                         console.log('err updating Selbi merchant object with stripe event');
                         return;
