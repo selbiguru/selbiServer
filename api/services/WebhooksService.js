@@ -48,42 +48,24 @@
 
     /**
      *  This is a public method to update Selbi merchant from Stripe Event
-     *  @param      eventId is the id of the Stripe Event
+     *  @param      retrievedEvent is the Stripe Event
      *  @param      cb is the callback
      *  @return     Returns Updated Selbi User Account
      */
-    module.exports.stripeAccountUpdate = function(eventId, cb) {
-        async.waterfall([
-            function(callback) {
-                sails.services['webhooksservice'].retrieveStripeEvent(eventId, function (err, retrievedEvent) {
-                    if(err) {
-                        console.log('error retrieving stripe event ', err);
-                        return callback(err, null);
-                    }
-                    return callback(null, retrievedEvent);
-                });
-            },
-            function(retrievedEvent, callback) {
-                var updateVerificationObj = {
-                    stripeVerified: retrievedEvent.data.object.legal_entity.verification.status,
-                    fields_needed: retrievedEvent.data.object.verification.fields_needed,
-                    due_by: new Date(parseFloat(retrievedEvent.data.object.verification.due_by )*1000).toISOString()
-                }
-                sails.models['merchant'].update({ where: {stripeManagedAccountId: retrievedEvent.data.object.id } }, updateVerificationObj).exec(function(err, updateVerificationMerchant){
-                    if(err)
-                        return callback(err, null);
-                    if(updateVerificationMerchant === null) {
-                        console.log('No user found to update merchant on stripe event');
-                    }
-                    return callback(null, updateVerificationMerchant);
-                }); 
-            }
-        ], function (err, result) {
+    module.exports.stripeAccountUpdate = function(retrievedEvent, cb) {
+        var updateVerificationObj = {
+            stripeVerified: retrievedEvent.data.object.legal_entity.verification.status,
+            fields_needed: retrievedEvent.data.object.verification.fields_needed,
+            due_by: new Date(parseFloat(retrievedEvent.data.object.verification.due_by )*1000).toISOString()
+        }
+        sails.models['merchant'].update({ where: {stripeManagedAccountId: retrievedEvent.data.object.id } }, updateVerificationObj).exec(function(err, updateVerificationMerchant){
             if(err)
                 return cb(err, null);
-
-            return cb(null, result);
-        });
+            if(updateVerificationMerchant === null) {
+                console.log('No user found to update merchant on stripe event');
+            }
+            return cb(null, updateVerificationMerchant);
+        });       
     };
 
 
