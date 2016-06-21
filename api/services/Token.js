@@ -73,6 +73,7 @@ module.exports.getToken = function getToken(request, next, throwError) {
   } else if (request.param('token')) { // JWT token sent by parameter
     token = request.param('token');
   } else if (throwError) { // Otherwise request didn't contain required JWT token
+    console.log('Error, No authorization header was found');
     throw new Error('No authorization header was found');
   }
 

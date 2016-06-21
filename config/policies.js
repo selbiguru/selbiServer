@@ -28,9 +28,8 @@ module.exports.policies = {
 
   // Author controller
   AuthController: {
-    '*':              ['passport'],
-    'checkPassword':  ['authenticated'],
-    'callback': ['authenticated']
+    '*':              ['authenticated','passport'],
+    'checkPassword':  ['authenticated']
   },
 
   // Author controller
