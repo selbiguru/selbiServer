@@ -122,6 +122,7 @@ var AuthController = {
           if (error) {
             next(error);
           } else if (!passport) {
+            console.log('Error, Auth Controller: No authorization header was found');
             next({message: 'Given authorization token is not valid'});
           } else {
             next(null, passport);
