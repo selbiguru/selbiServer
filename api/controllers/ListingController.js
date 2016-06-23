@@ -139,6 +139,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         });
     },
     getUserListings: function(req, res){
+        sails.log.verbose('Is this doing it right?!!!!????!?!!34283842938429384298');
         var createdPaginate = req.body['createdAt'] || new Date();
         sails.models['user'].findOne({ where: { id: req.params['userId'] } }).exec(function(err, userResult) {
             var query;
