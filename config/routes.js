@@ -62,18 +62,7 @@ module.exports.routes = {
   'POST /userData/uniquePhone': 'UserController.uniquePhones',
   'PUT /userData/forgot/password': 'UserController.forgotPassword',
   'POST /userData/reset/password/:token': 'UserController.resetPassword',
-  'GET /userData/reset/validate/:token': 'UserController.validateLinkPassword',
-
-  //braintree payments routes
-  ////'GET /payments/getClientToken': 'PaymentsController.getClientToken',
-  ////'GET /payments/getMerchantAccount/:merchantAccountId': 'PaymentsController.getMerchantAccount',
-  ////'GET /payments/findCustomer/:userId': 'PaymentsController.findCustomer',
-  //'GET /payments/:userId': 'PaymentsController.getPayments',
-  ////'DELETE /payments/paymentMethod/:userId': 'PaymentsController.deletePaymentMethod',
-  ////'DELETE /payments/merchant/:userId': 'PaymentsController.deleteMerchant',
-  ////'POST /payments/createSubMerchantAccount/:userId': 'PaymentsController.createSubMerchantAccount',
-  //'POST /payments/createCustomerAndPaymentMethod': 'PaymentsController.createCustomerAndPaymentMethod',
-  //'POST /payments/createOrder': 'PaymentsController.createOrder',  
+  'GET /userData/reset/validate/:token': 'UserController.validateLinkPassword', 
 
   //Stripe payments routes
   'GET /payments/getManagedAccount/:userId': 'PaymentsStripeController.getManagedAccount',//

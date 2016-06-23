@@ -17,7 +17,6 @@
     "barrels": "1.4.0",
     "bcryptjs": "2.1.0",
     "bluebird": "^2.9.13",
-    "braintree": "1.28.0",
     "cloudinary": "^1.2.1",
     "cloudinary-url": "0.0.2",
     "include-all": "0.1.6",

@@ -27,14 +27,6 @@ module.exports = {
         "fromName": "Selbi Support",
         "toEmail": "testing@selbi.io"
     },
-    braintree: {
-        "publicKey" : "nktzr995vy2sxwrx",
-        "privateKey" : "a73c6cb5a55678883fe611403d9c4e40",
-        "merchantId" : "zw67j4nst8r33wms",
-        "masterMerchantAccountId": "selbi",
-        "fundingDescriptor": "Selbi Sale",
-        "serviceFeePercent": "20"
-    },
     stripe: {
         "publicKey" : "pk_test_pVgDzmnHbUaT9z8L7p5slTKB",
         "privateKey" : "sk_test_MtXKfDYlQdtIYHTunUaw8cu4",

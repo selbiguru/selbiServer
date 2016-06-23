@@ -15,10 +15,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
             unique: true,
             primaryKey: true
         },
-        merchantId: { //merchant id on braintree
-            type: 'string',
-            required: false
-        },
         accountNumberLast4: {
             type: 'string',
             required: false

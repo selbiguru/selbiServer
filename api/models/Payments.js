@@ -15,10 +15,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       unique: true,
       primaryKey: true
     },
-    paymentMethodToken: { // to delete braintree
-        type: 'string',
-        required: false
-    },
     stripeCustomerId: {
         type: 'string',
         required: false

@@ -369,7 +369,7 @@
                     });
                 });
             }
-            //No merchant was found on selbi so create a new merchant on braintree
+            //No merchant was found on selbi so create a new merchant on Stripe
             else {
                 delete managedAccountParams['id'];
                 //add unix date to managedAccountParams for stripe validation purposes
@@ -445,7 +445,7 @@
                 });
             },
             function(listingResult, buyerPaymentResult, sellerPaymentResult, cb) {
-                //create sale transaction with Braintree
+                //create sale transaction with Stripe
                 sails.services['paymentstripeservice'].createSaleTransaction(listingResult, sellerPaymentResult.userMerchant,
                     buyerPaymentResult.userPaymentMethod, function (err, sellerPaymentResult) {
                     if(err)
