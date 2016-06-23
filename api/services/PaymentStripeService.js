@@ -356,7 +356,7 @@
                         stripeManagedAccountId: managedAccountUpdate.id,
                         stripeVerified: managedAccountUpdate.legal_entity.verification.status,
                         fields_needed: managedAccountUpdate.verification.fields_needed,
-                        due_by: managedAccountCreate.verification.due_by
+                        due_by: managedAccountUpdate.verification.due_by
                     }
                     //create the merchant info in selbi db
                     sails.models['merchant'].update({ where: {id: merchResults.id } }, managedAccountUpdateObj).exec(function(err, updateResults){
