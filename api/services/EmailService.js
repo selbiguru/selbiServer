@@ -63,14 +63,14 @@
      *  Send welcome to Selbi email to the new user
      * @example:
      *      sails.services['emailservice'].sendWelcomeEmail('xxxxx@gmail.com', 'Bill', 'Bucks');
-     * @param  {String} to           Destination Email address
+     * @param  {String} toEmail           Destination Email address
      * @param  {String} toFirst      First Name of new user
      * @param  {String} toLast       Last Name of new user
      * @return
      */
-    module.exports.sendWelcomeEmail = function(to, toFirst, toLast) {
+    module.exports.sendWelcomeEmail = function(toEmail, toFirst, toLast) {
         var data = { "id" : 1,
-          "to" : sails.config.sendinblue.toEmail,
+          "to" : sails.config.environment === 'production' ? toEmail : sails.config.sendinblue.toEmail,
           "attr" : {"FIRSTNAME":toFirst,"LASTNAME":toLast}
         }
         sendTransactionalEmail(data);
@@ -93,7 +93,7 @@
 
         var data = { 
             "id" : 4,
-            "to" : sails.config.sendinblue.toEmail,
+            "to" : sails.config.environment === 'production' ? listingData.user.email : sails.config.sendinblue.toEmail,
             "attr" : {
                     "FIRSTNAME": buyerData.firstName,
                     "LASTNAME": buyerData.lastName,
@@ -105,7 +105,6 @@
                     "REFNUM": listingData.id,
                     }
         }
-        console.log("email of listingData.user.email", listingData.user.email);
         sendTransactionalEmail(data);
     };
 
@@ -121,7 +120,7 @@
     module.exports.sendPurchaseEmail = function(buyerData, listingData) {
         var data = { 
             "id" : 3,
-            "to" : sails.config.sendinblue.toEmail,
+            "to" : sails.config.environment === 'production' ? buyerData.email : sails.config.sendinblue.toEmail,
             "attr" : {
                     "FIRSTNAME": listingData.user.firstName,
                     "LASTNAME": listingData.user.lastName,
@@ -131,7 +130,6 @@
                     "REFNUM": listingData.id,
                     }
         }
-        console.log("email of buyerData.email", buyerData.email);
         sendTransactionalEmail(data);
     };
 
