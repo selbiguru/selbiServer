@@ -20,7 +20,6 @@
             function(callback) {
                 sails.services['webhooksservice'].retrieveStripeEvent(eventId, function (err, retrievedEvent) {
                     if(err) {
-                        console.log('error retrieving stripe event ', err);
                         return callback(err, null);
                     }
                     return callback(null, retrievedEvent);
@@ -39,9 +38,10 @@
                 }); 
             }
         ], function (err, result) {
-            if(err)
+            if(err) {
+                sails.log.error("updateStripeEvent");
                 return cb(err, null);
-
+            }
             cb(null, result);
         });
     };
@@ -59,10 +59,12 @@
             due_by: new Date(parseFloat(retrievedEvent.data.object.verification.due_by )*1000).toISOString()
         }
         sails.models['merchant'].update({ where: {stripeManagedAccountId: retrievedEvent.data.object.id } }, updateVerificationObj).exec(function(err, updateVerificationMerchant){
-            if(err)
+            if(err) {
+                sails.log.error("stripeAccountUpdate");
                 return cb(err, null);
+            }
             if(updateVerificationMerchant === null) {
-                console.log('No user found to update merchant on stripe event');
+                sails.log.warn("stripeAccountUpdate, No user found to update merchant on stripe event");
             }
             return cb(null, updateVerificationMerchant);
         });       
@@ -77,8 +79,10 @@
      */
     module.exports.retrieveStripeEvent = function(eventId, cb) {
         stripe.events.retrieve(eventId, function(err, eventObj) {
-            if(err)
+            if(err) {
+                sails.log.error("retrieveStripeEvent");
                 return cb(err.message, null);
+            }
             return cb(null, eventObj);
         });
     };

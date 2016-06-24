@@ -29,8 +29,10 @@
                     cbEach();
                 });
             }, function(err) {
-                if(err)
+                if(err) {
+                    sails.log.error('getFriendsByUserService');
                     return cb(500, err);
+                }
                 return cb(err, friendList);
             });
         });
@@ -62,8 +64,10 @@
                     cbEach();
                 });
             }, function(err) {
-                if(err)
+                if(err) {
+                    sails.log.error('getAllInvitationByUserService');
                     return cb(500, err);
+                }
                 return cb(err, friendList);
             });
         });

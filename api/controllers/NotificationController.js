@@ -13,8 +13,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	createNotification: function(req, res) {
 		var createNotificationObj = req.body;
 		sails.services['notificationservice'].createNotificationService( createNotificationObj, function(err, createResponse){
-            if(err)
+            if(err) {
+                sails.log.error('createNotification');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(createResponse);
         });
 	},
@@ -36,23 +39,32 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	},*/
 	deleteNotification: function(req, res) {
 		sails.services['notificationservice'].deleteNotificationService( req.params['notificationId'], function(err, deleteResponse){
-            if(err)
+            if(err) {
+                sails.log.error('deleteNotification');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(deleteResponse);
         });
 	},
     countNotifications: function(req, res) {
         sails.services['notificationservice'].countNotificationService( req.params['userId'], function(err, countResponse){
-            if(err)
+            if(err) {
+                sails.log.error('countNotifications');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(countResponse);
         });
     },
 	getNotificationByUserId: function(req, res) {
         var notifcationArray = [];
 		sails.services['notificationservice'].getNotificationByUserIdService( req.params['userId'], function(err, getResponse){
-            if(err)
+            if(err) {
+                sails.log.error('getNotificationByUserId, get notification by userId');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             async.eachLimit(getResponse, 10, function(notification, cbEach){
                 var requesterId = notification.userFrom;
                 sails.models['user'].findOne({ where: { id: requesterId } }).exec(function(err, userResult){
@@ -64,8 +76,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                     cbEach();
                 });
             }, function(err) {
-                if(err)
+                if(err) {
+                    sails.log.error('getNotificationByUserId, find users');
+                    sails.log.error(new Error(err));
                     return res.json(500, err);
+                }
                 return res.json(notifcationArray);
             });
         });
@@ -73,11 +88,16 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	getByNotificationId: function(req, res) {
         var notifcationArray = [];
 		sails.services['notificationservice'].getByNotificationIdService( req.params['notificationId'], function(err, getResponse){
-            if(err)
+            if(err) {
+                sails.log.error('getByNotificationId, get notification by userId');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             var requesterId = notification.userFrom;
             sails.models['user'].findOne({ where: { id: requesterId } }).exec(function(err, userResult){
                 if(err) {
+                    sails.log.error('getByNotificationId, find one user');
+                    sails.log.error(new Error(err));
                     return res.json(500, err);
                 };
                 notification.userFromInfo = userResult;

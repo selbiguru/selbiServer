@@ -18,6 +18,7 @@
     module.exports.createNotificationService = function(createNotificationObj, cb) {
          sails.models['notification'].create(createNotificationObj).exec(function (err, notification) {
             if(err) {
+                sails.log.error("createNotificationService");
                 return cb(500, err.message);
             }
             return cb(err, notification);
@@ -63,8 +64,10 @@
      */
     module.exports.deleteNotificationService = function(notificationId, cb) {
         sails.models['notification'].destroy({where: {id: notificationId } }).exec(function (err, deleteResult) {
-            if (err)
+            if (err) {
+                sails.log.error("deleteNotificationService");
                 return cb(500, err);
+            }
             return cb(err, deleteResult);
         });
     };
@@ -77,8 +80,10 @@
      */
     module.exports.countNotificationService = function(userId, cb) {
         sails.models['notification'].count({where: {user: userId } }).exec(function (err, countResult) {
-            if (err)
+            if (err) {
+                sails.log.error("countNotificationService");
                 return cb(500, err);
+            }
             return cb(err, countResult);
         });
     };
@@ -91,8 +96,10 @@
      */
     module.exports.getNotificationByUserIdService = function(userId, cb) {
         sails.models['notification'].find({ where: { userTo: userId } }).exec(function(err, results){
-            if(err)
+            if(err) {
+                sails.log.error("getNotificationByUserIdService");
                 return cb(500, err);
+            }
             return cb(err, results);
         });
     };
@@ -105,8 +112,10 @@
      */
     module.exports.getByNotificationIdService = function(notificationId, cb) {
         sails.models['notification'].findOne({ where: { id: notificationId } }).exec(function(err, results){
-            if(err)
+            if(err) {
+                sails.log.error("getByNotificationIdService");
                 return cb(500, err);
+            }
             return cb(err, results);
         });
     };
@@ -136,6 +145,7 @@
             }
         ], function(err, results){
             if(err) {
+                sails.log.error("getNotificationByBothIdsService");
                 return cb(500, err);
             } else {
                 var notificationList = [];

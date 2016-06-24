@@ -22,6 +22,7 @@
             body: SMSmessage,
         }, function(error, message) {
             if (error) {
+                sails.log.error("sendSMSMessage");
                 cb(error, null);
             } else {
                 cb(null, message);

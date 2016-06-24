@@ -20,7 +20,7 @@
      */
     var sendTransactionalEmail = function(data) {
         client.send_transactional_template(data).on('complete', function(data) {
-          console.log('completed transactional email ',data);
+            sails.log.verbose('Completed transactional email ', data);
         });
 
     };

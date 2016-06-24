@@ -15,9 +15,12 @@
      */
     module.exports.deleteListingService = function(listingId, cb) {
         sails.models['listing'].destroy({where: {id: listingId } }).exec(function (err, deleteResult) {
-            if (err)
+            if (err) {
+                sails.log.error("deleteListingService");
                 return cb(500, err);
+            }
             if(deleteResult.length  <= 0) {
+                sails.log.warn("deleteListingService listing not found");
                 return cb(404, 'Listing not found!')
             }
             return cb(err, deleteResult);
@@ -33,8 +36,10 @@
      */
     module.exports.updateListingService = function(listingId, updateObj, cb) {
         sails.models['listing'].update({where : { id: listingId } }, updateObj).exec(function(err, updateResults){     
-            if(err) 
+            if(err) {
+                sails.log.error("updateListingService");
                 return cb(500, err);
+            }
             return cb(null, updateResults);
         });
     };
@@ -55,8 +60,10 @@
      */
     module.exports.createListingService = function(createListingObj, cb) {
         sails.models['listing'].create(createListingObj).exec(function (err, listing) {
-            if (err)
+            if (err) {
+                sails.log.error("createListingService");
                 return cb(500, err);
+            }
             return cb(err, listing);
         });
     };
@@ -70,8 +77,10 @@
      */
     module.exports.countListingService = function(userId, cb) {
         sails.models['listing'].count({where: {userId: userId, isSold: false, isArchived: false, isFraud: false, isPrivate: false } }).exec(function (err, countResult) {
-            if (err)
+            if (err) {
+                sails.log.error("countListingService");
                 return cb(500, err);
+            }
             return cb(err, countResult);
         });
     };

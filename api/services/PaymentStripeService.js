@@ -11,8 +11,9 @@
 
 
     module.exports.createCustomerAndPaymentMethod = function(userId, firstName, lastName, email, paymentStripeCardResponse, cb){
-        if(!paymentStripeCardResponse || !userId)
+        if(!paymentStripeCardResponse || !userId) {
             return cb('paymentStripeCardResponse or userId is missing!', null);
+        }
 
         var customerCreateParams = {
             description: 'Customer '+firstName+' '+lastName+'. Email: '+email+'.',
@@ -20,23 +21,21 @@
             email: email
         }
         var expMonth = (paymentStripeCardResponse.card.exp_month).toString().length > 1 ? paymentStripeCardResponse.card.exp_month : '0'+paymentStripeCardResponse.card.exp_month;
-        console.log('create customer 0' , customerCreateParams);
         sails.models['user'].findOne({ where: { id: userId } }).populate('userPaymentMethod').exec(function(err, customerResults){
-            if(err)
+            if(err) {
+                sails.log.error("createCustomerAndPaymentMethod, finding user");
                 return cb(err, null);
-            if(customerResults === undefined)
+            }
+            if(customerResults === undefined) {
+                sails.log.warn("createCustomerAndPaymentMethod, no user found");
                 return cb('No user found', null);
-            console.log('create customer 1 ', customerResults);
-            console.log('create customer 2 ', customerResults.userPaymentMethod);
-            console.log('create customer 3 ', !customerResults.userPaymentMethod);
+            }
             if(!customerResults.userPaymentMethod){
-                console.log('create customer 4');
                 //customer not found so create new customer and payment method
                 stripe.customers.create(customerCreateParams, function (err, customerCreateResult) {
-                    console.log('create customer 5 ', customerCreateResult);
                     var cardMethodStatus = {};
                     if(err) {
-                        console.log('error creating customer ', err.param,' ', err.message);
+                        sails.log.err("createCustomerAndPaymentMethod, error creating customer ", err.param);
                         return cb(err.message, null);
                     }
                     var pm = {
@@ -51,23 +50,20 @@
                     }
                     //save the payment token user can have multiple payment methods
                     sails.models['user'].update({ where: {id: userId } }, pm).exec(function(err, updateResult){
-                        console.log('create customer 6 ', updateResult);
-                        if(err)
-                             return cb(err, null);
-
+                        if(err) {
+                            sails.log.error("createCustomerAndPaymentMethod, updating new user");
+                            return cb(err, null);
+                        }
                         cb(null, cardMethodStatus);
                     });
-                });//create brackets
+                });
             }
             else{
                 //update customer payment method
-                console.log('create customer 7 ');
                 stripe.customers.update(customerResults.userPaymentMethod.stripeCustomerId, customerCreateParams, function (err, customerUpdate) {
-                    console.log('create customer 8 ', err);
-                    console.log('create customer 9 ', customerUpdate);
                     var cardMethodStatus = {};
                     if(err) {
-                        console.log('error creating customer ', err.param,' ', err.message);
+                        sails.log.error("createCustomerAndPaymentMethod, error updating customer ", err.param);
                         return cb(err.message, null);
                     }
                     var pm = {
@@ -80,9 +76,10 @@
 
                     //save the payment token user can have multiple payment methods
                     sails.models['payments'].update({ where: {id: customerResults.userPaymentMethod.id } }, pm).exec(function (err, resultsCustomer) {
-                        console.log('create customer 9 ', resultsCustomer);
-                        if (err)
+                        if (err) {
+                            sails.log.error("createCustomerAndPaymentMethod, updating user");
                             return cb(err, null);
+                        }
                         cb(null, cardMethodStatus);
                     });
                 }); //create payment method  
@@ -94,16 +91,24 @@
         if(!userId)
             return cb('userId is missing!', null);
         sails.models['user'].findOne({ where: { id: userId } }).populate('userPaymentMethod').exec(function(err, findCustomerResult){
-                if(err)
+            if(err) {
+                sails.log.error("getCustomerOnStripe, finding user");
                 return cb(err, null);
-            if(customerResults === undefined)
+            }
+            if(findCustomerResult === undefined) {
+                sails.log.warn("getCustomerOnStripe, no user found");
                 return cb('No user found', null);
-            if(!findCustomerResult.userPaymentMethod)
+            }
+            if(!findCustomerResult.userPaymentMethod) {
+                sails.log.warn("getCustomerOnStripe, no stripe customer found");
                 return cb('No stripe customer found', null);
+            }
             stripe.customers.retrieve("cus_8brBBcDuO2aoUd'", function(err, customer) {
                 // asynchronously called
-                if(err)
+                if(err) {
+                    sails.log.error("getCustomerOnStripe, retrieving customer from stripe");
                     return cb(err, null);
+                }
                 cb(err, customer);
             });
         });
@@ -116,17 +121,22 @@
             var result = {
                 userId: userId
             };
-            if(err)
+            if(err) {
+                sails.log.error("getPayments, finding user");
                 return cb(err, null);
+            }
             if(results === undefined) {
                 //no user found
+                sails.log.warn("getPayments, no user found");
                 return cb('No User found!', null);
             }
             async.parallel([
                 function(cb) {
                     sails.models['payments'].findOne({ where: { id: results.userPaymentMethod || {} } }).exec(function(err, paymentsResult) {
-                        if (err)
+                        if (err) {
+                            sails.log.warn("getPayments, finding payment method");
                             return cb(err, null);
+                        }
                         var userPaymentMethod = {};
                         if(paymentsResult) {
                             userPaymentMethod = {
@@ -142,8 +152,10 @@
                 },
                 function(cb) {
                     sails.models['merchant'].findOne({where: {id: results.userMerchant || {} }}).exec(function (err, merchantResult) {
-                        if (err)
+                        if (err) {
+                            sails.log.warn("getPayments, finding merchant");
                             return cb(err, null);
+                        }
                         var userMerchant = {};
                         if(merchantResult) {
                             userMerchant = {
@@ -162,8 +174,10 @@
                     });
                 }
             ], function(err, paraResults) {
-                if(err)
+                if(err) {
+                    sails.log.error("getPayments, getting payments");
                     cb(err, null);
+                }
                 cb(null, result);
             })
         });
@@ -174,22 +188,21 @@
             return cb('userId is missing!', null);
 
         sails.models['user'].findOne({ where: { id: userId } }).populate('userPaymentMethod').exec(function(err, results){
-            if(err)
+            if(err) {
+                sails.log.error("deleteCustomer, finding user");
                 return cb(err, null);
+            }
             if(results && results.userPaymentMethod) {
                 stripe.customers.del( results.userPaymentMethod.stripeCustomerId, function(err, deleteCustomer) {
-                    console.log('delete payment method 3 ', err);
-                    console.log('delete payment method 4 ', deleteCustomer);
                     // asynchronously called
                     if(err) {
-                        console.log('error deleting customer ', err.param,' ', err.message);
+                        sails.log.error("deleteCustomer, deleting customer from stripe");
                         return cb(err.message, null);
                     }
                     //update the merchant info in selbi db
                     sails.models['payments'].destroy({ where: {id: results.userPaymentMethod.id } }).exec(function(err, destroyCustomerResults){
-                        console.log('delete payment method 5 ', destroyCustomerResults);
                         if(err){
-                            console.log('Error deleting customer from Selbi');
+                            sails.log.error("deleteCustomer, deleting customer from Selbi");
                             cb(err, null);
                         }
 
@@ -205,21 +218,16 @@
     module.exports.deletePaymentMethod = function (userId, cb){
         if(!userId)
             return cb('userId is missing!', null);
-
         sails.models['user'].findOne({ where: { id: userId } }).populate('userPaymentMethod').exec(function(err, results){
-            console.log('delete payment method 0 ', results);
-            console.log('delete payment method 1 ', results.userPaymentMethod);
-            console.log('delete payment method 2 ', !results.userPaymentMethod);
-            if(err)
+            if(err) {
+                sails.log.error("deletePaymentMethod, finding user");
                 return cb(err, null);
+            }
             if(results && results.userPaymentMethod) {
-
                 stripe.customers.deleteCard( results.userPaymentMethod.stripeCustomerId, results.userPaymentMethod.stripeCardId, function(err, deleteCustomerCard) {
-                    console.log('delete payment method 3 ', err);
-                    console.log('delete payment method 4 ', deleteCustomerCard);
                     // asynchronously called
                     if(err) {
-                        console.log('error deleting customer card ', err.param,' ', err.message);
+                        sails.log.error("deletePaymentMethod deleting payment ", err.param);
                         return cb(err.message, null);
                     }
                     //update the merchant info in selbi db
@@ -230,10 +238,9 @@
                         stripeCardId: ''
                     }
                     sails.models['payments'].update({ where: {id: results.userPaymentMethod.id } }, customerDeleteObj).exec(function(err, updateResults){
-                        console.log('delete payment method 5 ', updateResults);
-                        if(err)
-                            console.log('Error deleting customer card from our db');
-
+                        if(err) {
+                            sails.log.error("deletePaymentMethod, updating payment db");
+                        }
                        cb(null, updateResults);
                     });
                 });
@@ -246,25 +253,22 @@
     module.exports.deleteManagedAccount = function(userId, cb){
        if(!userId)
             return cb('userId is missing!', null);
-
         sails.models['user'].findOne({ where: { id: userId } }).populate('userMerchant').exec(function(err, results){
-            if(err)
+            if(err) {
+                sails.log.error("deleteManagedAccount, finding user");
                 return cb(err, null);
+            }
             if(results && results.userMerchant) {
                 stripe.accounts.del(results.userMerchant.stripeManagedAccountId, function(err, deleteConfirmation){
-                    console.log('delete payment method 0 ', err);
-                    console.log('delete payment method 1 ', deleteConfirmation);
                     if(err){
-                        console.log('error deleting managed external account ', err.param,' ', err.message);
+                        sails.log.error("deleteManagedAccount deleting managed account from stripe ", err.param);
                         return cb(err.message, null);
                     }
 
                     //update the merchant info in selbi db
                     sails.models['merchant'].destroy({where: {id: results.userMerchant.id } }).exec(function(err, destroyResult){
-                        console.log('delete payment method 2 ', err);
-                        console.log('delete payment method 3 ', destroyResult);
                         if(err){
-                            console.log('Error deleting managed account from selbi');
+                            sails.log.error("deleteManagedAccount, destroying merchant record from db");
                             return cb(err, null);
                         }
                         return cb(null, destroyResult);
@@ -279,13 +283,14 @@
     module.exports.deleteExternalAccount = function (userId, cb){
         if(!userId)
             return cb('userId is missing!', null);
-
         sails.models['user'].findOne({ where: { id: userId } }).populate('userMerchant').exec(function(err, results){
-            if(err)
+            if(err) {
+                sails.log.error("deleteExternalAccount, finding user");
                 return cb(err, null);
+            }
             stripe.accounts.deleteExternalAccount(results.userMerchant.stripeManagedAccountId, results.userMerchant.stripeBankId, function(err, deleteConfirmation){
                 if(err){
-                    console.log('error deleting managed external account ', err.param,' ', err.message);
+                    sails.log.error("deleteExternalAccount, deleting external account from stripe ", err.param);
                     return cb(err.message, null);
                 }
                 var managedAccountDeleteObj = {
@@ -295,9 +300,10 @@
                 }
                 //update the merchant info in selbi db
                 sails.models['merchant'].update({ where: {id: results.userMerchant.id } }, managedAccountDeleteObj).exec(function(err, updateResults){
-                    if(err)
+                    if(err) {
+                        sails.log.error("deleteExternalAccount, updating merchant in db");
                         return cb(err, null);
-
+                    }
                    cb(null, updateResults);
                 });
             });
@@ -308,16 +314,21 @@
         if(!userId)
             return cb('userId is missing!', null);
         sails.models['user'].findOne({ where: { id: userId } }).populate('userMerchant').exec(function(err, userResult){
-            if(err)
+            if(err) {
+                sails.log.error("getManagedAccount, finding user");
                 return cb(err, null);
-            if(userResult === undefined)
+            }
+            if(userResult === undefined) {
+                sails.log.warn("getManagedAccount, no user exists");
                 return cb('No user found', null);
+            }
             if(userResult.userMerchant) {
                 stripe.accounts.retrieve(userResult.userMerchant.stripeManagedAccountId, function(err, managedAccount) {
                     // asynchronously called
-                    if(err)
-                        console.log('error getting managed account ', err.param,' ', err.message);
+                    if(err) {
+                        sails.log.error("getManagedAccount, retrieving managed account from stripe ", err.param);
                         return cb(err.message, null);
+                    }
                     return cb(null, managedAccountUpdate);
                 });
             } else {
@@ -332,21 +343,19 @@
             return cb('userId is missing!', null);
         //1) check if this user has a merchant
         sails.models['user'].findOne({ where: { id: managedAccountParams.id } }).populate('userMerchant').exec(function(err, merchResults){
-            console.log('create managed account 1 ' , merchResults);
-            console.log('create managed account 2 ' , !merchResults.userMerchant);
-            console.log('create managed account 2.5 ' , !!merchResults.userMerchant);
-            if(err)
+            if(err) {
+                sails.log.error("createManagedAccount, finding user");
                 return cb(err, null);
-            if(merchResults === undefined)
+            }
+            if(merchResults === undefined) {
+                sails.log.warn("createManagedAccount, no user found");
                 return cb('No user found', null);
+            }
             if(merchResults.userMerchant) {
-                console.log('create managed account 3');
                 //update managed account on stripe
                 stripe.accounts.update(merchResults.userMerchant.stripeManagedAccountId, { external_account: managedAccountParams.external_account}, function(err, managedAccountUpdate) {
-                    console.log('create managed account 4 ' , err);
-                    console.log('create managed account 5 ' , managedAccountUpdate);
                     if(err) {
-                        console.log('error updating managed account ', err.param,' ', err.message);
+                        sails.log.error("createManagedAccount, updating managed acocunt on stripe ", err.param);
                         return cb(err.message, null);
                     }
                     var managedAccountUpdateObj = {
@@ -360,11 +369,10 @@
                     }
                     //create the merchant info in selbi db
                     sails.models['merchant'].update({ where: {id: merchResults.id } }, managedAccountUpdateObj).exec(function(err, updateResults){
-                        console.log('create managed account 6 ' , err);
-                        console.log('create managed account 7 ' , updateResults);
-                        if(err)
+                        if(err) {
+                            sails.log.error("createManagedAccount, updating merchant on db");
                             return cb(err, null);
-
+                        }
                        cb(null, updateResults);
                     });
                 });
@@ -374,13 +382,10 @@
                 delete managedAccountParams['id'];
                 //add unix date to managedAccountParams for stripe validation purposes
                 managedAccountParams.tos_acceptance.date = (new Date(merchResults.createdAt).getTime() / 1000).toFixed(0);
-                console.log('create managed account 8 ' , managedAccountParams.tos_acceptance.date);
                 stripe.accounts.create(managedAccountParams, function(err, managedAccountCreate) {
-                  console.log('create managed account 9 ' , err);
-                  console.log('create managed account 10 ' , managedAccountCreate);
                   // asynchronously called
                     if(err) {
-                        console.log('error creating managed account ', err.param,' ', err.message);
+                        sails.log.error("createManagedAccount, creating managed account on stripe ", err.param);
                         return cb(err.message, null);
                     }
 
@@ -400,10 +405,10 @@
                     }
                     //create the merchant info in selbi db
                     sails.models['user'].update({ where: {id: userId } }, merchantCreateObj).exec(function(err, manageUserUpdate){
-                        console.log('create managed account 11 ' , err);
-                        console.log('create managed account 12 ' , manageUserUpdate);
-                        if(err)
+                        if(err) {
+                            sails.log.error("createManagedAccount, creating merchant on db");
                             return cb(err, null);
+                        }
                         cb(null,{ success: true });
                     });
                 });
@@ -417,9 +422,12 @@
             function(cb) {
                 //Get listing data
                 sails.models['listing'].findOne({ where: { id: listingId } }).populate('user').exec(function(err, listingResult){
-                    if(err)
+                    if(err) {
+                        sails.log.warn("createOrder, finding user");
                         return cb(err, null);
+                    }
                     if(listingResult.isSold === true) {
+                        sails.log.warn("createOrder, item has been sold already");
                         return cb(500, 'Item has been sold');
                     }
                     listingData = listingResult;
@@ -431,7 +439,6 @@
                 sails.services['paymentstripeservice'].getPayments(buyerId, function (err, buyerPaymentResult) {
                     if(err)
                         return cb(err, null);
-
                     cb(null, listingResult, buyerPaymentResult);
                 });
             },
@@ -440,7 +447,6 @@
                 sails.services['paymentstripeservice'].getPayments(sellerId, function (err, sellerPaymentResult) {
                     if(err)
                         return cb(err, null);
-
                     cb(null, listingResult, buyerPaymentResult, sellerPaymentResult);
                 });
             },
@@ -450,12 +456,10 @@
                     buyerPaymentResult.userPaymentMethod, function (err, sellerPaymentResult) {
                     if(err)
                         return cb(err, null);
-
                     cb(null, sellerPaymentResult, listingResult.id);
                 });
             },
             function(sellerPaymentResult, listingId, cb) {
-                console.log('create sale 3 ', sellerPaymentResult)
                 var transactionData = {
                     isSold: true,
                     chargeId: sellerPaymentResult.id,
@@ -468,8 +472,10 @@
                 }
                 //get payments data for the seller
                 sails.models['listing'].update({ where: {id: listingId } }, transactionData).exec(function(err, updateResult){
-                    if(err)
+                    if(err) {
+                        sails.log.warn("createOrder, updating listing on db");
                         return cb(err, null);
+                    }
 
                     cb(null, updateResult);
                 });
@@ -510,15 +516,19 @@
                         })
                     }
                 ], function(err, results) {
-                    if(err)
+                    if(err) {
+                        sails.log.warn("createOrder, notification and gathering user data");
                         return cb(500, err);
+                    }
                     return cb(null, updateResult);
                 });
             }
         ], function (err, result) {
             // result now equals 'done'
-            if(err)
+            if(err) {
+                sails.log.error("createOrder, creating and executing order");
                 return callback(err, null);
+            }
 
             callback(null, result);
         });
@@ -527,7 +537,6 @@
     }
 
     module.exports.createSaleTransaction = function (listing, managedAccount, customerAccount, cb){
-        console.log('create sale 0 ');
         if(!listing || !managedAccount || !customerAccount)
             return cb(500, "Listing or ManagedAccount or CustomerAccount is missing!");
         var serviceFee = listing.user.serviceFee !== parseFloat(sails.config.stripe.serviceFeePercent) ? listing.user.serviceFee < parseFloat(sails.config.stripe.serviceFeePercent) ? listing.user.serviceFee : parseFloat(sails.config.stripe.serviceFeePercent) : parseFloat(sails.config.stripe.serviceFeePercent);
@@ -543,10 +552,10 @@
                 selbiId: listing.user.id
             }
         }, function(err, chargeResult){
-            console.log('create sale 1 ', err);
-            console.log('create sale 2 ', chargeResult);
-            if(err)
+            if(err) {
+                sails.log.error("createSaleTransaction creating a charge on stripe");
                 return cb(err, chargeResult);
+            }
             cb(null, chargeResult);
         });
     }

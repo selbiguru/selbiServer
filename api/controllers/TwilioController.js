@@ -28,11 +28,14 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             }
         ], function(err, results) {
             if(err) {
+                sails.log.error('sendValidationMessage');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
             } else {
                 sails.services['smsservice'].sendValidationMessage(req.body['phoneNumber'], req.body['verifyPhone'], function(err, response){
-                    console.log("Twilio failed to send Phone Validation code ", err);
                     if(err){
+                        sails.log.error('sendValidationMessage, twilio failed to send phone validation');
+                        sails.log.error(new Error(err));
                         return res.send(err.status, 'The phone number you entered is unable to receive a validation text from us, please check your phone number and try again');
                     } else {
                         return res.send({"success":200});

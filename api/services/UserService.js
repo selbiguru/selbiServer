@@ -14,10 +14,14 @@
      */
     module.exports.getUserByUsernameService = function(userName, cb) {
         sails.models['user'].findOne({where : {username: userName }}).populate('userAddress').exec(function(err, results) {
-            if(err)
-                 return cb(500, err);
-            if(results === undefined)
+            if(err) {
+                sails.log.error("getUserByUsernameService");
+                return cb(500, err);
+            }
+            if(results === undefined) {
+                sails.log.warn("getUserByUsernameService");
                 return cb(404, 'Sorry, this user does not exist!');
+            }
             return cb(err, results);
         });
     };
@@ -29,8 +33,10 @@
      */
     module.exports.getUserDataService = function(userId, cb) {
         sails.models['user'].findOne({ where: { id: userId } }).populate('userAddress').exec(function(err, results){
-            if(err)
+            if(err) {
+                sails.log.error("getUserDataService");
                 return cb(500, err);
+            }
             return cb(err, results);
         });
     };
@@ -42,8 +48,10 @@
      */
     module.exports.getUserByEmailService = function(userEmail, cb) {
         sails.models['user'].findOne({ where: { email: userEmail } }).populate('userAddress').exec(function(err, results){
-            if(err)
+            if(err) {
+                sails.log.error("getUserByEmailService");
                 return cb(500, err);
+            }
             return cb(err, results);
         });
     };
@@ -57,8 +65,10 @@
      */
     module.exports.updateUserDataService = function(userId, fieldsUpdating, cb) {
         sails.models['user'].update({ where: { id: userId } }, fieldsUpdating).exec(function(err, updatedResults){
-            if(err)
+            if(err) {
+                sails.log.error("updateUserDataService");
                 return cb(500, err);
+            }
             return cb(err, updatedResults);
         });
     };
@@ -72,8 +82,10 @@
      */
     module.exports.uniqueUsername = function(userName, userId, cb) {
         sails.models['user'].find({where : {username: userName } }).exec(function(err, results) {
-            if(err)
+            if(err) {
+                sails.log.error("uniqueUsername");
                 return cb(500, err);
+            }
             if(results.length > 0) {
                 for(var i in results) {
                     if(results[i].id !== userId) {
@@ -96,8 +108,10 @@
      */
     module.exports.uniquePhones = function(phoneNum, userId, cb) {
         sails.models['user'].find({where : {phoneNumber: phoneNum } }).exec(function(err, results) {
-            if(err)
+            if(err) {
+                sails.log.error("uniquePhones");
                 return cb(500, err);
+            }
             if(results.length > 0) {
                 for(var i in results) {
                     if(results[i].id !== userId) {

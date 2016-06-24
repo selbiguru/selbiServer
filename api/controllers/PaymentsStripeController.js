@@ -18,8 +18,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         }
         //make a service paymentstripeservice call
         sails.services['paymentstripeservice'].createCustomerAndPaymentMethod(req.body['userId'], req.body['firstName'], req.body['lastName'], req.body['email'], req.body['paymentStripeCardResponse'], function(err, result){
-            if(err)
+            if(err) {
+                sails.log.error('createCustomerAndPaymentMethod');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(200, result);
         });
     },
@@ -30,8 +33,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         }
         //make a service paymentstripeservice call
         sails.services['paymentstripeservice'].getCustomerOnStripe(req.params['userId'], function(err, result){
-            if(err)
+            if(err) {
+                sails.log.error('getCustomer');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(200, result);
         });
     },
@@ -42,8 +48,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         }
         //make a service paymentstripeservice call
         sails.services['paymentstripeservice'].getPayments(req.params['userId'], function (err, result) {
-            if (err)
+            if (err) {
+                sails.log.error('getPayments');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             delete result.userMerchant.stripeBankId;
             delete result.userMerchant.routingNumber;
             delete result.userMerchant.stripeManagedAccountId;
@@ -58,8 +67,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         }
         //make a service paymentstripeservice call
         sails.services['paymentstripeservice'].deleteCustomer(req.params['userId'], function(err, result){
-            if(err)
+            if(err) {
+                sails.log.error('deleteCustomer');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(200, result);
         });
     },
@@ -70,8 +82,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         }
         //make a service paymentstripeservice call
         sails.services['paymentstripeservice'].deletePaymentMethod(req.params['userId'], function(err, result){
-            if(err)
+            if(err) {
+                sails.log.error('deletePaymentMethod');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(200, result);
         });
     },
@@ -81,8 +96,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         }
         //make a service paymentstripeservice call
         sails.services['paymentstripeservice'].deleteManagedAccount(req.params['userId'], function(err, result){
-            if(err)
+            if(err) {
+                sails.log.error('deleteManagedAccount');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(200, result);
         });
     },
@@ -93,8 +111,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         }
         //make a service paymentstripeservice call
         sails.services['paymentstripeservice'].deleteExternalAccount(req.params['userId'], function(err, result){
-            if(err)
+            if(err) {
+                sails.log.error('deleteExternalAccount');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(200, result);
         });
     },
@@ -139,15 +160,21 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             id:  req.body['id']
         };
         sails.services['paymentstripeservice'].createManagedAccount(managedAccountParams, req.body['id'], function(err, result){
-            if(err)
+            if(err) {
+                sails.log.error('createManagedAccount');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(200, result);
         });
     },
     getManagedAccount: function (req, res){
         sails.services['paymentstripeservice'].getManagedAccount(req.params['userId'], function(err, managedAccount){
-            if(err)
+            if(err) {
+                sails.log.error('getManagedAccount');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(200, managedAccount);
         });
     },
@@ -157,11 +184,15 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             return res.json(500, 'buyerId or sellerId or listingId is missing.');
         }
         sails.services['paymentstripeservice'].createOrder(req.body['listingId'], req.body['buyerId'], req.body['sellerId'], function(err, result){
-            if(err)
+            if(err) {
+                sails.log.error('createOrder, creating order');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             sails.services['listingservice'].countListingService(req.body['sellerId'], function(err, countResult){
                 if(err){
-                    console.log('Unable to get count of listings for user');
+                    sails.log.error('createOrder, unable to get count of listings');
+                    sails.log.error(new Error(err));
                     return res.json(200, result);
                 }
                 if(countResult === 0) {
@@ -170,7 +201,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                     };
                     sails.services['userservice'].updateUserDataService(req.body['sellerId'], updateObj, function(err, updateResult) {
                         if(err) {
-                            console.log('User not updated when buying an item');
+                            sails.log.error('createOrder, user not updated when buying an item in db');
+                            sails.log.error(new Error(err));
                         }
                         return res.json(200, result);
                     });
