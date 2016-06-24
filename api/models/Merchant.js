@@ -15,10 +15,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
             unique: true,
             primaryKey: true
         },
-        merchantId: { //merchant id on braintree
-            type: 'string',
-            required: false
-        },
         accountNumberLast4: {
             type: 'string',
             required: false
@@ -27,11 +23,31 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
             type: 'string',
             required: false
         },
-        mobilePhone: {
+        publicKey: {
             type: 'string',
             required: false
         },
-        fundingDestination: {
+        secretKey: {
+          type: 'string',
+          required: false
+        },
+        stripeBankId: {
+          type: 'string',
+          required: false
+        },
+        stripeManagedAccountId: {
+          type: 'string',
+          required: false
+        },
+        stripeVerified: {
+          type: 'string',
+          defaultsTo: false
+        },
+        fields_needed: {
+          type: 'array',
+          required: false
+        },
+        due_by: {
           type: 'string',
           required: false
         },

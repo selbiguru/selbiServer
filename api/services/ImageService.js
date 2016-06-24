@@ -26,8 +26,10 @@
      *  @param      cb is a callback
      */
     module.exports.deleteCloudinaryImageService = function(images, cb) {
-        if(!images)
+        if(!images) {
+            sails.log.warn("deleteCloudinaryImageService");
             return cb(404, 'Images Not Found');
+        }
         var urlGenerator = new cloudinaryUrl(sails.config.cloudinary.api_key, sails.config.cloudinary.api_secret, 'selbi');
         var cloudinaryData = urlGenerator.sign({
                 invalidate: true
@@ -41,8 +43,10 @@
                 }
             }, cloudinaryData.params);
         }, function(err, results) {
-            if(err)
+            if(err) {
+                sails.log.error("deleteCloudinaryImageService");
                 return cb(500, err);
+            }
             return cb(null, 'success');
         });
     };

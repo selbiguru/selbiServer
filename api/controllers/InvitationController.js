@@ -39,6 +39,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             }
         ], function(err, results){
             if(err) {
+            	sails.log.error('sendFriendInvitation');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
             } else {
                 return res.json(responseObj);
@@ -89,6 +91,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 			}
 		], function(err, results){
             if(err) {
+            	sails.log.error('updateFriendInvitation');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
             } else {
                 return res.json(responseObj);
@@ -106,8 +110,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 			notification: ''
 		};
 		sails.services['invitationservice'].getInvitationByUserIdsService(req.body['userTo'], req.body['userFrom'], function(err, invitationResponse) {
-			if(err)
+			if(err) {
+				sails.log.error('updateFriendInvitationByUserIds, get invitation by user Ids');
 				return res.json(500, err);
+			}
 			async.parallel([
 				function(cb) {
 					sails.services['invitationservice'].updateFriendInvitationService(invitationResponse[0].id, req.body, function(err, updateResults) {
@@ -143,6 +149,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 				}
 			], function(err, results) {
 				if(err) {
+					sails.log.error('updateFriendInvitationByUserIds');
+                	sails.log.error(new Error(err));
 	                return res.json(500, err);
 	            } else {
 	                return res.json(responseObj);
@@ -152,20 +160,29 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	},
 	getInvitationByUserIds: function(req, res) {
 		sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], req.params['friendId'], function(err, invitationsResponse){
-            if(err)
+            if(err) {
+            	sails.log.error('getInvitationByUserIds');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(invitationsResponse);
         });
 	},
 	getInvitationByUsername: function(req, res) {
 		sails.services['userservice'].getUserByUsernameService( req.params['username'], function(err, usernameResponse){
             var invitationUser = usernameResponse
-            if(err)
+            if(err) {
+            	sails.log.error('getInvitationByUsername, get user by username');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], usernameResponse.id, function(err, invitationResponse){
 	           invitationUser.invitation = invitationResponse;
-	            if(err)
+	            if(err) {
+	            	sails.log.error('getInvitationByUsername, get invitation by user Ids');
+                	sails.log.error(new Error(err));
 	                return res.json(500, err);
+	            }
 	            return res.json(invitationUser);
 	        });
         });

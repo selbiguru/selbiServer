@@ -12,16 +12,22 @@ var async = require('async');
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	getFriendsByUser: function(req, res) {
 		sails.services['friendservice'].getFriendsByUserService( req.params['userId'], function(err, friendsResult){
-			if(err)
+			if(err) {
+				sails.log.error('getFriendsByUser');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+			}
             return res.json(friendsResult);
 		});
 	},
 	//Includes pending friends
 	getAllFriendsByUser: function(req, res) {
 		sails.services['friendservice'].getAllInvitationByUserService( req.params['userId'], function(err, allFriendsResult){
-			if(err)
+			if(err) {
+				sails.log.error('getAllFriendsByUser');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+			}
             return res.json(allFriendsResult);
 		});
 	},
@@ -32,7 +38,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 		async.eachLimit(phoneList, 10, function(newPhone, cbEach){
 			sails.models['user'].findOne({ where: {phoneNumber: newPhone }}).exec(function(err, result){
 				if(err)
-					return res.json(500, err);
+					return cbEach(err, null);
 				if(result && result.id) {
 					var createInvitationObject = {
 						userFrom: req.params['userId'],
@@ -41,7 +47,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 					};
 					sails.services['invitationservice'].createFriendInvitationService( createInvitationObject, function(err, createResult) {
 						if(err) {
-							return res.json(500, err);
+							return cbEach(err, null);
 						}
 						responseList.push(createResult);
 						cbEach();
@@ -52,6 +58,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 			});
 		}, function(err){
 			if(err) {
+				sails.log.error('addFriendsByPhone');
+                sails.log.error(new Error(err));
 				return res.json(500, err);
 			}
 			return res.json(responseList);

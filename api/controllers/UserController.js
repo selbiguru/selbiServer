@@ -12,33 +12,35 @@ var bcrypt = require('bcryptjs');
  */
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	signUp: function signUp(request, response){
-        sails.services['userservice'].getUserByEmailService( request.body['email'] , function(err, userResult){
-            if(err || userResult)
-                return response.json(500, "User already exists with this email!");
-            sails.services['userservice'].uniqueUsername(request.body['username'], null, function(err, userNameResult){
-                if (err) {
-                    request.params.all().username = request.body['username'].slice(0,16) + (Math.floor(Math.random() * 9000)+1000);
-                } else if (!userNameResult) {
-                    request.params.all().username = request.body['username'].slice(0,16) + (Math.floor(Math.random() * 9000)+1000);
+        sails.services['userservice'].uniqueUsername(request.body['username'], null, function(err, userNameResult){
+            if (err) {
+                sails.log.error('signUp, unique username');
+                sails.log.error(new Error(err));
+                request.params.all().username = request.body['username'].slice(0,16) + (Math.floor(Math.random() * 9000)+1000);
+            } else if (!userNameResult) {
+                request.params.all().username = request.body['username'].slice(0,16) + (Math.floor(Math.random() * 9000)+1000);
+            }
+            sails.models['user'].create(request.params.all()).exec(function (err, user) {
+                if(err) {
+                    sails.log.error('signUp, create user');
+                    sails.log.error(new Error(err));
+                    return response.send(500, "Unable to register, please try again");
                 }
-                sails.models['user'].create(request.params.all()).exec(function (err, user) {
-                    if(err) {
-                        return response.send(500, "Unable to register, please try again!");
-                    }
-                    var passportModel = sails.models['passport'];
+                var passportModel = sails.models['passport'];
 
-                    passportModel.create({
-                        protocol: 'local',
-                        password: request.body['password'],
-                        user: user.id
-                    }).exec(function(err, passport){
-                        if(err) {
-                            response.json(500, "Unable to register, please try again!");
-                        } else {
-                            sails.services['emailservice'].sendWelcomeEmail(user.email, user.firstName, user.lastName);
-                            response.json(200, user);
-                        }
-                    });
+                passportModel.create({
+                    protocol: 'local',
+                    password: request.body['password'],
+                    user: user.id
+                }).exec(function(err, passport){
+                    if(err) {
+                        sails.log.error('signUp, passport');
+                        sails.log.error(new Error(err));
+                        response.json(500, "Unable to register, please try again");
+                    } else {
+                        sails.services['emailservice'].sendWelcomeEmail(user.email, user.firstName, user.lastName);
+                        response.json(200, user);
+                    }
                 });
             });
         });
@@ -74,20 +76,26 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         		});
         	},
         	function(token, user, cb) {
-        		sails.services['emailservice'].resetPasswordEmail('jordanburrows@gmail.com', "http://selbi-server.herokuapp.com/userData/reset/validate/"+token);
+        		sails.services['emailservice'].resetPasswordEmail('testing.selbi.io', sails.config.resetPasswordRef.passwordRefLink + token);
         		cb(null, user);
         	}
        	], function(err, results) {
-       		if(err)
+       		if(err) {
+                sails.log.error('forgotPassword');
+                sails.log.error(new Error(err));
        			return res.json(500, err)
+            }
        		res.json(results);
        	});
     },
     validateLinkPassword: function(req, res) {
     	sails.models['user'].findOne({resetPasswordToken: req.params['token'], resetPasswordExpires: {'>': Date.now()}}).exec(function(err, userResult) {
 			if(err){
+                sails.log.error('validateLinkPassword, find one user token');
+                sails.log.error(new Error(err));
 				res.redirect('http://selbi.io/error');
 			} else if(!userResult) {
+                sails.log.warn('validateLinkPassword, no user exists');
 				res.redirect('http://selbi.io/error');
 			} else {
 				res.redirect('http://selbi.io/resetpassword/'+req.params['token']);
@@ -117,7 +125,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         		});
         	},
         	function(user, cb) {
-        		req.body.password
         		passportModel.update({where: { user: user.id } },{ password: req.body['password'] }).exec(function(err, passport){
 					if(err) {
 						return cb(err, null);
@@ -128,6 +135,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         	}
        	], function(err, results) {
        		if(err) {
+                sails.log.error('resetPassword');
+                sails.log.error(new Error(err));
        			return res.json(500, err);
             }
        		res.json(results);
@@ -135,19 +144,28 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     },
 	getUserData: function(req, res){
         sails.services['userservice'].getUserDataService( req.params['userId'] , function(err, userResult){
-            if(err)
+            if(err) {
+                sails.log.error('getUserData');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(userResult);
         });
     },
     updateUserData: function (req, res){
     	sails.models['user'].update({where : { id: req.params['userId'] } }, req.body).exec(function(err, updateResult){
-    		if(err)
-    			return res.json(500, err);
-    			//do a find and populate again to populate address.
+            if(err) {
+                sails.log.error('updateUserData, update user data');
+                sails.log.error(new Error(err));
+                return res.json(500, err);
+            }
+    		//do a find and populate again to populate address.
 	    	sails.models['user'].findOne({ where: { id: req.params['userId'] } }).populate('userAddress').exec(function(err, results){
-	    		if(err)
+	    		if(err) {
+                    sails.log.error('updateUserData, find user');
+                    sails.log.error(new Error(err));
 	    			return res.json(500, err);
+                }
 	    		return res.json(results);
     		});
     	});
@@ -155,6 +173,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     uniqueUsername: function (req, res){
     	sails.services['userservice'].uniqueUsername(req.body['username'], req.body['userId'], function(err, results){
             if (err) {
+                sails.log.error('uniqueUsername');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
             } else if (results) {
                 return res.json(true);
@@ -164,25 +184,25 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         });
     },
     uniquePhones: function (req, res){
-    	sails.models['user'].find({where : {phoneNumber: req.body['phone']} }).exec(function(err, results) {
-    		if(err)
-    			return res.json(500, err);
-    		if(results.length > 0) {
-    			for(var i in results) {
-    				if(results[i].id !== req.body['userId']) {
-    					return res.json(false)
-    				}
-    			}
-    			return res.json(true);
-    		} else {
-    			return res.json(true);
-    		}
-    	});
+    	sails.services['userservice'].uniquePhones(req.body['phone'], req.body['userId'], function(err, results){
+            if (err) {
+                sails.log.error('uniquePhones');
+                sails.log.error(new Error(err));
+                return res.json(500, err);
+            } else if (results) {
+                return res.json(true);
+            } else {
+                return res.json(false);
+            }
+        });
     },
     getUserByUsername: function (req, res){
     	sails.services['userservice'].getUserByUsernameService( req.params['username'], function(err, usernameUser){
-            if(err)
+            if(err) {
+                sails.log.error('getUserByUsername');
+                sails.log.error(new Error(err));
                 return res.json(500, err);
+            }
             return res.json(usernameUser);
         });
     },
@@ -227,6 +247,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	    	});
 		}, function(err){
 			if(err) {
+                sails.log.error('getUsersByPhones');
+                sails.log.error(new Error(err));
 				return res.json(500, err);
 			}
 			return res.json(responseList);

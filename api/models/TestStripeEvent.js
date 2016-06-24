@@ -3,9 +3,9 @@
 var _ = require('lodash');
 
 /**
- * payments.js
+ * AboutUs.js
  *
- * @description :: This is a model of the payment info of a user. A one to one relationship with User model that is the owner
+ * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
@@ -15,28 +15,17 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       unique: true,
       primaryKey: true
     },
-    stripeCustomerId: {
-        type: 'string',
-        required: false
+    eventId: {
+      type: 'string',
+      required: true
     },
-    stripeCardId: {
+    type: {
       type: 'string',
       required: false
     },
-    cardType: {
+    livemode: {
       type: 'string',
       required: false
     },
-    lastFour: {
-      type: 'string',
-      required: false
-    },
-    expirationDate: {
-      type: 'string',
-      required: false
-    },
-    owner: {
-      model:'user'
-    }
   }
 });

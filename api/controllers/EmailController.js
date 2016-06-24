@@ -11,10 +11,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
     contactSelbi: function(req, res){
     	sails.services['emailservice'].plainTextEmail(sails.config.sendinblue.toEmail, sails.config.sendinblue.fromName, req.body['subject'], req.body['body'], req.body['email'] , req.body['name'], function(err, results){
-    		if (err) { 
+    		if (err) {
+                sails.log.error('contactSelbi');
+                sails.log.error(new Error(err));
     			return res.json(500, err);
     		} else {
-    			console.log("Is it even hitting in here");
     			return res.json(200, {success: true});
     		}
     	});

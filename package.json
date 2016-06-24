@@ -17,7 +17,6 @@
     "barrels": "1.4.0",
     "bcryptjs": "2.1.0",
     "bluebird": "^2.9.13",
-    "braintree": "1.28.0",
     "cloudinary": "^1.2.1",
     "cloudinary-url": "0.0.2",
     "include-all": "0.1.6",
@@ -39,6 +38,7 @@
     "sails-hook-apianalytics": "git://github.com/mikermcneil/sails-hook-apianalytics",
     "sails-mongo": "^0.11.5",
     "sails-mysql": "0.10.11",
+    "stripe": "^4.7.0",
     "twilio": "^2.4.0",
     "ua-parser": "0.3.5",
     "validator": "3.19.0"

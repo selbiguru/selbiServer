@@ -62,18 +62,23 @@ module.exports.routes = {
   'POST /userData/uniquePhone': 'UserController.uniquePhones',
   'PUT /userData/forgot/password': 'UserController.forgotPassword',
   'POST /userData/reset/password/:token': 'UserController.resetPassword',
-  'GET /userData/reset/validate/:token': 'UserController.validateLinkPassword',
+  'GET /userData/reset/validate/:token': 'UserController.validateLinkPassword', 
 
-  //braintree payments routes
-  'GET /payments/getClientToken': 'PaymentsController.getClientToken',
-  'GET /payments/getMerchantAccount/:merchantAccountId': 'PaymentsController.getMerchantAccount',
-  'GET /payments/findCustomer/:userId': 'PaymentsController.findCustomer',
-  'GET /payments/:userId': 'PaymentsController.getPayments',
-  'DELETE /payments/paymentMethod/:userId': 'PaymentsController.deletePaymentMethod',
-  'DELETE /payments/merchant/:userId': 'PaymentsController.deleteMerchant',
-  'POST /payments/createSubMerchantAccount/:userId': 'PaymentsController.createSubMerchantAccount',
-  'POST /payments/createCustomerAndPaymentMethod': 'PaymentsController.createCustomerAndPaymentMethod',
-  'POST /payments/createOrder': 'PaymentsController.createOrder',
+  //Stripe payments routes
+  'GET /payments/getManagedAccount/:userId': 'PaymentsStripeController.getManagedAccount',//
+  'GET /payments/getCustomer/:userId': 'PaymentsStripeController.getCustomer',//
+  'GET /payments/:userId': 'PaymentsStripeController.getPayments', //
+  'DELETE /payments/deletePaymentMethod/:userId': 'PaymentsStripeController.deletePaymentMethod',//
+  'DELETE /payments/deleteCustomer/:userId': 'PaymentsStripeController.deleteCustomer',//
+  'DELETE /payments/deleteExternalAccount/:userId': 'PaymentsStripeController.deleteExternalAccount',//
+  'DELETE /payments/deleteManagedAccount/:userId': 'PaymentsStripeController.deleteManagedAccount',//
+  'POST /payments/createManagedAccount/:userId': 'PaymentsStripeController.createManagedAccount',//
+  'POST /payments/createCustomerAndPaymentMethod': 'PaymentsStripeController.createCustomerAndPaymentMethod',//
+  'POST /payments/createOrder': 'PaymentsStripeController.createOrder',//
+  
+  //Stripe Webhooks
+  'POST /payments/webhook/event': 'WebhooksController.stripeEvent',//
+  'POST /payments/webhook/test': 'WebhooksController.testStripeEvent',//
 
   //Twilio routes
   'POST /twilio/sendValidationMessage': 'TwilioController.sendValidationMessage',

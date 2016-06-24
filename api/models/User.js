@@ -47,7 +47,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       type: 'string'
     },
     phoneNumber: {
-      type: 'string'
+      type: 'string',
+      required: false,
+      unique: true
     },
     userAgreementAccepted: {
       type: 'boolean',
@@ -95,6 +97,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     },
     resetPasswordExpires: {
       type: 'integer'
+    },
+    fraudAlert: {
+      type: 'boolean',
+      required: true,
+      defaultsTo: false
     },
     //Money that we keep as commission
     serviceFee: {

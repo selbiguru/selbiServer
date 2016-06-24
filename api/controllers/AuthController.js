@@ -122,6 +122,7 @@ var AuthController = {
           if (error) {
             next(error);
           } else if (!passport) {
+            sails.log.error('Error, Auth Controller: No authorization header was found. Given authorization token is not valid');
             next({message: 'Given authorization token is not valid'});
           } else {
             next(null, passport);

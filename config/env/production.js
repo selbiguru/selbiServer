@@ -39,28 +39,34 @@ module.exports = {
    * Set the production database connection for models in production         *
    * environment (see config/connections.js and config/models.js )           *
   ***************************************************************************/
-  cloudinary: {
-        cloud_name: "selbi",
-        api_key: "379521277533334",
-        api_secret: "TLriaJe_kfUseLAKslsbR-s-3d0"
+    cloudinary: {
+        cloud_name: "selbi-io",
+        api_key: "823837749384676",
+        api_secret: "j_iaykSNvXWiZEnmkf10hUZgqGM"
     },
     sendinblue: {
         "apikey": "djac5b8nLq3W7ZNR",
         "fromEmail": "no-reply@selbi.io",
-        "fromName": "Selbi",
-        "toEmail": "selbiguru@gmail.com"
+        "fromName": "Selbi Support",
+        "toEmail": "support@selbi.io"
     },
-    braintree: {
-        "publicKey" : "nktzr995vy2sxwrx",
-        "privateKey" : "a73c6cb5a55678883fe611403d9c4e40",
-        "merchantId" : "zw67j4nst8r33wms",
-        "masterMerchantAccountId": "selbi",
-        "fundingDescriptor": "Selbi Sale",
+    stripe: {
+        "publicKey" : "pk_live_9DCkm19QCeutLrgLrsv7kmVP",
+        "privateKey" : "sk_live_KVe2yZ8aAJCqaOGo17dVVEWA",
         "serviceFeePercent": "20"
     },
     twilio: {
         "accountSid" : "AC21c328a896543f751d70f26702e77a7c",
         "authToken" : "5e7ca65f34e2d19100cb01cf9b2fd67d",
-        "twilioPhoneNumber": "+13477673524"
+        "twilioPhoneNumber": "+16505673524"
+    },
+    mongodbServer: {
+        "awsEC2" : "ec2-52-9-235-109.us-west-1.compute.amazonaws.com",
+    },
+    couchDBServer: {
+        "awsEC2" : "ec2-52-7-210-171.compute-1.amazonaws.com",
+    },
+    resetPasswordRef: {
+        "passwordRefLink" : "http://selbi-server.herokuapp.com/userData/reset/validate/",
     }
 };

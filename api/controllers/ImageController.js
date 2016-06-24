@@ -16,8 +16,11 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	},
 	deleteCloudinaryImages: function(request, response){
 		sails.services['imageservice'].deleteCloudinaryImageService(request.body['images'], function(err, deleteSignature) {
-			if(err)
+			if(err) {
+				sails.log.error('deleteCloudinaryImages');
+                sails.log.error(new Error(err));
 				return response.json(500, err)
+			}
 			return response.json(deleteSignature);
 		});
 	}

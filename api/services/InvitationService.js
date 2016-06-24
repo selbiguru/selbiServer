@@ -29,6 +29,7 @@
             }
         ], function(err, results){
             if(err) {
+                sails.log.error("getInvitationByUserIdsService");
                 return cb(500, err);
             } else {
                 var invitationList = [];
@@ -49,6 +50,7 @@
     module.exports.updateFriendInvitationService = function(invitationId, invitationBody, cb) {
         sails.models['invitation'].update({where : { id: invitationId } }, invitationBody).exec(function (err, invitation) {
             if(err) {
+                sails.log.error("updateFriendInvitationService");
                 return cb(500, err.message);
             }
             //todo: send email
@@ -65,6 +67,7 @@
     module.exports.createFriendInvitationService = function(createInvite, cb) {
         sails.models['invitation'].create(createInvite).exec(function (err, invitation) {
             if(err) {
+                sails.log.error("createFriendInvitationService");
                 return cb(500, err.message);
             }
             //todo: send email
@@ -84,8 +87,10 @@
             idArray: []
         }
         sails.models['invitation'].find().where({or: [{ userTo: userId },{userFrom: userId}], status: 'approved'}).exec(function(err, friendsResult) {
-            if(err)
+            if(err) {
+                sails.log.error("getApprovedInvitesByIdService");
                 return cb(500, err);
+            }
             friendsObj.invitationArray = friendsResult;
             friendsObj.idArray.push(userId);
             for(var i in friendsResult) {
@@ -111,8 +116,10 @@
             idArray: []
         }
         sails.models['invitation'].find().where({or: [{ userTo: userId },{userFrom: userId}], status: {'!': "denied"} }).exec(function(err, allFriendsResult) {
-            if(err)
+            if(err) {
+                sails.log.error("getAllInvitesByIdService");
                 return cb(500, err);
+            }
             friendsObj.invitationArray = allFriendsResult;
             friendsObj.idArray.push(userId);
             for(var i in allFriendsResult) {

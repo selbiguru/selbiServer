@@ -20,7 +20,7 @@
      */
     var sendTransactionalEmail = function(data) {
         client.send_transactional_template(data).on('complete', function(data) {
-          console.log('sending sending sending sending ',data);
+            sails.log.verbose('Completed transactional email ', data);
         });
 
     };
@@ -63,14 +63,14 @@
      *  Send welcome to Selbi email to the new user
      * @example:
      *      sails.services['emailservice'].sendWelcomeEmail('xxxxx@gmail.com', 'Bill', 'Bucks');
-     * @param  {String} to           Destination Email address
+     * @param  {String} toEmail           Destination Email address
      * @param  {String} toFirst      First Name of new user
      * @param  {String} toLast       Last Name of new user
      * @return
      */
-    module.exports.sendWelcomeEmail = function(to, toFirst, toLast) {
+    module.exports.sendWelcomeEmail = function(toEmail, toFirst, toLast) {
         var data = { "id" : 1,
-          "to" : "jordanburrows@gmail.com",
+          "to" : sails.config.environment === 'production' ? toEmail : sails.config.sendinblue.toEmail,
           "attr" : {"FIRSTNAME":toFirst,"LASTNAME":toLast}
         }
         sendTransactionalEmail(data);
@@ -93,19 +93,18 @@
 
         var data = { 
             "id" : 4,
-            "to" : "jordanburrows@gmail.com",
+            "to" : sails.config.environment === 'production' ? listingData.user.email : sails.config.sendinblue.toEmail,
             "attr" : {
                     "FIRSTNAME": buyerData.firstName,
                     "LASTNAME": buyerData.lastName,
                     "ADDRESSONE": lineOneAddress,
                     "ADDRESSTWO": lineTwoAddress,
                     "EMAIL": buyerData.email,
-                    "PRICE": listingData.price,
+                    "PRICE": (listingData.price).formatMoney(2),
                     "TITLE": listingData.title,
                     "REFNUM": listingData.id,
                     }
         }
-        console.log("email of listingData.user.email", listingData.user.email);
         sendTransactionalEmail(data);
     };
 
@@ -121,17 +120,16 @@
     module.exports.sendPurchaseEmail = function(buyerData, listingData) {
         var data = { 
             "id" : 3,
-            "to" : "jordanburrows@gmail.com",
+            "to" : sails.config.environment === 'production' ? buyerData.email : sails.config.sendinblue.toEmail,
             "attr" : {
                     "FIRSTNAME": listingData.user.firstName,
                     "LASTNAME": listingData.user.lastName,
                     "EMAIL": listingData.user.email,
-                    "PRICE": listingData.price,
+                    "PRICE": listingData.price.formatMoney(2),
                     "TITLE": listingData.title,
                     "REFNUM": listingData.id,
                     }
         }
-        console.log("email of buyerData.email", buyerData.email);
         sendTransactionalEmail(data);
     };
 
