@@ -103,7 +103,7 @@
                 sails.log.warn("getCustomerOnStripe, no stripe customer found");
                 return cb('No stripe customer found', null);
             }
-            stripe.customers.retrieve("cus_8brBBcDuO2aoUd'", function(err, customer) {
+            stripe.customers.retrieve(findCustomerResult.userPaymentMethod.stripeCustomerId, function(err, customer) {
                 // asynchronously called
                 if(err) {
                     sails.log.error("getCustomerOnStripe, retrieving customer from stripe");
