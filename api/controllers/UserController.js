@@ -38,7 +38,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                         sails.log.error(new Error(err));
                         response.json(500, "Unable to register, please try again");
                     } else {
-                        sails.services['emailservice'].sendWelcomeEmail(user.email, user.firstName, user.lastName);
+                        var welcomeEmail = (process.env.NODE_ENV === "production") ? user.email : sails.config.sendinblue.toEmail;
+                        sails.services['emailservice'].sendWelcomeEmail(welcomeEmail, user.firstName, user.lastName);
                         response.json(200, user);
                     }
                 });
@@ -76,7 +77,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         		});
         	},
         	function(token, user, cb) {
-        		sails.services['emailservice'].resetPasswordEmail(req.body['email'], sails.config.resetPasswordRef.passwordRefLink + token);
+                var resetEmail = (process.env.NODE_ENV === "production") ? req.body['email'] : sails.config.sendinblue.toEmail;
+        		sails.services['emailservice'].resetPasswordEmail(resetEmail, sails.config.resetPasswordRef.passwordRefLink + token);
         		cb(null, user);
         	}
        	], function(err, results) {
