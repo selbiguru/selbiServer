@@ -35,7 +35,7 @@
     "sails": "git://github.com/balderdashy/sails",
     "sails-couchdb": "git://github.com/codeswarm/sails-couchdb-orm.git",
     "sails-disk": "^0.10.8",
-    "sails-hook-apianalytics": "git://github.com/mikermcneil/sails-hook-apianalytics",
+    "sails-hook-apianalytics": "git://github.com/mikermcneil/sails-hook-apianalytics.git",
     "sails-mongo": "^0.11.5",
     "sails-mysql": "0.10.11",
     "stripe": "^4.7.0",
