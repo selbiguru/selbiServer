@@ -87,6 +87,7 @@ exports.request = function request(log, request, response) {
 
     // Create new log entry
     function writeLog() {
+        console.log('log log log log log log log log log log ', log);
         sails.models['requestlog']
             .create({
                 method: log.method,
