@@ -20,7 +20,7 @@
      */
     var sendTransactionalEmail = function(data) {
         client.send_transactional_template(data).on('complete', function(data) {
-            if(data.code === 'failure') {
+            if(data.code === 'failure' || data.code === 'error') {
                 sails.log.error('sendTransactionalEmail, failure code');
                 sails.log.error(new Error(data));
             }
