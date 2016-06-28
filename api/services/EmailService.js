@@ -20,9 +20,10 @@
      */
     var sendTransactionalEmail = function(data) {
         client.send_transactional_template(data).on('complete', function(data) {
-            if(data['code'] === 'failure' || data['code'] === 'error') {
+            if(JSON.parse(data).code === 'failure' || JSON.parse(data).code === 'error') {
                 sails.log.error('sendTransactionalEmail, failure code');
                 sails.log.error(new Error(data));
+                return;
             }
             sails.log.verbose('Completed transactional email ');
         });
