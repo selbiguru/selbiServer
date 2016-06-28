@@ -87,7 +87,6 @@ exports.request = function request(log, request, response) {
 
     // Create new log entry
     function writeLog() {
-        console.log('log log log log log log log log log log ', log);
         sails.models['requestlog']
             .create({
                 method: log.method,
@@ -98,8 +97,8 @@ exports.request = function request(log, request, response) {
                 body: log.diagnostic.bodyParams,
                 protocol: log.protocol,
                 ip: log.ip,
-                responseTime: log.responseTime,
-                middlewareLatency: log.diagnostic.middlewareLatency,
+                responseTime: isNaN(parseInt(log.responseTime)) ? 0 : log.responseTime,
+                middlewareLatency: isNaN(parseInt(log.diagnostic.middlewareLatency)) ? 0 : log.diagnostic.middlewareLatency,
                 user: userId
             })
             .exec(function exec(error) {
