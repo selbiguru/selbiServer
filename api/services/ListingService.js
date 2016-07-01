@@ -76,7 +76,7 @@
      *  @param      cb is a callback
      */
     module.exports.countListingService = function(userId, cb) {
-        sails.models['listing'].count({where: {userId: userId, isSold: false, isArchived: false, isFraud: false, isPrivate: false } }).exec(function (err, countResult) {
+        sails.models['listing'].count({where: {userId: userId, isSold: false, isArchived: false, isFraud: false } }).exec(function (err, countResult) {
             if (err) {
                 sails.log.error("countListingService");
                 return cb(500, err);
