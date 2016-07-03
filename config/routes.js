@@ -64,6 +64,9 @@ module.exports.routes = {
   'POST /userData/reset/password/:token': 'UserController.resetPassword',
   'GET /userData/reset/validate/:token': 'UserController.validateLinkPassword', 
 
+  //Address routes
+  'POST /address/:userId': 'AddressController.addUserAddress',
+
   //Stripe payments routes
   'GET /payments/getManagedAccount/:userId': 'PaymentsStripeController.getManagedAccount',//
   'GET /payments/getCustomer/:userId': 'PaymentsStripeController.getCustomer',//
