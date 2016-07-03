@@ -214,7 +214,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
 		async.eachLimit(userList, 50, function(user, cbEach){
             if(user.newNumber === '9176488584' || user.newNumber === '5154913237' || user.newNumber === '5152405123' || user.newNumber === '5152400772'){
-                console.log('chooke choke choke chokec choke  ',user.newNumber);
+                console.log('chooke choke choke chokec choke  ',user);
             }
 			sails.models['user'].findOne({ where: {phoneNumber: user.newNumber }}).exec(function(err, result){
                 if(user.newNumber === '9176488584' || user.newNumber === '5154913237' || user.newNumber === '5152405123' || user.newNumber === '5152400772'){
