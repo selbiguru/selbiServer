@@ -214,12 +214,12 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
 		async.eachLimit(userList, 50, function(user, cbEach){
 			sails.models['user'].findOne({ where: {phoneNumber: user.newNumber }}).exec(function(err, result){
-                console.log('logic logic logic ',result);
-				console.log('play play play play ',user.newNumber);
                 if(err) {
 					return res.json(500, err);
 				}
 				if(result && result.id) {
+                    console.log('logic logic logic ',result);
+                    console.log('play play play play ',user.newNumber);
 					sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], result.id, function(err, results) {
 						if(err) {
 							return res.json(500, err);
@@ -255,7 +255,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 sails.log.error(new Error(err));
 				return res.json(500, err);
 			}
-            console.log('knot knot knot knot ', responseList);
 			return res.json(responseList);
 		});
 	}
