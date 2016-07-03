@@ -211,21 +211,24 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     getUsersByPhones: function(req, res){
 		var userList = req.body;
 		var responseList = [];
-
 		async.eachLimit(userList, 50, function(user, cbEach){
             if(user.newNumber === '9176488584' || user.newNumber === '5154913237' || user.newNumber === '5152405123' || user.newNumber === '5152400772'){
-                console.log('chooke choke choke chokec choke  ',user);
+                //console.log('chooke choke choke chokec choke  ',user);
+            }
+            if(user.newNumber === 5152405123){
+                console.log('number number number number  ',user);
+                console.log('clown clown clown clown  ',typeof user.newNumber);
             }
 			sails.models['user'].findOne({ where: {phoneNumber: user.newNumber }}).exec(function(err, result){
                 if(user.newNumber === '9176488584' || user.newNumber === '5154913237' || user.newNumber === '5152405123' || user.newNumber === '5152400772'){
-                    console.log('train train train train  ',user.newNumber);
-                    console.log('bogus bogus bogus bogus  ',result);
+                    //console.log('train train train train  ',user.newNumber);
+                    //console.log('bogus bogus bogus bogus  ',result);
                 }
                 if(err) {
 					return res.json(500, err);
 				}
 				if(result && result.id) {
-                    console.log('play play play play ',user.newNumber);
+                    //console.log('play play play play ',user.newNumber);
 					sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], result.id, function(err, results) {
 						if(err) {
 							return res.json(500, err);
