@@ -213,12 +213,18 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 		var responseList = [];
 
 		async.eachLimit(userList, 50, function(user, cbEach){
+            if(user.newNumber === '9176488584' || user.newNumber === '5154913237' || user.newNumber === '5152405123' || user.newNumber === '5152400772'){
+                console.log('chooke choke choke chokec choke  ',user.newNumber);
+            }
 			sails.models['user'].findOne({ where: {phoneNumber: user.newNumber }}).exec(function(err, result){
+                if(user.newNumber === '9176488584' || user.newNumber === '5154913237' || user.newNumber === '5152405123' || user.newNumber === '5152400772'){
+                    console.log('bogus bogus bogus bogus  ',result);
+                    console.log('bogus bogus bogus bogus  ',result.id);
+                }
                 if(err) {
 					return res.json(500, err);
 				}
 				if(result && result.id) {
-                    console.log('logic logic logic ',result);
                     console.log('play play play play ',user.newNumber);
 					sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], result.id, function(err, results) {
 						if(err) {
@@ -237,6 +243,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 						}
 					});
 				} else {
+                    console.log('monkey monkey monkey monkey ',user.newNumber);
 					responseList.push({
 						newNumber: user.newNumber,
 						originalNumber: user.originalNumber,
