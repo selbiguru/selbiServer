@@ -35,7 +35,7 @@
                 stripe.customers.create(customerCreateParams, function (err, customerCreateResult) {
                     var cardMethodStatus = {};
                     if(err) {
-                        sails.log.err("createCustomerAndPaymentMethod, error creating customer ", err.param);
+                        sails.log.error("createCustomerAndPaymentMethod, error creating customer ", err.param);
                         return cb(err.message, null);
                     }
                     var pm = {
