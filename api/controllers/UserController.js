@@ -218,8 +218,8 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             }
 			sails.models['user'].findOne({ where: {phoneNumber: user.newNumber }}).exec(function(err, result){
                 if(user.newNumber === '9176488584' || user.newNumber === '5154913237' || user.newNumber === '5152405123' || user.newNumber === '5152400772'){
-                    console.log('bogus bogus bogus bogus  ',result);
-                    console.log('bogus bogus bogus bogus  ',result.id);
+                    console.log('train train train train  ',user.newNumber);
+                    console.log('bogus bogus bogus bogus  ',result;
                 }
                 if(err) {
 					return res.json(500, err);
@@ -243,7 +243,6 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 						}
 					});
 				} else {
-                    console.log('monkey monkey monkey monkey ',user.newNumber);
 					responseList.push({
 						newNumber: user.newNumber,
 						originalNumber: user.originalNumber,
