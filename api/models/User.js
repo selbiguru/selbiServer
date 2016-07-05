@@ -47,7 +47,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
       type: 'string'
     },
     phoneNumber: {
-      type: 'string',
+      type: 'integer',
       required: false,
       unique: true
     },

@@ -122,7 +122,7 @@
      *  @param      cb is a callback
      */
     module.exports.uniquePhones = function(phoneNum, userId, cb) {
-        sails.models['user'].find({where : {phoneNumber: phoneNum } }).exec(function(err, results) {
+        sails.models['user'].find({where : {phoneNumber: parseFloat(phoneNum) } }).exec(function(err, results) {
             if(err) {
                 sails.log.error("uniquePhones");
                 return cb(500, err);

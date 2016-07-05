@@ -36,7 +36,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 		var responseList = [];
 
 		async.eachLimit(phoneList, 10, function(newPhone, cbEach){
-			sails.models['user'].findOne({ where: {phoneNumber: newPhone }}).exec(function(err, result){
+			sails.models['user'].findOne({ where: {phoneNumber: parseFloat(newPhone) }}).exec(function(err, result){
 				if(err)
 					return cbEach(err, null);
 				if(result && result.id) {

@@ -17,7 +17,7 @@
      */
     var sendSMSMessage = function(phoneNumber, SMSmessage, cb) {
     	client.messages.create({
-            to: phoneNumber,
+            to: phoneNumber.toString(),
             from: sails.config.twilio.twilioPhoneNumber,
             body: SMSmessage,
         }, function(error, message) {
@@ -32,7 +32,7 @@
 
     module.exports.sendValidationMessage = function(phoneNumber, verifyCode, cb) {
         var message = "Hello from Selbi!  Please use the following code ("+verifyCode+") to verify your phone."
-        sendSMSMessage(phoneNumber, message, function(err, res) {
+        sendSMSMessage(phoneNumber.toString(), message, function(err, res) {
             cb(err, res);
         });
     }

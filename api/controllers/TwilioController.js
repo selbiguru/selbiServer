@@ -20,7 +20,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 });
             },
             function(cb) {
-                sails.services['userservice'].uniquePhones(req.body['phoneNumber'], null, function(err, phoneResult){
+                sails.services['userservice'].uniquePhones(parseFloat(req.body['phoneNumber']), null, function(err, phoneResult){
                     if(err || !phoneResult)
                         return cb("A Selbi user already exists with this phone number", null);
                     return cb(null, phoneResult);
@@ -32,7 +32,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 sails.log.error(new Error(err));
                 return res.json(500, err);
             } else {
-                sails.services['smsservice'].sendValidationMessage(req.body['phoneNumber'], req.body['verifyPhone'], function(err, response){
+                sails.services['smsservice'].sendValidationMessage(parseFloat(req.body['phoneNumber']), req.body['verifyPhone'], function(err, response){
                     if(err){
                         sails.log.error('sendValidationMessage, twilio failed to send phone validation');
                         sails.log.error(new Error(err));
