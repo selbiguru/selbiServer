@@ -39,7 +39,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 			sails.models['user'].findOne({ where: {phoneNumber: parseFloat(newPhone) }}).exec(function(err, result){
 				if(err)
 					return cbEach(err, null);
-				if(result && result.id) {
+				if(result && result.id && (result.id !== req.params['userId'])) {
 					var createInvitationObject = {
 						userFrom: req.params['userId'],
 						userTo: result.id,
