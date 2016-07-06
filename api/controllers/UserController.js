@@ -214,16 +214,16 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 		var responseList = [];
         var repeatPhoneNumbers = [];
 		async.eachLimit(userList, 50, function(user, cbEach){
-            console.log('user.number user.number user.number ', user.newPhone);
-            if(repeatPhoneNumbers.indexOf(parseFloat(user.newPhone) ) == -1 ) {
+            console.log('user.number user.number user.number ', user.newNumber);
+            if(repeatPhoneNumbers.indexOf(parseFloat(user.newNumber) ) == -1 ) {
     			sails.models['user'].findOne({ where: {phoneNumber: parseFloat(user.newNumber) }}).exec(function(err, result){
                     if(err) {
     					return res.json(500, err);
     				}
     				if(result && result.id) {
                         console.log('repeated numbers repeated numbers ', repeatPhoneNumbers);
-                        console.log('numbers newphone numbers new phoneNumber ', user.newPhone);
-                        repeatPhoneNumbers.push(parseFloat(user.newPhone));
+                        console.log('numbers newphone numbers new phoneNumber ', user.newNumber);
+                        repeatPhoneNumbers.push(parseFloat(user.newNumber));
     					sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], result.id, function(err, results) {
     						if(err) {
     							return res.json(500, err);
