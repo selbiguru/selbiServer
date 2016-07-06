@@ -213,7 +213,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 		var userList = req.body;
 		var responseList = [];
         var repeatPhoneNumbers = [];
-		async.eachLimit(userList, 10, function(user, cbEach){
+		async.eachLimit(userList, 50, function(user, cbEach){
             if(repeatPhoneNumbers.indexOf(parseFloat(user.newPhone) ) == -1 ) {
     			sails.models['user'].findOne({ where: {phoneNumber: parseFloat(user.newNumber) }}).exec(function(err, result){
                     if(err) {
