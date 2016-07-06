@@ -34,28 +34,34 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 	addFriendsByPhone: function(req, res) {
 		var phoneList = req.body;
 		var responseList = [];
+		var repeatPhoneNumbers = [];
 
 		async.eachLimit(phoneList, 10, function(newPhone, cbEach){
-			sails.models['user'].findOne({ where: {phoneNumber: parseFloat(newPhone) }}).exec(function(err, result){
-				if(err)
-					return cbEach(err, null);
-				if(result && result.id && (result.id !== req.params['userId'])) {
-					var createInvitationObject = {
-						userFrom: req.params['userId'],
-						userTo: result.id,
-						status: 'approved',
-					};
-					sails.services['invitationservice'].createFriendInvitationService( createInvitationObject, function(err, createResult) {
-						if(err) {
-							return cbEach(err, null);
-						}
-						responseList.push(createResult);
+			if(repeatPhoneNumbers.indexOf(parseFloat(newPhone) ) == -1 ) {
+				sails.models['user'].findOne({ where: {phoneNumber: parseFloat(newPhone) }}).exec(function(err, result){
+					if(err)
+						return cbEach(err, null);
+					if(result && result.id && (result.id !== req.params['userId'])) {
+						repeatPhoneNumbers.push(parseFloat(newPhone));
+						var createInvitationObject = {
+							userFrom: req.params['userId'],
+							userTo: result.id,
+							status: 'approved',
+						};
+						sails.services['invitationservice'].createFriendInvitationService( createInvitationObject, function(err, createResult) {
+							if(err) {
+								return cbEach(err, null);
+							}
+							responseList.push(createResult);
+							cbEach();
+						});
+					} else {
 						cbEach();
-					});
-				} else {
-					cbEach();
-				}
-			});
+					}
+				});
+			} else {
+				cbEach();
+			}
 		}, function(err){
 			if(err) {
 				sails.log.error('addFriendsByPhone');

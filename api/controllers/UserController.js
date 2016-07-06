@@ -212,41 +212,47 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
     getUsersByPhones: function(req, res){
 		var userList = req.body;
 		var responseList = [];
-		async.eachLimit(userList, 50, function(user, cbEach){
-			sails.models['user'].findOne({ where: {phoneNumber: parseFloat(user.newNumber) }}).exec(function(err, result){
-                if(err) {
-					return res.json(500, err);
-				}
-				if(result && result.id) {
-					sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], result.id, function(err, results) {
-						if(err) {
-							return res.json(500, err);
-						} else {
-							responseList.push({
-								newNumber: user.newNumber,
-								originalNumber: user.originalNumber,
-								contactName: user.contactName,
-								username: result.username,
-								id: result ? result.id : 0,
-								isActiveUser: result && result.id ? true : false,
-								invitation: results
-							});
-							cbEach();
-						}
-					});
-				} else {
-					responseList.push({
-						newNumber: user.newNumber,
-						originalNumber: user.originalNumber,
-						contactName: user.contactName,
-						username: false,
-						id: 0,
-						isActiveUser: false,
-						invitation: []
-					});
-					cbEach();
-				}
-	    	});
+        var repeatPhoneNumbers = [];
+		async.eachLimit(userList, 10, function(user, cbEach){
+            if(repeatPhoneNumbers.indexOf(parseFloat(newPhone) ) == -1 ) {
+    			sails.models['user'].findOne({ where: {phoneNumber: parseFloat(user.newNumber) }}).exec(function(err, result){
+                    if(err) {
+    					return res.json(500, err);
+    				}
+    				if(result && result.id) {
+                        repeatPhoneNumbers.push(parseFloat(newPhone));
+    					sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], result.id, function(err, results) {
+    						if(err) {
+    							return res.json(500, err);
+    						} else {
+    							responseList.push({
+    								newNumber: user.newNumber,
+    								originalNumber: user.originalNumber,
+    								contactName: user.contactName,
+    								username: result.username,
+    								id: result ? result.id : 0,
+    								isActiveUser: result && result.id ? true : false,
+    								invitation: results
+    							});
+    							cbEach();
+    						}
+    					});
+    				} else {
+    					responseList.push({
+    						newNumber: user.newNumber,
+    						originalNumber: user.originalNumber,
+    						contactName: user.contactName,
+    						username: false,
+    						id: 0,
+    						isActiveUser: false,
+    						invitation: []
+    					});
+    					cbEach();
+    				}
+    	    	});
+            } else {
+                cbEach();
+            }
 		}, function(err){
 			if(err) {
                 sails.log.error('getUsersByPhones');
