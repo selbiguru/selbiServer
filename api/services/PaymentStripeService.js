@@ -337,6 +337,19 @@
         });
     }
 
+    module.exports.getManagedBalanceService = function(secretKey, cb) {
+        if(!secretKey)
+            return cb('secretKey is missing!', null);
+        var managedBalance = require("stripe")(secretKey);
+        managedBalance.balance.retrieve(function(err, balance) {
+            if(err) {
+                sails.log.warn("getManagedBalanceService, error in stripe retrieve balance");
+                return cb(err, null);
+            }
+            return cb(null, balance)
+        });
+    }
+
     module.exports.createManagedAccount = function (managedAccountParams, userId, cb){
         //TODO need to add more checks here for required fields
         if(!managedAccountParams.id || !userId)
@@ -543,13 +556,13 @@
         stripe.charges.create({
             amount: parseFloat(((listing.price).toFixed(2)*100).toFixed(0)),
             currency: 'usd',
-            description: ""+listing.title+": "+listing.description+".",
+            description: ""+listing.title+": "+(listing.description).slice(0,3700)+".", //4,000 character limit
             application_fee: parseFloat((parseFloat(listing.price) * parseFloat(serviceFee)).toFixed(0)), // amount in cents
             customer: customerAccount.stripeCustomerId,
             destination: managedAccount.stripeManagedAccountId,
-            statement_descriptor: 'Selbi '+listing.title,
+            statement_descriptor: 'Selbi: '+(listing.title).slice(0,15),
             metadata: {
-                selbiId: listing.user.id
+                selbiId: listing.user.id // key:value limits - 40:500
             }
         }, function(err, chargeResult){
             if(err) {

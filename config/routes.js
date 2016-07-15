@@ -71,6 +71,7 @@ module.exports.routes = {
   'GET /payments/getManagedAccount/:userId': 'PaymentsStripeController.getManagedAccount',//
   'GET /payments/getCustomer/:userId': 'PaymentsStripeController.getCustomer',//
   'GET /payments/:userId': 'PaymentsStripeController.getPayments', //
+  'GET /payments/bankBalance/:userId': 'PaymentsStripeController.getManagedBalance', //
   'DELETE /payments/deletePaymentMethod/:userId': 'PaymentsStripeController.deletePaymentMethod',//
   'DELETE /payments/deleteCustomer/:userId': 'PaymentsStripeController.deleteCustomer',//
   'DELETE /payments/deleteExternalAccount/:userId': 'PaymentsStripeController.deleteExternalAccount',//

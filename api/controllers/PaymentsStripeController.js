@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var stripe = require('stripe')(sails.config.stripe.privateKey);
+var async = require('async');
 /**
  * Stripe payments controller
  *
@@ -210,6 +211,44 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                     return res.json(200, result);
                 }
             });
+        });
+    },
+    getManagedBalance: function(req, res){
+        async.waterfall([
+            function(cb) {
+                sails.services['userservice'].getUserMerchantService(req.params['userId'], function(err, userResult) {
+                    if(err) {
+                        sails.log.warn('getManagedBalance, user not found when searching by id');
+                        return cb(err, null)
+                    }
+                    cb(null, userResult);
+                });
+            },
+            function(user, cb) {
+                if(user === undefined) {
+                    sails.log.warn("getManagedBalance, no user found");
+                    return cb('No user found', null);
+                }
+                if(!user.userMerchant) {
+                    sails.log.warn("getManagedBalance, no user found");
+                    return cb('No user found', null);
+                }
+                sails.services['paymentstripeservice'].getManagedBalanceService(user.userMerchant.secretKey, function(err, balanceResult){
+                    if(err) {
+                        sails.log.warn('getManagedBalance, balance not returned');
+                        return cb(err, null)
+                    }
+                    cb(null, balanceResult);
+                });
+                
+            }
+        ], function(err, result) {
+            if(err) {
+                sails.log.error('getManagedBalance, unable to get stripe balance ');
+                sails.log.error(new Error(err));
+                return res.json(500, err);
+            }
+            return res.json(result);
         });
     }
 });
