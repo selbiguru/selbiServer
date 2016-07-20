@@ -244,8 +244,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             }
         ], function(err, result) {
             if(err) {
-                sails.log.error('getManagedBalance, unable to get stripe balance ');
-                sails.log.error(new Error(err));
+                sails.log.warn('getManagedBalance, unable to get stripe balance ');
                 return res.json(500, err);
             }
             return res.json(result);
