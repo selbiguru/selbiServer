@@ -53,7 +53,7 @@ module.exports = {
     stripe: {
         "publicKey" : "pk_live_9DCkm19QCeutLrgLrsv7kmVP",
         "privateKey" : "sk_live_KVe2yZ8aAJCqaOGo17dVVEWA",
-        "serviceFeePercent": "20"
+        "serviceFeePercent": "15"
     },
     twilio: {
         "accountSid" : "AC21c328a896543f751d70f26702e77a7c",

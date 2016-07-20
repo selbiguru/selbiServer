@@ -106,7 +106,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Model')), {
     //Money that we keep as commission
     serviceFee: {
         type: 'float',
-        defaultsTo: '20',
+        defaultsTo: '15',
         required: true
     },
   }

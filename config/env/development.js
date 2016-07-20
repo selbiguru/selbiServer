@@ -30,7 +30,7 @@ module.exports = {
     stripe: {
         "publicKey" : "pk_test_pVgDzmnHbUaT9z8L7p5slTKB",
         "privateKey" : "sk_test_MtXKfDYlQdtIYHTunUaw8cu4",
-        "serviceFeePercent": "20"
+        "serviceFeePercent": "15"
     },
     twilio: {
         "accountSid" : "AC21c328a896543f751d70f26702e77a7c",

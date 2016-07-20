@@ -60,7 +60,7 @@
         }
         sails.models['merchant'].update({ where: {stripeManagedAccountId: retrievedEvent.data.object.id } }, updateVerificationObj).exec(function(err, updateVerificationMerchant){
             if(err) {
-                sails.log.error("stripeAccountUpdate");
+                sails.log.warn("stripeAccountUpdate, could not get merchant object");
                 return cb(err, null);
             }
             if(updateVerificationMerchant === null) {
@@ -80,7 +80,7 @@
     module.exports.retrieveStripeEvent = function(eventId, cb) {
         stripe.events.retrieve(eventId, function(err, eventObj) {
             if(err) {
-                sails.log.error("retrieveStripeEvent");
+                sails.log.warn("retrieveStripeEvent, unable to retrieve stripe event");
                 return cb(err.message, null);
             }
             return cb(null, eventObj);
