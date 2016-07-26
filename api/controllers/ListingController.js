@@ -198,7 +198,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             };
             if(req.body['myself']) {
                 query = {where: {userId: req.params['userId'], isArchived: false, isSold: req.body['isSold'], createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
-            } else if(req.body['friends'] || userResult.admin) {
+            } else if(req.body['friends']) {
                 query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, isFraud: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             } else {
                 query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, isFraud: false, isPrivate: false, isPickupOnly: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
@@ -229,7 +229,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             };
             if(req.body['myself']) {
                 query = {where: {userId: userResult.id, isArchived: false, isSold: req.body['isSold'], createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
-            } else if(req.body['friends'] || userResult.admin) {
+            } else if(req.body['friends']) {
                 query = {where: {userId: userResult.id, isSold: false, isArchived: false, isFraud: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             } else {
                 query = {where: {userId: userResult.id, isSold: false, isArchived: false, isFraud: false, isPrivate: false, isPickupOnly: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
