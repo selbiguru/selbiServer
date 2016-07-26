@@ -134,9 +134,9 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         });
     },
     findOne: function(req, res){
-        sails.models['listing'].findOne({where: {id: req.params['id']}}).populate('user').exec(function(err, results){     
+        sails.services['listingservice'].findOneListingService( req.params['id'], function(err, findOneResult) {     
             if(err) {
-                sails.log.error('findOne, find one listing');
+                sails.log.error('findOne, unable to find one listing');
                 sails.log.error(new Error(err));
                 return res.json(500, err);
             }
@@ -144,20 +144,42 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         });
     },
     getListing: function(req, res){
-        sails.models['listing'].findOne({ where: { id: req.params['id'] } }).populate('user').exec(function(err, results){
+        sails.services['listingservice'].findOneListingService( req.params['id'], function(err, findOneResult) {
             if(err) {
-                sails.log.error('getListing, find one listing');
+                sails.log.error('getListing, unable to find one listing by listing Id');
                 sails.log.error(new Error(err));
                 return res.json(500, err);
-            }
-            sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], results.user.id, function(err, inviteResult) {
+            } 
+            async.parallel([
+                function(cb) {
+                    sails.services['invitationservice'].getInvitationByUserIdsService( req.params['userId'], findOneResult.user.id, function(err, inviteResult) {
+                        if(err) {
+                            sails.log.warn('getListing, get invitation by user');
+                            sails.log.warn(new Error(err));
+                            return cb(500, err);
+                        }
+                        findOneResult.invitation = inviteResult;
+                        return cb(null, inviteResult);
+                    });
+                },
+                function(cb) {
+                    sails.services['userservice'].getUserDataService( findOneResult.user.id, function(err, getUserData) {
+                        if(err) {
+                            sails.log.warn('getListing, get invitation by user');
+                            sails.log.warn(new Error(err));
+                            return cb(500, err);
+                        }
+                        findOneResult.user = getUserData;
+                        return cb(null, getUserData);
+                    });
+                }
+            ], function(err, results) {
                 if(err) {
-                    sails.log.error('getListing, get invitation by user');
+                    sails.log.error('getListing, error fetching one listing by ID');
                     sails.log.error(new Error(err));
                     return res.json(500, err);
                 }
-                results.invitation = inviteResult;
-                return res.json(results);
+                return res.json(findOneResult);                
             });
         });
     },
@@ -176,10 +198,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             };
             if(req.body['myself']) {
                 query = {where: {userId: req.params['userId'], isArchived: false, isSold: req.body['isSold'], createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
-            } else if(req.body['friends'] || userResult.admin) {
+            } else if(req.body['friends']) {
                 query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, isFraud: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             } else {
-                query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, isFraud: false, isPrivate: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
+                query = {where: {userId: req.params['userId'], isSold: false, isArchived: false, isFraud: false, isPrivate: false, isPickupOnly: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             }
             sails.models['listing'].find(query).exec(function(err, results){
                 if(err) {
@@ -207,10 +229,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             };
             if(req.body['myself']) {
                 query = {where: {userId: userResult.id, isArchived: false, isSold: req.body['isSold'], createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
-            } else if(req.body['friends'] || userResult.admin) {
+            } else if(req.body['friends']) {
                 query = {where: {userId: userResult.id, isSold: false, isArchived: false, isFraud: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             } else {
-                query = {where: {userId: userResult.id, isSold: false, isArchived: false, isFraud: false, isPrivate: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
+                query = {where: {userId: userResult.id, isSold: false, isArchived: false, isFraud: false, isPrivate: false, isPickupOnly: false, createdAt: {'<': createdPaginate }, sort: 'createdAt DESC', limit: 30 } };
             }
             sails.models['listing'].find(query).exec(function(err, results){
                 if(err) {
@@ -285,7 +307,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             var createdPaginate = req.body['createdAt'] || new Date();
             var categories = req.body['categories'] || ['all','Electronics', 'Menswear', 'Womenswear', 'Sports & Outdoors', 'Music', 'Furniture', 'Jewelry', 'Games & Toys', 'Automotive', 'Baby & Kids', 'Appliances', 'Other'];
             var listingSelbiUSAObj = {};
-            sails.models['listing'].find({where: {userId: {'!':friendsApproved}, createdAt: {'<': createdPaginate }, isSold: false, searchCategory: categories, isArchived: false, isFraud: false, isPrivate: false, sort: 'createdAt DESC', limit: 30 } } ).exec(function(err, listingResult){
+            sails.models['listing'].find({where: {userId: {'!':friendsApproved}, createdAt: {'<': createdPaginate }, isSold: false, searchCategory: categories, isArchived: false, isFraud: false, isPrivate: false, isPickupOnly: false, sort: 'createdAt DESC', limit: 30 } } ).exec(function(err, listingResult){
                 if(err) {
                     sails.log.error('getSelbiListings, get selbi listings');
                     sails.log.error(new Error(err));

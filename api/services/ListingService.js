@@ -9,6 +9,22 @@
 
 
     /**
+     *  This is a public methods to find a listing
+     *  @param      listingId is the ID of the listing to find
+     *  @param      cb is a callback
+     */
+    module.exports.findOneListingService = function(listingId, cb) {
+        sails.models['listing'].findOne({ where: { id: listingId } }).populate('user').exec(function(err, findOneResult){    
+            if(err) {
+                sails.log.warn("findOneListingService, unable to findOne listing");
+                return cb(500, err);
+            }
+            return cb(null, findOneResult);
+        });
+    };
+
+
+    /**
      *  This is a public methods to delete a listing
      *  @param      listingId is the ID of the listing to delete
      *  @param      cb is a callback
