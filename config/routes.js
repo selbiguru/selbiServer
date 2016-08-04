@@ -68,17 +68,17 @@ module.exports.routes = {
   'POST /address/:userId': 'AddressController.addUserAddress',
 
   //Stripe payments routes
-  'GET /payments/getManagedAccount/:userId': 'PaymentsStripeController.getManagedAccount',//
-  'GET /payments/getCustomer/:userId': 'PaymentsStripeController.getCustomer',//
-  'GET /payments/:userId': 'PaymentsStripeController.getPayments', //
-  'GET /payments/bankBalance/:userId': 'PaymentsStripeController.getManagedBalance', //
-  'DELETE /payments/deletePaymentMethod/:userId': 'PaymentsStripeController.deletePaymentMethod',//
-  'DELETE /payments/deleteCustomer/:userId': 'PaymentsStripeController.deleteCustomer',//
-  'DELETE /payments/deleteExternalAccount/:userId': 'PaymentsStripeController.deleteExternalAccount',//
-  'DELETE /payments/deleteManagedAccount/:userId': 'PaymentsStripeController.deleteManagedAccount',//
-  'POST /payments/createManagedAccount/:userId': 'PaymentsStripeController.createManagedAccount',//
-  'POST /payments/createCustomerAndPaymentMethod': 'PaymentsStripeController.createCustomerAndPaymentMethod',//
-  'POST /payments/createOrder': 'PaymentsStripeController.createOrder',//
+  // 'GET /payments/getManagedAccount/:userId': 'PaymentsStripeController.getManagedAccount',//
+  // 'GET /payments/getCustomer/:userId': 'PaymentsStripeController.getCustomer',//
+  // 'GET /payments/:userId': 'PaymentsStripeController.getPayments', //
+  // 'GET /payments/bankBalance/:userId': 'PaymentsStripeController.getManagedBalance', //
+  // 'DELETE /payments/deletePaymentMethod/:userId': 'PaymentsStripeController.deletePaymentMethod',//
+  // 'DELETE /payments/deleteCustomer/:userId': 'PaymentsStripeController.deleteCustomer',//
+  // 'DELETE /payments/deleteExternalAccount/:userId': 'PaymentsStripeController.deleteExternalAccount',//
+  // 'DELETE /payments/deleteManagedAccount/:userId': 'PaymentsStripeController.deleteManagedAccount',//
+  // 'POST /payments/createManagedAccount/:userId': 'PaymentsStripeController.createManagedAccount',//
+  // 'POST /payments/createCustomerAndPaymentMethod': 'PaymentsStripeController.createCustomerAndPaymentMethod',//
+  //'POST /payments/createOrder': 'PaymentsStripeController.createOrder',//
   
   //Stripe Webhooks
   'POST /payments/webhook/event': 'WebhooksController.stripeEvent',//
